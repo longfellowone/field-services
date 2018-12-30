@@ -1,0 +1,4 @@
+#! /bin/bash
+cd docker
+echo "Starting services ..."
+docker-compose up -d
