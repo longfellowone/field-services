@@ -7,6 +7,7 @@ package main
 
 import (
 	"database/sql"
+	"field/pkg/inmem"
 	"field/pkg/ordering"
 	"field/pkg/postgres"
 )
@@ -15,6 +16,12 @@ import (
 
 func initializeFieldServices(db *sql.DB) *ordering.Service {
 	orderRepository := postgres.NewOrderRepository(db)
+	service := ordering.NewOrderingService(orderRepository)
+	return service
+}
+
+func initializeFieldServicesInMemory() *ordering.Service {
+	orderRepository := inmem.NewOrderRepository()
 	service := ordering.NewOrderingService(orderRepository)
 	return service
 }

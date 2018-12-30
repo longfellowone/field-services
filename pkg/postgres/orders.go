@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 )
 
 //var Set = wire.NewSet(NewOrderRepository)
@@ -17,5 +18,5 @@ func NewOrderRepository(db *sql.DB) *OrderRepository {
 }
 
 func (c *OrderRepository) FindAll() (string, error) {
-	return "Found All!", nil
+	return "", errors.New("FindAll() not implemented")
 }

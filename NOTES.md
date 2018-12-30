@@ -5,5 +5,6 @@ chmod u+x ./
 https://github.com/google/go-cloud/tree/master/samples
 https://github.com/terashi58/wire-example
 https://github.com/PacktPublishing/Hands-On-Dependency-Injection-in-Go/tree/master/ch10
+https://groups.google.com/forum/#!forum/natsio
 
 ####
