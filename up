@@ -1,4 +1,8 @@
 #! /bin/bash
+echo "Starting docker containers..."
 cd docker
-echo "Starting services ..."
 docker-compose up -d
+echo "Starting fielsvc..."
+cd ../cmd
+GOOS=linux CGO_ENABLED=0 go build -o fieldsvc .
+./fieldsvc

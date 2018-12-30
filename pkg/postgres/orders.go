@@ -1,10 +1,14 @@
 package postgres
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 //var Set = wire.NewSet(NewOrderRepository)
 
-type OrderRepository struct{}
+type OrderRepository struct {
+	db *sql.DB
+}
 
 func NewOrderRepository(db *sql.DB) *OrderRepository {
 	return &OrderRepository{
