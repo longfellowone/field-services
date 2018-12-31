@@ -49,10 +49,17 @@ func main() {
 	//	fs = initializeFieldServices(db)
 	//}
 
-	result, _ := fs.CreateNewOrder("oid1", "pid1")
-	fmt.Printf("Result: %s\n", result)
+	fs.CreateNewOrder("oid1", "pid1")
+	fs.CreateNewOrder("oid2", "pid1")
 
 	result2, _ := fs.FindOrder("oid1")
-	fmt.Printf("Result: %s\n", result2)
+	fmt.Println("Find order")
+	fmt.Printf("[OID]: %v - [PID]: %v\n", result2.OrderID, result2.ProjectID)
 
+	result3, _ := fs.FindAllProjectOrders("pid1")
+	fmt.Println("Find by project")
+	for _, v := range result3 {
+		fmt.Printf("[OID]: %v - [PID]: %v\n", v.OrderID, v.ProjectID)
+
+	}
 }

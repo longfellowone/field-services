@@ -12,6 +12,7 @@ type Service struct {
 type OrderRepository interface {
 	Save(o *material.Order) error
 	Find(id material.OrderID) (*material.Order, error)
+	FindAllFromProject(id material.ProjectID) ([]*material.Order, error)
 }
 
 func NewOrderingService(db OrderRepository) *Service {
@@ -35,6 +36,14 @@ func (s *Service) CreateNewOrder(o material.OrderID, p material.ProjectID) (*mat
 
 func (s *Service) FindOrder(id material.OrderID) (*material.Order, error) {
 	findAll, err := s.db.Find(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return findAll, nil
+}
+
+func (s *Service) FindAllProjectOrders(id material.ProjectID) ([]*material.Order, error) {
+	findAll, err := s.db.FindAllFromProject(id)
 	if err != nil {
 		log.Fatal(err)
 	}
