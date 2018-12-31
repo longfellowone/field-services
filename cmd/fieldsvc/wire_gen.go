@@ -6,19 +6,11 @@
 package main
 
 import (
-	"database/sql"
 	"field/pkg/inmem"
 	"field/pkg/ordering"
-	"field/pkg/postgres"
 )
 
 // Injectors from wire.go:
-
-func initializeFieldServices(db *sql.DB) *ordering.Service {
-	orderRepository := postgres.NewOrderRepository(db)
-	service := ordering.NewOrderingService(orderRepository)
-	return service
-}
 
 func initializeFieldServicesInMemory() *ordering.Service {
 	orderRepository := inmem.NewOrderRepository()

@@ -1,9 +1,18 @@
 package ordering
 
 import (
-	"errors"
+	"field/pkg"
 	"log"
 )
+
+type Service struct {
+	db OrderRepository
+}
+
+type OrderRepository interface {
+	Save(o *material.Order) error
+	Find(id material.OrderID) (*material.Order, error)
+}
 
 func NewOrderingService(db OrderRepository) *Service {
 	return &Service{
@@ -11,18 +20,23 @@ func NewOrderingService(db OrderRepository) *Service {
 	}
 }
 
-type Service struct {
-	db OrderRepository
-}
-
-type OrderRepository interface {
-	FindAll() (string, error)
-}
-
-func (f *Service) FindAllOrders() (string, error) {
-	findAll, err := f.db.FindAll()
+func (s *Service) CreateNewOrder(o material.OrderID, p material.ProjectID) (*material.Order, error) {
+	order, err := material.NewOrder(o, p)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return findAll, errors.New("not implemented yet")
+	err = s.db.Save(order)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return order, nil
+}
+
+func (s *Service) FindOrder(id material.OrderID) (*material.Order, error) {
+	findAll, err := s.db.Find(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return findAll, nil
 }
