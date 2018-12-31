@@ -58,7 +58,7 @@ func main() {
 	//fmt.Printf("[OID]: %v - [PID]: %v\n", result2.OrderID, result2.ProjectID)
 
 	result3, _ := fs.FindAllProjectOrders("pid1")
-	_ = result3[1].AddItemToOrder("1", "name1", material.EA, 7)
+	_ = result3[1].AddItemToOrder("1", "name1", material.EA)
 	_ = result3[1].SendOrder()
 
 	//fmt.Println("Find by project")

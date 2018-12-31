@@ -39,15 +39,12 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 	}, nil
 }
 
-func (o *Order) AddItemToOrder(id ProductID, name string, uom UOM, quantity int) error {
-	if err := checkQuantityNotZero(quantity); err != nil {
-		return err
-	}
+func (o *Order) AddItemToOrder(id ProductID, name string, uom UOM) error {
 	o.LineItems = append(o.LineItems, LineItem{
 		ProductID: id,
 		Name:      name,
 		UOM:       uom,
-		Quantity:  quantity,
+		Quantity:  0,
 		status:    Waiting,
 		PO:        "",
 	})
@@ -98,13 +95,6 @@ func (o *Order) SendOrder() error {
 func (o *Order) checkOrderHasItems() error {
 	if len(o.LineItems) <= 0 {
 		return ErrMustHaveItems
-	}
-	return nil
-}
-
-func checkQuantityNotZero(quantity int) error {
-	if quantity <= 0 {
-		return ErrQuantityZero
 	}
 	return nil
 }
