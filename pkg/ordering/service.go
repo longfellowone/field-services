@@ -30,34 +30,6 @@ func (s *Service) CreateNewOrder(o material.OrderID, p material.ProjectID) (*mat
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	order.AddItemToOrder(material.LineItem{
-		ProductID: "1",
-		Name:      "Test",
-		UOM:       0,
-		Quantity:  7,
-		PO:        "",
-	})
-
-	order.AddItemToOrder(material.LineItem{
-		ProductID: "2",
-		Name:      "Test",
-		UOM:       0,
-		Quantity:  2,
-		PO:        "",
-	})
-
-	order.AddItemToOrder(material.LineItem{
-		ProductID: "3",
-		Name:      "Test",
-		UOM:       0,
-		Quantity:  13,
-		PO:        "",
-	})
-
-	//order.RemoveItemFromOrder("1")
-	order.UpdateItemQuantity("3", 9)
-
 	return order, nil
 }
 

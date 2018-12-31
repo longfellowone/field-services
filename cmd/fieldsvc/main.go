@@ -1,6 +1,7 @@
 package main
 
 import (
+	"field/pkg"
 	"field/pkg/ordering"
 	"fmt"
 	_ "github.com/lib/pq"
@@ -57,7 +58,9 @@ func main() {
 	//fmt.Printf("[OID]: %v - [PID]: %v\n", result2.OrderID, result2.ProjectID)
 
 	result3, _ := fs.FindAllProjectOrders("pid1")
-	result3[0].SendOrder()
+	_ = result3[1].AddItemToOrder("1", "name1", material.EA, 7)
+	_ = result3[1].SendOrder()
+
 	//fmt.Println("Find by project")
 	for _, v := range result3 {
 		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n\t%v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type, v.LineItems)

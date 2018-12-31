@@ -2,12 +2,15 @@ package material
 
 import (
 	"errors"
+	"log"
 	"time"
 )
 
 var (
-	ErrOrderNotFound = errors.New("order not found")
-	ErrQuantityZero  = errors.New("quantity must be greater than 0")
+	ErrOrderNotFound    = errors.New("order not found")
+	ErrQuantityZero     = errors.New("quantity must be greater than 0")
+	ErrMustHaveItems    = errors.New("order must have at least 1 item")
+	ErrOrderAlreadySent = errors.New("order already sent")
 )
 
 type OrderID string
@@ -36,11 +39,18 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 	}, nil
 }
 
-func (o *Order) AddItemToOrder(l LineItem) error {
-	if l.Quantity <= 0 {
-		return ErrQuantityZero
+func (o *Order) AddItemToOrder(id ProductID, name string, uom UOM, quantity int) error {
+	if err := checkQuantityNotZero(quantity); err != nil {
+		return err
 	}
-	o.LineItems = append(o.LineItems, l)
+	o.LineItems = append(o.LineItems, LineItem{
+		ProductID: id,
+		Name:      name,
+		UOM:       uom,
+		Quantity:  quantity,
+		status:    Waiting,
+		PO:        "",
+	})
 	return nil
 }
 
@@ -70,13 +80,32 @@ func (o *Order) UpdateItemQuantity(id ProductID, q int) error {
 }
 
 func (o *Order) SendOrder() error {
-	if len(o.LineItems) <= 0 {
-		return ErrQuantityZero
+	if err := o.checkOrderHasItems(); err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	if o.Statuses[len(o.Statuses)-1].Type != New {
+		return ErrOrderAlreadySent
 	}
 	o.Statuses = append(o.Statuses, status{
 		Date: time.Time{},
 		Type: Sent,
 	})
+	return nil
+}
+
+func (o *Order) checkOrderHasItems() error {
+	if len(o.LineItems) <= 0 {
+		return ErrMustHaveItems
+	}
+	return nil
+}
+
+func checkQuantityNotZero(quantity int) error {
+	if quantity <= 0 {
+		return ErrQuantityZero
+	}
 	return nil
 }
 
