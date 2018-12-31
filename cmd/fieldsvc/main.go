@@ -52,14 +52,14 @@ func main() {
 	fs.CreateNewOrder("oid1", "pid1")
 	fs.CreateNewOrder("oid2", "pid1")
 
-	result2, _ := fs.FindOrder("oid1")
-	fmt.Println("Find order")
-	fmt.Printf("[OID]: %v - [PID]: %v\n", result2.OrderID, result2.ProjectID)
+	//result2, _ := fs.FindOrder("oid1")
+	//fmt.Println("Find order")
+	//fmt.Printf("[OID]: %v - [PID]: %v\n", result2.OrderID, result2.ProjectID)
 
 	result3, _ := fs.FindAllProjectOrders("pid1")
-	fmt.Println("Find by project")
+	result3[0].SendOrder()
+	//fmt.Println("Find by project")
 	for _, v := range result3 {
-		fmt.Printf("[OID]: %v - [PID]: %v\n", v.OrderID, v.ProjectID)
-
+		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n\t%v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type, v.LineItems)
 	}
 }

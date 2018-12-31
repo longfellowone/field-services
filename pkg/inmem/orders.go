@@ -18,16 +18,16 @@ func NewOrderRepository() *OrderRepository {
 	}
 }
 
-func (r *OrderRepository) Save(o *material.Order) error {
+func (r *OrderRepository) Save(order *material.Order) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	r.orders[o.OrderID] = o
+	r.orders[order.OrderID] = order
 
-	if _, ok := r.porders[o.ProjectID]; !ok {
-		r.porders[o.ProjectID] = make([]*material.Order, 0)
+	if _, ok := r.porders[order.ProjectID]; !ok {
+		r.porders[order.ProjectID] = make([]*material.Order, 0)
 	}
-	r.porders[o.ProjectID] = append(r.porders[o.ProjectID], o)
+	r.porders[order.ProjectID] = append(r.porders[order.ProjectID], order)
 
 	return nil
 }
@@ -36,8 +36,8 @@ func (r *OrderRepository) Find(id material.OrderID) (*material.Order, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if val, ok := r.orders[id]; ok {
-		return val, nil
+	if order, ok := r.orders[id]; ok {
+		return order, nil
 	}
 	return nil, material.ErrOrderNotFound
 }
@@ -49,17 +49,9 @@ func (r *OrderRepository) FindAllFromProject(id material.ProjectID) ([]*material
 	if len(r.porders[id]) == 0 {
 		return nil, material.ErrOrderNotFound
 	}
-	o := make([]*material.Order, 0, len(r.porders))
-	for _, v := range r.porders[id] {
-		o = append(o, v)
+	orders := make([]*material.Order, 0, len(r.porders))
+	for _, o := range r.porders[id] {
+		orders = append(orders, o)
 	}
-	return o, nil
+	return orders, nil
 }
-
-//func (r *OrderRepository) FindAll() (string, error) {
-//	return "", errors.New("not implemented")
-//}
-
-//func (r *OrderRepository) FindAll() (string, error) {
-//	return "", errors.New("not implemented")
-//}
