@@ -8,13 +8,24 @@ import (
 var (
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyOnList = errors.New("item already on list")
-	ErrQuantityZero      = errors.New("item quantity must be greater than 0")
+	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
 )
 
 type ProductID string
 
 type List struct {
 	Items []Item
+}
+
+type Item struct {
+	ProductID         ProductID
+	Name              string
+	UOM               UOM
+	QuantityRequested QuantityRequested
+	QuantityReceived  QuantityReceived
+	Status            ItemStatus
+	LastUpdate        time.Time
+	PO                string
 }
 
 type QuantityRequested int
@@ -51,8 +62,8 @@ func (l *List) removeItem(id ProductID) error {
 }
 
 func (l *List) updateQuantityRequested(id ProductID, q QuantityRequested) error {
-	if q <= 0 {
-		return ErrQuantityZero
+	if isZero(int(q)) {
+		return ErrItemQuantityZero
 	}
 
 	for i, item := range l.Items {
@@ -65,8 +76,8 @@ func (l *List) updateQuantityRequested(id ProductID, q QuantityRequested) error 
 }
 
 func (l *List) receiveQuantity(id ProductID, q QuantityReceived) error {
-	if q <= 0 {
-		return ErrQuantityZero
+	if isZero(int(q)) {
+		return ErrItemQuantityZero
 	}
 
 	for i, item := range l.Items {
@@ -87,31 +98,21 @@ func (l *List) itemAlreadyExists(id ProductID) error {
 	return nil
 }
 
-func (l *List) haveItems() bool {
-	if len(l.Items) <= 0 {
-		return false
-	}
-	return true
+func isZero(q int) bool {
+	return q <= 0
 }
 
-func (l *List) missingQuantities() error {
+func (l *List) haveItems() bool {
+	return len(l.Items) != 0
+}
+
+func (l *List) missingQuantities() bool {
 	for _, item := range l.Items {
 		if item.QuantityRequested <= 0 {
-			return ErrQuantityZero
+			return true
 		}
 	}
-	return nil
-}
-
-type Item struct {
-	ProductID         ProductID
-	Name              string
-	UOM               UOM
-	QuantityRequested QuantityRequested
-	QuantityReceived  QuantityReceived
-	Status            ItemStatus
-	LastUpdate        time.Time
-	PO                string
+	return false
 }
 
 func (l *Item) receive(q QuantityReceived) {

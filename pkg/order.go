@@ -2,7 +2,6 @@ package material
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -10,17 +9,25 @@ var (
 	ErrOrderNotFound    = errors.New("order not found")
 	ErrOrderAlreadySent = errors.New("order already sent")
 	ErrMustHaveItems    = errors.New("order must have at least 1 item")
+	ErrQuantityZero     = errors.New("item quantity must be greater than 0")
 )
 
-type OrderID string
-type ProjectID string
+type (
+	OrderID   string
+	ProjectID string
+)
 
 type Order struct {
 	OrderID   OrderID
 	ProjectID ProjectID
 	version   int
-	Statuses  []status
+	Statuses  []Status
 	List      List
+}
+
+type Status struct {
+	Date time.Time
+	Type OrderStatus
 }
 
 func NewOrder(o OrderID, p ProjectID) (*Order, error) {
@@ -28,7 +35,7 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 		OrderID:   o,
 		ProjectID: p,
 		version:   0,
-		Statuses: []status{
+		Statuses: []Status{
 			{
 				Date: time.Now(),
 				Type: New,
@@ -41,22 +48,17 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 }
 
 func (o *Order) SendOrder() error {
-	if !o.List.haveItems() {
+	switch {
+	case !o.List.haveItems():
 		return ErrMustHaveItems
-	}
-	if err := o.List.missingQuantities(); err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	if o.Statuses[len(o.Statuses)-1].Type != New {
+	case o.List.missingQuantities():
+		return ErrQuantityZero
+	case o.alreadySent():
 		return ErrOrderAlreadySent
+	default:
+		o.send()
+		return nil
 	}
-	o.Statuses = append(o.Statuses, status{
-		Date: time.Time{},
-		Type: Sent,
-	})
-	return nil
 }
 
 func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
@@ -75,9 +77,15 @@ func (o *Order) ReceiveQuantity(id ProductID, q QuantityReceived) error {
 	return o.List.receiveQuantity(id, q)
 }
 
-type status struct {
-	Date time.Time
-	Type OrderStatus
+func (o *Order) send() {
+	o.Statuses = append(o.Statuses, Status{
+		Date: time.Time{},
+		Type: Sent,
+	})
+}
+
+func (o *Order) alreadySent() bool {
+	return o.Statuses[len(o.Statuses)-1].Type != New
 }
 
 type OrderStatus int
