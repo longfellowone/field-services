@@ -67,6 +67,9 @@ func main() {
 	_ = result3[1].AddItemToList("1", "name1", material.FT)
 	_ = result3[1].AddItemToList("2", "name2", material.FT)
 
+	_ = result3[1].UpdateQuantityRequested("1", 12)
+	_ = result3[1].UpdateQuantityRequested("2", 12)
+
 	_ = result3[1].SendOrder()
 
 	//fmt.Println("Find by project")

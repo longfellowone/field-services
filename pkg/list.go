@@ -66,9 +66,10 @@ func (l *List) updateQuantityRequested(id ProductID, q QuantityRequested) error 
 	for i, item := range l.Items {
 		if item.ProductID == id {
 			l.Items[i].QuantityRequested = q
+			return nil
 		}
 	}
-	return nil
+	return ErrItemNotFound
 }
 
 func (l *List) updateQuantityReceived(id ProductID, q QuantityReceived) error {
@@ -79,7 +80,6 @@ func (l *List) itemAlreadyExists(id ProductID) error {
 	for _, item := range l.Items {
 		if item.ProductID == id {
 			return ErrItemAlreadyOnList
-
 		}
 	}
 	return nil
@@ -93,10 +93,6 @@ func (l *List) hasItems() error {
 }
 
 func (l *List) missingQuantities() error {
-	return nil
-}
-
-func (l *List) itemMissingQuantity() error {
 	for _, item := range l.Items {
 		if item.QuantityRequested <= 0 {
 			return ErrQuantityZero
@@ -104,6 +100,13 @@ func (l *List) itemMissingQuantity() error {
 	}
 	return nil
 }
+
+//func (i Item) itemMissingQuantity() error {
+//	if i.QuantityRequested <= 0 {
+//		return ErrQuantityZero
+//	}
+//	return nil
+//}
 
 type LineItemStatus int
 
