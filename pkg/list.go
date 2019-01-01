@@ -115,12 +115,16 @@ type Item struct {
 }
 
 func (l *Item) receive(q QuantityReceived) {
+	rec := int(q)
+	req := int(l.QuantityRequested)
+
 	l.LastUpdate = time.Now()
 	l.QuantityReceived = +q
+
 	switch {
-	case int(q) >= int(l.QuantityRequested):
+	case rec >= req:
 		l.Status = Filled
-	case int(q) < int(l.QuantityRequested):
+	case rec < req:
 		l.Status = BackOrdered
 	default:
 		l.Status = Waiting
