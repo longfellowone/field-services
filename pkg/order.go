@@ -47,20 +47,6 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 	}, nil
 }
 
-func (o *Order) SendOrder() error {
-	switch {
-	case !o.List.haveItems():
-		return ErrMustHaveItems
-	case o.List.missingQuantities():
-		return ErrQuantityZero
-	case o.alreadySent():
-		return ErrOrderAlreadySent
-	default:
-		o.send()
-		return nil
-	}
-}
-
 func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
 	return o.List.addItem(id, name, uom)
 }
@@ -75,6 +61,20 @@ func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error
 
 func (o *Order) ReceiveQuantity(id ProductID, q QuantityReceived) error {
 	return o.List.receiveQuantity(id, q)
+}
+
+func (o *Order) SendOrder() error {
+	switch {
+	case !o.List.haveItems():
+		return ErrMustHaveItems
+	case o.List.missingQuantities():
+		return ErrQuantityZero
+	case o.alreadySent():
+		return ErrOrderAlreadySent
+	default:
+		o.send()
+		return nil
+	}
 }
 
 func (o *Order) send() {

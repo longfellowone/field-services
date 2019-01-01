@@ -65,7 +65,7 @@ func main() {
 	_ = result3[0].RemoveItemFromList("4")
 
 	_ = result3[1].AddItemToList("1", "name1", material.FT)
-	_ = result3[1].AddItemToList("1", "name1", material.FT)
+	//_ = result3[1].AddItemToList("1", "name1", material.FT)
 	_ = result3[1].AddItemToList("2", "name2", material.FT)
 
 	_ = result3[1].UpdateQuantityRequested("1", 12)
