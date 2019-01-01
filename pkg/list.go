@@ -2,6 +2,7 @@ package material
 
 import (
 	"errors"
+	"time"
 )
 
 var (
@@ -16,22 +17,12 @@ type List struct {
 	Items []Item
 }
 
-type Item struct {
-	ProductID         ProductID
-	Name              string
-	UOM               UOM
-	QuantityRequested QuantityRequested
-	QuantityReceived  QuantityReceived
-	status            LineItemStatus
-	PO                string
-}
-
 type QuantityRequested int
 type QuantityReceived int
 
 func (l *List) addItem(id ProductID, name string, uom UOM) error {
 	if err := l.itemAlreadyExists(id); err != nil {
-		return err
+		return ErrItemAlreadyOnList
 	}
 
 	l.Items = append(l.Items, Item{
@@ -40,7 +31,8 @@ func (l *List) addItem(id ProductID, name string, uom UOM) error {
 		UOM:               uom,
 		QuantityRequested: 0,
 		QuantityReceived:  0,
-		status:            Waiting,
+		Status:            Waiting,
+		LastUpdate:        time.Now(),
 		PO:                "",
 	})
 	return nil
@@ -72,8 +64,18 @@ func (l *List) updateQuantityRequested(id ProductID, q QuantityRequested) error 
 	return ErrItemNotFound
 }
 
-func (l *List) updateQuantityReceived(id ProductID, q QuantityReceived) error {
-	return nil
+func (l *List) receiveQuantity(id ProductID, q QuantityReceived) error {
+	if q <= 0 {
+		return ErrQuantityZero
+	}
+
+	for i, item := range l.Items {
+		if item.ProductID == id {
+			l.Items[i].receive(q)
+			return nil
+		}
+	}
+	return ErrItemNotFound
 }
 
 func (l *List) itemAlreadyExists(id ProductID) error {
@@ -85,11 +87,11 @@ func (l *List) itemAlreadyExists(id ProductID) error {
 	return nil
 }
 
-func (l *List) hasItems() error {
+func (l *List) haveItems() bool {
 	if len(l.Items) <= 0 {
-		return ErrMustHaveItems
+		return false
 	}
-	return nil
+	return true
 }
 
 func (l *List) missingQuantities() error {
@@ -101,22 +103,39 @@ func (l *List) missingQuantities() error {
 	return nil
 }
 
-//func (i Item) itemMissingQuantity() error {
-//	if i.QuantityRequested <= 0 {
-//		return ErrQuantityZero
-//	}
-//	return nil
-//}
+type Item struct {
+	ProductID         ProductID
+	Name              string
+	UOM               UOM
+	QuantityRequested QuantityRequested
+	QuantityReceived  QuantityReceived
+	Status            ItemStatus
+	LastUpdate        time.Time
+	PO                string
+}
 
-type LineItemStatus int
+func (l *Item) receive(q QuantityReceived) {
+	l.LastUpdate = time.Now()
+	l.QuantityReceived = +q
+	switch {
+	case int(q) >= int(l.QuantityRequested):
+		l.Status = Filled
+	case int(q) < int(l.QuantityRequested):
+		l.Status = BackOrdered
+	default:
+		l.Status = Waiting
+	}
+}
+
+type ItemStatus int
 
 const (
-	Waiting LineItemStatus = iota
+	Waiting ItemStatus = iota
 	Filled
 	BackOrdered
 )
 
-func (s LineItemStatus) String() string {
+func (s ItemStatus) String() string {
 	switch s {
 	case Waiting:
 		return "Waiting"

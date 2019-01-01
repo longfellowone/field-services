@@ -8,8 +8,8 @@ import (
 
 var (
 	ErrOrderNotFound    = errors.New("order not found")
-	ErrMustHaveItems    = errors.New("order must have at least 1 item")
 	ErrOrderAlreadySent = errors.New("order already sent")
+	ErrMustHaveItems    = errors.New("order must have at least 1 item")
 )
 
 type OrderID string
@@ -41,9 +41,8 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 }
 
 func (o *Order) SendOrder() error {
-	if err := o.List.hasItems(); err != nil {
-		fmt.Println(err)
-		return err
+	if !o.List.haveItems() {
+		return ErrMustHaveItems
 	}
 	if err := o.List.missingQuantities(); err != nil {
 		fmt.Println(err)
@@ -65,15 +64,15 @@ func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
 }
 
 func (o *Order) RemoveItemFromList(id ProductID) error {
-	return nil
+	return o.List.removeItem(id)
 }
 
 func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error {
 	return o.List.updateQuantityRequested(id, q)
 }
 
-func (o *Order) UpdateQuantityReceived(id ProductID, q QuantityReceived) error {
-	return o.List.updateQuantityReceived(id, q)
+func (o *Order) ReceiveQuantity(id ProductID, q QuantityReceived) error {
+	return o.List.receiveQuantity(id, q)
 }
 
 type status struct {

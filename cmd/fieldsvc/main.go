@@ -62,18 +62,24 @@ func main() {
 	_ = result3[0].AddItemToList("3", "name3", material.FT)
 	_ = result3[0].AddItemToList("4", "name4", material.FT)
 	_ = result3[0].AddItemToList("3", "name3", material.FT)
+	_ = result3[0].RemoveItemFromList("4")
 
 	_ = result3[1].AddItemToList("1", "name1", material.FT)
 	_ = result3[1].AddItemToList("1", "name1", material.FT)
 	_ = result3[1].AddItemToList("2", "name2", material.FT)
 
 	_ = result3[1].UpdateQuantityRequested("1", 12)
-	_ = result3[1].UpdateQuantityRequested("2", 12)
+	_ = result3[1].UpdateQuantityRequested("2", 8)
+
+	_ = result3[1].ReceiveQuantity("1", 12)
 
 	_ = result3[1].SendOrder()
 
 	//fmt.Println("Find by project")
 	for _, v := range result3 {
-		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n\t%v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type, v.List.Items)
+		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type)
+		for _, v := range v.List.Items {
+			fmt.Printf("\t%v %v %v %v %v\n", v.ProductID, v.Name, v.Status, v.QuantityRequested, v.QuantityReceived)
+		}
 	}
 }
