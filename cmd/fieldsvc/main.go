@@ -58,11 +58,19 @@ func main() {
 	//fmt.Printf("[OID]: %v - [PID]: %v\n", result2.OrderID, result2.ProjectID)
 
 	result3, _ := fs.FindAllProjectOrders("pid1")
-	_ = result3[1].AddItemToOrder("1", "name1", material.EA)
+
+	_ = result3[0].AddItemToList("3", "name3", material.FT)
+	_ = result3[0].AddItemToList("4", "name4", material.FT)
+	_ = result3[0].AddItemToList("3", "name3", material.FT)
+
+	_ = result3[1].AddItemToList("1", "name1", material.FT)
+	_ = result3[1].AddItemToList("1", "name1", material.FT)
+	_ = result3[1].AddItemToList("2", "name2", material.FT)
+
 	_ = result3[1].SendOrder()
 
 	//fmt.Println("Find by project")
 	for _, v := range result3 {
-		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n\t%v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type, v.LineItems)
+		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n\t%v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type, v.List.Items)
 	}
 }

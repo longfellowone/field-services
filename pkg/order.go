@@ -2,13 +2,12 @@ package material
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"time"
 )
 
 var (
 	ErrOrderNotFound    = errors.New("order not found")
-	ErrQuantityZero     = errors.New("quantity must be greater than 0")
 	ErrMustHaveItems    = errors.New("order must have at least 1 item")
 	ErrOrderAlreadySent = errors.New("order already sent")
 )
@@ -21,7 +20,7 @@ type Order struct {
 	ProjectID ProjectID
 	version   int
 	Statuses  []status
-	LineItems []LineItem
+	List      List
 }
 
 func NewOrder(o OrderID, p ProjectID) (*Order, error) {
@@ -35,50 +34,19 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 				Type: New,
 			},
 		},
-		LineItems: nil,
+		List: List{
+			Items: nil,
+		},
 	}, nil
 }
 
-func (o *Order) AddItemToOrder(id ProductID, name string, uom UOM) error {
-	o.LineItems = append(o.LineItems, LineItem{
-		ProductID: id,
-		Name:      name,
-		UOM:       uom,
-		Quantity:  0,
-		status:    Waiting,
-		PO:        "",
-	})
-	return nil
-}
-
-func (o *Order) RemoveItemFromOrder(id ProductID) error {
-	for i := range o.LineItems {
-		if o.LineItems[i].ProductID == id {
-			copy(o.LineItems[i:], o.LineItems[i+1:])
-			o.LineItems[len(o.LineItems)-1] = LineItem{}
-			o.LineItems = o.LineItems[:len(o.LineItems)-1]
-			break
-		}
-	}
-	return nil
-}
-
-func (o *Order) UpdateItemQuantity(id ProductID, q int) error {
-	if q <= 0 {
-		return ErrQuantityZero
-	}
-
-	for i, l := range o.LineItems {
-		if l.ProductID == id {
-			o.LineItems[i].Quantity = q
-		}
-	}
-	return nil
-}
-
 func (o *Order) SendOrder() error {
-	if err := o.checkOrderHasItems(); err != nil {
-		log.Fatal(err)
+	if err := o.List.hasItems(); err != nil {
+		fmt.Println(err)
+		return err
+	}
+	if err := o.List.missingQuantities(); err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -92,11 +60,20 @@ func (o *Order) SendOrder() error {
 	return nil
 }
 
-func (o *Order) checkOrderHasItems() error {
-	if len(o.LineItems) <= 0 {
-		return ErrMustHaveItems
-	}
+func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
+	return o.List.addItem(id, name, uom)
+}
+
+func (o *Order) RemoveItemFromList(id ProductID) error {
 	return nil
+}
+
+func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error {
+	return o.List.updateQuantityRequested(id, q)
+}
+
+func (o *Order) UpdateQuantityReceived(id ProductID, q QuantityReceived) error {
+	return o.List.updateQuantityReceived(id, q)
 }
 
 type status struct {
