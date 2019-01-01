@@ -33,3 +33,7 @@ https://github.com/altairsix/eventsource/blob/master/pgstore/store.go
 -> repository.Save event to local DB
 // -> Publish event
 -> gRPC response
+
+####
+Dont return pointer item, return full struct
+Item = Item.DoSomething

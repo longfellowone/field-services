@@ -76,18 +76,25 @@ func (l *List) receivedAll() bool {
 }
 
 func (l *List) updateItemPO(id ProductID, n PONumber, s Supplier) error {
-	for i := range l.Items {
-		item := &l.Items[i]
+	for i, item := range l.Items {
 		if item.ProductID == id {
-			item.updatePO(n, s)
+			l.Items[i].PO.PONumber = n
+			l.Items[i].PO.Supplier = s
 			return nil
 		}
 	}
 	return ErrPOnotFound
 }
 
-func (l *List) removePOfromItem(id ProductID, n PONumber) error {
-	return nil
+func (l *List) removeItemPO(id ProductID) error {
+	for i, item := range l.Items {
+		if item.ProductID == id {
+			l.Items[i].PO.PONumber = ""
+			l.Items[i].PO.Supplier = ""
+			return nil
+		}
+	}
+	return ErrPOnotFound
 }
 
 func (l *List) itemExists(id ProductID) bool {

@@ -9,26 +9,15 @@ var (
 	ErrPOnotFound      = errors.New("PO not found")
 )
 
-type PurchaseOrder struct {
-	PONumber PONumber
-	Supplier Supplier
-}
-
-//func (p *PurchaseOrder) update(n PONumber, s Supplier) PurchaseOrder {
-//	return PurchaseOrder{
-//		PONumber: n,
-//		Supplier: s,
-//	}
-//}
-//
-//func (p *PurchaseOrder) remove() *PurchaseOrder {
-//	return &PurchaseOrder{}
-//}
-
 type (
 	PONumber string
 	Supplier string
 )
+
+type PurchaseOrder struct {
+	PONumber PONumber
+	Supplier Supplier
+}
 
 type OrderPOs struct {
 	POs []PurchaseOrder

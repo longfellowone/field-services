@@ -50,20 +50,3 @@ func (l *Item) receive(q QuantityReceived) {
 		l.Status = Waiting
 	}
 }
-
-func (l *Item) updatePO(n PONumber, s Supplier) Item {
-	return Item{
-		ProductID:         "3242342",
-		Name:              "",
-		UOM:               0,
-		QuantityRequested: 0,
-		QuantityReceived:  0,
-		Status:            0,
-		LastUpdate:        time.Time{},
-		PO:                PurchaseOrder{},
-	}
-}
-
-func (l *Item) removePO() {
-	//l.PO.remove()
-}

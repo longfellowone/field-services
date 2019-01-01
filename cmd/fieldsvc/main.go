@@ -73,13 +73,20 @@ func main() {
 
 	_ = result3[1].SendOrder()
 
-	_ = result3[1].AddPOtoOrder("po1", "s1")
-	_ = result3[1].AddPOtoOrder("po2", "s2")
-	_ = result3[1].AddPOtoOrder("po3", "s3")
+	_ = result3[1].AddOrderPO("po1", "s1")
+	_ = result3[1].AddOrderPO("po2", "s2")
+	_ = result3[1].AddOrderPO("po3", "s3")
 
-	_ = result3[1].RemovePOfromOrder("po2")
+	_ = result3[1].RemoveOrderPO("po2")
 
 	_ = result3[1].UpdateItemPO("1", "po4", "s4")
+	_ = result3[1].UpdateItemPO("1", "po5", "s5")
+	_ = result3[1].UpdateItemPO("2", "po7", "s7")
+	_ = result3[1].UpdateItemPO("2", "po6", "s6")
+
+	_ = result3[1].RemoveItemPO("1")
+
+	_ = result3[1].UpdateItemPO("1", "po9", "s9")
 
 	_ = result3[1].ReceiveQuantity("1", 12)
 	_ = result3[1].ReceiveQuantity("2", 23)

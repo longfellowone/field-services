@@ -100,11 +100,11 @@ func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error
 	return o.List.updateQuantityRequested(id, q)
 }
 
-func (o *Order) AddPOtoOrder(n PONumber, s Supplier) error {
+func (o *Order) AddOrderPO(n PONumber, s Supplier) error {
 	return o.OrderPOs.add(n, s)
 }
 
-func (o *Order) RemovePOfromOrder(n PONumber) error {
+func (o *Order) RemoveOrderPO(n PONumber) error {
 	return o.OrderPOs.remove(n)
 }
 
@@ -112,8 +112,8 @@ func (o *Order) UpdateItemPO(id ProductID, n PONumber, s Supplier) error {
 	return o.List.updateItemPO(id, n, s)
 }
 
-func (o *Order) RemoveItemPO(id ProductID, n PONumber) error {
-	return o.List.removePOfromItem(id, n)
+func (o *Order) RemoveItemPO(id ProductID) error {
+	return o.List.removeItemPO(id)
 }
 
 type OrderStatus int
