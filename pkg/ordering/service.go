@@ -6,16 +6,10 @@ import (
 )
 
 type Service struct {
-	db OrderRepository
+	db material.OrderRepository
 }
 
-type OrderRepository interface {
-	Save(o *material.Order) error
-	Find(id material.OrderID) (*material.Order, error)
-	FindAllFromProject(id material.ProjectID) ([]*material.Order, error)
-}
-
-func NewOrderingService(db OrderRepository) *Service {
+func NewOrderingService(db material.OrderRepository) *Service {
 	return &Service{
 		db: db,
 	}

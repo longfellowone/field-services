@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type OrderRepository interface {
+	Save(o *Order) error
+	Find(id OrderID) (*Order, error)
+	FindAllFromProject(id ProjectID) ([]*Order, error)
+}
+
 var (
 	ErrOrderNotFound    = errors.New("order not found")
 	ErrOrderAlreadySent = errors.New("order already sent")
