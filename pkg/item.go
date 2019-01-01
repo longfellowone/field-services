@@ -1,0 +1,69 @@
+package material
+
+import (
+	"time"
+)
+
+type (
+	ProductID         string
+	QuantityRequested int
+	QuantityReceived  int
+)
+
+type Item struct {
+	ProductID         ProductID
+	Name              string
+	UOM               UOM
+	QuantityRequested QuantityRequested
+	QuantityReceived  QuantityReceived
+	Status            ItemStatus
+	LastUpdate        time.Time
+	PO                PurchaseOrder
+}
+
+func newItem(id ProductID, name string, uom UOM) Item {
+	return Item{
+		ProductID:         id,
+		Name:              name,
+		UOM:               uom,
+		QuantityRequested: 0,
+		QuantityReceived:  0,
+		Status:            Waiting,
+		LastUpdate:        time.Now(),
+		PO:                PurchaseOrder{},
+	}
+}
+
+func (l *Item) receive(q QuantityReceived) {
+	rec := int(q)
+	req := int(l.QuantityRequested)
+
+	l.LastUpdate = time.Now()
+	l.QuantityReceived = +q
+
+	switch {
+	case rec >= req:
+		l.Status = Filled
+	case rec < req:
+		l.Status = BackOrdered
+	default:
+		l.Status = Waiting
+	}
+}
+
+func (l *Item) updatePO(n PONumber, s Supplier) Item {
+	return Item{
+		ProductID:         "3242342",
+		Name:              "",
+		UOM:               0,
+		QuantityRequested: 0,
+		QuantityReceived:  0,
+		Status:            0,
+		LastUpdate:        time.Time{},
+		PO:                PurchaseOrder{},
+	}
+}
+
+func (l *Item) removePO() {
+	//l.PO.remove()
+}

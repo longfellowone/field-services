@@ -69,17 +69,35 @@ func main() {
 	_ = result3[1].AddItemToList("2", "name2", material.FT)
 
 	_ = result3[1].UpdateQuantityRequested("1", 12)
-	_ = result3[1].UpdateQuantityRequested("2", 8)
-
-	_ = result3[1].ReceiveQuantity("1", 12)
+	_ = result3[1].UpdateQuantityRequested("2", 23)
 
 	_ = result3[1].SendOrder()
 
+	_ = result3[1].AddPOtoOrder("po1", "s1")
+	_ = result3[1].AddPOtoOrder("po2", "s2")
+	_ = result3[1].AddPOtoOrder("po3", "s3")
+
+	_ = result3[1].RemovePOfromOrder("po2")
+
+	_ = result3[1].UpdateItemPO("1", "po4", "s4")
+
+	_ = result3[1].ReceiveQuantity("1", 12)
+	_ = result3[1].ReceiveQuantity("2", 23)
+
 	//fmt.Println("Find by project")
 	for _, v := range result3 {
-		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: %v\n", v.OrderID, v.ProjectID, v.Statuses[len(v.Statuses)-1].Type)
+		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: ", v.OrderID, v.ProjectID) //[len(v.Statuses)-1].Type
+		for _, v := range v.Statuses {
+			fmt.Printf("->%v ", v.Type)
+		}
+		fmt.Printf("[POs]: ")
+		for _, po := range v.OrderPOs.POs {
+			fmt.Printf("%v | ", po.PONumber)
+		}
+		fmt.Println("")
 		for _, v := range v.List.Items {
-			fmt.Printf("\t%v %v %v %v %v\n", v.ProductID, v.Name, v.Status, v.QuantityRequested, v.QuantityReceived)
+			fmt.Printf("\t%v %v %v(%v) req:%v rec:%v [%v]\n", v.ProductID, v.Name, v.Status, v.LastUpdate.Format("3:04PM"), v.QuantityRequested, v.QuantityReceived, v.PO.PONumber)
+			//Mon Jan 2 15:04:05 MST 2006
 		}
 	}
 }

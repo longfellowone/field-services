@@ -2,7 +2,6 @@ package material
 
 import (
 	"errors"
-	"time"
 )
 
 var (
@@ -11,25 +10,9 @@ var (
 	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
 )
 
-type ProductID string
-
 type List struct {
 	Items []Item
 }
-
-type Item struct {
-	ProductID         ProductID
-	Name              string
-	UOM               UOM
-	QuantityRequested QuantityRequested
-	QuantityReceived  QuantityReceived
-	Status            ItemStatus
-	LastUpdate        time.Time
-	PO                string
-}
-
-type QuantityRequested int
-type QuantityReceived int
 
 func (l *List) addItem(id ProductID, name string, uom UOM) error {
 	if l.itemExists(id) {
@@ -49,8 +32,14 @@ func (l *List) removeItem(id ProductID) error {
 	return ErrItemNotFound
 }
 
+func (l *List) remove(i int) {
+	copy(l.Items[i:], l.Items[i+1:])
+	l.Items[len(l.Items)-1] = Item{}
+	l.Items = l.Items[:len(l.Items)-1]
+}
+
 func (l *List) updateQuantityRequested(id ProductID, q QuantityRequested) error {
-	if isZero(int(q)) {
+	if q <= 0 {
 		return ErrItemQuantityZero
 	}
 
@@ -64,7 +53,7 @@ func (l *List) updateQuantityRequested(id ProductID, q QuantityRequested) error 
 }
 
 func (l *List) receiveQuantity(id ProductID, q QuantityReceived) error {
-	if isZero(int(q)) {
+	if q <= 0 {
 		return ErrItemQuantityZero
 	}
 
@@ -77,40 +66,28 @@ func (l *List) receiveQuantity(id ProductID, q QuantityReceived) error {
 	return ErrItemNotFound
 }
 
-func (l *Item) receive(q QuantityReceived) {
-	rec := int(q)
-	req := int(l.QuantityRequested)
-
-	l.LastUpdate = time.Now()
-	l.QuantityReceived = +q
-
-	switch {
-	case rec >= req:
-		l.Status = Filled
-	case rec < req:
-		l.Status = BackOrdered
-	default:
-		l.Status = Waiting
+func (l *List) receivedAll() bool {
+	for _, item := range l.Items {
+		if item.Status != Filled {
+			return false
+		}
 	}
+	return true
 }
 
-func newItem(id ProductID, name string, uom UOM) Item {
-	return Item{
-		ProductID:         id,
-		Name:              name,
-		UOM:               uom,
-		QuantityRequested: 0,
-		QuantityReceived:  0,
-		Status:            Waiting,
-		LastUpdate:        time.Now(),
-		PO:                "",
+func (l *List) updateItemPO(id ProductID, n PONumber, s Supplier) error {
+	for i := range l.Items {
+		item := &l.Items[i]
+		if item.ProductID == id {
+			item.updatePO(n, s)
+			return nil
+		}
 	}
+	return ErrPOnotFound
 }
 
-func (l *List) remove(i int) {
-	copy(l.Items[i:], l.Items[i+1:])
-	l.Items[len(l.Items)-1] = Item{}
-	l.Items = l.Items[:len(l.Items)-1]
+func (l *List) removePOfromItem(id ProductID, n PONumber) error {
+	return nil
 }
 
 func (l *List) itemExists(id ProductID) bool {
@@ -129,14 +106,6 @@ func (l *List) missingQuantities() bool {
 		}
 	}
 	return false
-}
-
-func (l *List) haveItems() bool {
-	return len(l.Items) != 0
-}
-
-func isZero(q int) bool {
-	return q <= 0
 }
 
 type ItemStatus int

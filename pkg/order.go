@@ -2,6 +2,7 @@ package material
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -20,9 +21,11 @@ type (
 type Order struct {
 	OrderID   OrderID
 	ProjectID ProjectID
-	version   int
 	Statuses  []Status
 	List      List
+	OrderPOs  OrderPOs
+	// Project string
+	// version int
 }
 
 type Status struct {
@@ -34,7 +37,6 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 	return &Order{
 		OrderID:   o,
 		ProjectID: p,
-		version:   0,
 		Statuses: []Status{
 			{
 				Date: time.Now(),
@@ -44,7 +46,46 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 		List: List{
 			Items: nil,
 		},
+		OrderPOs: OrderPOs{
+			POs: nil,
+		},
 	}, nil
+}
+
+func (o *Order) SendOrder() error {
+	switch {
+	case o.List.Items == nil:
+		fmt.Println("nil")
+		return ErrMustHaveItems
+	case o.List.missingQuantities():
+		return ErrQuantityZero
+	case o.alreadySent():
+		return ErrOrderAlreadySent
+	default:
+		o.updateStatus(Sent)
+		return nil
+	}
+}
+
+func (o *Order) updateStatus(s OrderStatus) {
+	o.Statuses = append(o.Statuses, Status{
+		Date: time.Time{},
+		Type: s,
+	})
+}
+
+func (o *Order) alreadySent() bool {
+	return o.Statuses[len(o.Statuses)-1].Type != New
+}
+
+func (o *Order) ReceiveQuantity(id ProductID, q QuantityReceived) error {
+	if err := o.List.receiveQuantity(id, q); err != nil {
+		return err
+	}
+	if o.List.receivedAll() {
+		o.updateStatus(Complete)
+	}
+	return nil
 }
 
 func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
@@ -59,33 +100,20 @@ func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error
 	return o.List.updateQuantityRequested(id, q)
 }
 
-func (o *Order) ReceiveQuantity(id ProductID, q QuantityReceived) error {
-	return o.List.receiveQuantity(id, q)
+func (o *Order) AddPOtoOrder(n PONumber, s Supplier) error {
+	return o.OrderPOs.add(n, s)
 }
 
-func (o *Order) SendOrder() error {
-	switch {
-	case !o.List.haveItems():
-		return ErrMustHaveItems
-	case o.List.missingQuantities():
-		return ErrQuantityZero
-	case o.alreadySent():
-		return ErrOrderAlreadySent
-	default:
-		o.send()
-		return nil
-	}
+func (o *Order) RemovePOfromOrder(n PONumber) error {
+	return o.OrderPOs.remove(n)
 }
 
-func (o *Order) send() {
-	o.Statuses = append(o.Statuses, Status{
-		Date: time.Time{},
-		Type: Sent,
-	})
+func (o *Order) UpdateItemPO(id ProductID, n PONumber, s Supplier) error {
+	return o.List.updateItemPO(id, n, s)
 }
 
-func (o *Order) alreadySent() bool {
-	return o.Statuses[len(o.Statuses)-1].Type != New
+func (o *Order) RemoveItemPO(id ProductID, n PONumber) error {
+	return o.List.removePOfromItem(id, n)
 }
 
 type OrderStatus int
