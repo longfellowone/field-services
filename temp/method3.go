@@ -1,9 +1,23 @@
-// https://play.golang.org/p/LyisgdEr1i5
+// https://play.golang.org/p/mNnaGo2v9HB
 package test
 
 import (
 	"fmt"
 )
+
+func main() {
+	order := BuildSampleOrder()
+	item := &order.LineItem.Items[0]
+
+	fmt.Printf("Old price: %d\n", item.Price)
+
+	err := order.AdjustItemPrice("Num1", 1)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("New price: %d\n", item.Price)
+}
 
 // A unique order
 type Order struct {
@@ -11,21 +25,17 @@ type Order struct {
 	LineItem Items
 }
 
+// Adjust the price of a single order item
+func (o *Order) AdjustItemPrice(number string, price int) error {
+	return o.LineItem.adjustItemPrice(number, price)
+}
+
 // A slice of order items
 type Items struct {
 	Items []Item
 }
 
-// An individual order item
-type Item struct {
-	Number string
-	Price  int
-}
-
-func (i *Item) adjustPrice(price int) {
-	i.Price = price
-}
-
+// Range threw items and adjust price of item number
 func (i *Items) adjustItemPrice(number string, price int) error {
 	if price <= 0 {
 		return fmt.Errorf("price must be greater than 0")
@@ -42,23 +52,15 @@ func (i *Items) adjustItemPrice(number string, price int) error {
 	return nil
 }
 
-// Adjust the price of a single order item
-func (o *Order) AdjustItemPrice(number string, price int) error {
-	return o.LineItem.adjustItemPrice(number, price)
+// An individual item
+type Item struct {
+	Number string
+	Price  int
 }
 
-func main() {
-	order := BuildSampleOrder()
-	item := &order.LineItem.Items[0]
-
-	fmt.Printf("Old price: %d\n", item.Price)
-
-	err := order.AdjustItemPrice("Num1", 1)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("New price: %d\n", item.Price)
+// Adjust price of an item
+func (i *Item) adjustPrice(price int) {
+	i.Price = price
 }
 
 // Build sample order

@@ -1,25 +1,28 @@
-// https://play.golang.org/p/oB7Rge2suz4
+// https://play.golang.org/p/nlpUz9Acqxl
 package test
 
 import (
 	"fmt"
 )
 
+func main() {
+	order := BuildSampleOrder()
+	item := &order.LineItem.Items[0]
+
+	fmt.Printf("Old price: %d\n", item.Price)
+
+	err := order.AdjustItemPrice("Num1", 1)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("New price: %d\n", item.Price)
+}
+
 // A unique order
 type Order struct {
 	OrderID  int
 	LineItem Items
-}
-
-// A slice of order items
-type Items struct {
-	Items []Item
-}
-
-// An individual order item
-type Item struct {
-	Number string
-	Price  int
 }
 
 // Adjust the price of a single order item
@@ -37,18 +40,15 @@ func (o *Order) AdjustItemPrice(number string, price int) error {
 	return nil
 }
 
-func main() {
-	order := BuildSampleOrder()
-	item := &order.LineItem.Items[0]
+// A slice of order items
+type Items struct {
+	Items []Item
+}
 
-	fmt.Printf("Old price: %d\n", item.Price)
-
-	err := order.AdjustItemPrice("Num1", 1)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("New price: %d\n", item.Price)
+// An individual item
+type Item struct {
+	Number string
+	Price  int
 }
 
 // Build sample order
