@@ -22,14 +22,14 @@ func (l *List) addItem(id ProductID, name string, uom UOM) error {
 	return nil
 }
 
-func (l List) removeItem(id ProductID) (List, error) {
+func (l *List) removeItem(id ProductID) error {
 	for i := range l.Items {
 		if l.Items[i].ProductID == id {
 			l.remove(i)
-			return l, nil
+			return nil
 		}
 	}
-	return l, ErrItemNotFound
+	return ErrItemNotFound
 }
 
 func (l *List) remove(i int) {
@@ -113,44 +113,4 @@ func (l *List) missingQuantities() bool {
 		}
 	}
 	return false
-}
-
-type ItemStatus int
-
-const (
-	Waiting ItemStatus = iota
-	Filled
-	BackOrdered
-)
-
-func (s ItemStatus) String() string {
-	switch s {
-	case Waiting:
-		return "Waiting"
-	case Filled:
-		return "Filled"
-	case BackOrdered:
-		return "Back Ordered"
-	}
-	return ""
-}
-
-type UOM int
-
-const (
-	EA UOM = iota
-	FT
-	M
-)
-
-func (s UOM) String() string {
-	switch s {
-	case EA:
-		return "ea"
-	case FT:
-		return "ft"
-	case M:
-		return "m"
-	}
-	return ""
 }

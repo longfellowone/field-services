@@ -12,7 +12,7 @@ type Item struct {
 	Price  int
 }
 
-func (o *Order) adjustItemPrice(number string, price int) {
+func (o *Order) AdjustItemPrice(number string, price int) {
 	for i, v := range o.LineItem {
 		if v.Number == number {
 			o.LineItem[i].Price = price
@@ -33,6 +33,6 @@ func main() {
 	}
 
 	fmt.Println(order.LineItem[0])
-	order.adjustItemPrice("Num1", 0)
+	order.AdjustItemPrice("Num1", 0)
 	fmt.Println(order.LineItem[0])
 }

@@ -51,3 +51,43 @@ func (l Item) receive(q QuantityReceived) Item {
 	}
 	return l
 }
+
+type ItemStatus int
+
+const (
+	Waiting ItemStatus = iota
+	Filled
+	BackOrdered
+)
+
+func (s ItemStatus) String() string {
+	switch s {
+	case Waiting:
+		return "Waiting"
+	case Filled:
+		return "Filled"
+	case BackOrdered:
+		return "Back Ordered"
+	}
+	return ""
+}
+
+type UOM int
+
+const (
+	EA UOM = iota
+	FT
+	M
+)
+
+func (s UOM) String() string {
+	switch s {
+	case EA:
+		return "ea"
+	case FT:
+		return "ft"
+	case M:
+		return "m"
+	}
+	return ""
+}

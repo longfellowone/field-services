@@ -2,15 +2,8 @@ package material
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
-
-type OrderRepository interface {
-	Save(o *Order) error
-	Find(id OrderID) (*Order, error)
-	FindAllFromProject(id ProjectID) ([]*Order, error)
-}
 
 var (
 	ErrOrderNotFound    = errors.New("order not found")
@@ -19,10 +12,14 @@ var (
 	ErrQuantityZero     = errors.New("item quantity must be greater than 0")
 )
 
-type (
-	OrderID   string
-	ProjectID string
-)
+type OrderRepository interface {
+	Save(o *Order) error
+	Find(id OrderID) (*Order, error)
+	FindAllFromProject(id ProjectID) ([]*Order, error)
+}
+
+type OrderID string
+type ProjectID string
 
 type Order struct {
 	OrderID   OrderID
@@ -39,7 +36,7 @@ type Status struct {
 	Type OrderStatus
 }
 
-func NewOrder(o OrderID, p ProjectID) (*Order, error) {
+func NewOrder(o OrderID, p ProjectID) *Order {
 	return &Order{
 		OrderID:   o,
 		ProjectID: p,
@@ -55,13 +52,12 @@ func NewOrder(o OrderID, p ProjectID) (*Order, error) {
 		OrderPOs: OrderPOs{
 			POs: nil,
 		},
-	}, nil
+	}
 }
 
 func (o *Order) SendOrder() error {
 	switch {
 	case o.List.Items == nil:
-		fmt.Println("nil")
 		return ErrMustHaveItems
 	case o.List.missingQuantities():
 		return ErrQuantityZero
@@ -99,8 +95,7 @@ func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
 }
 
 func (o *Order) RemoveItemFromList(id ProductID) (err error) {
-	o.List, err = o.List.removeItem(id)
-	return
+	return o.List.removeItem(id)
 }
 
 func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error {

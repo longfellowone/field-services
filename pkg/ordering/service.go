@@ -16,11 +16,8 @@ func NewOrderingService(db material.OrderRepository) *Service {
 }
 
 func (s *Service) CreateNewOrder(o material.OrderID, p material.ProjectID) (*material.Order, error) {
-	order, err := material.NewOrder(o, p)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = s.db.Save(order)
+	order := material.NewOrder(o, p)
+	err := s.db.Save(order)
 	if err != nil {
 		log.Fatal(err)
 	}
