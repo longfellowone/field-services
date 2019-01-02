@@ -26,7 +26,7 @@ type Order struct {
 }
 
 // Adjust the price of a single order item
-func (o *Order) AdjustItemPrice(number string, price int) (err error) {
+func (o *Order) AdjustItemPrice(number string, price int) error {
 	return o.LineItem.adjustItemPrice(number, price)
 }
 
