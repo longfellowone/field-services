@@ -1,8 +1,8 @@
+// https://play.golang.org/p/DB4afaTHSwV
 package test
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 )
 
 // A unique order
@@ -28,14 +28,14 @@ func (i *Item) adjustPrice(price int) {
 
 func (i Items) adjustItemPrice(number string, price int) (Items, error) {
 	if price <= 0 {
-		return i, errors.New("price must be greater than 0")
+		return i, fmt.Errorf("price must be greater than 0")
 	}
 
 	for n := range i.Items {
 		item := &i.Items[n]
 
 		if item.Number == number {
-			item.adjustPrice(5)
+			item.adjustPrice(price)
 			return i, nil
 		}
 	}

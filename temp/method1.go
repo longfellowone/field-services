@@ -1,8 +1,8 @@
-package main
+// https://play.golang.org/p/oB7Rge2suz4
+package test
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 )
 
 // A unique order
@@ -25,7 +25,7 @@ type Item struct {
 // Adjust the price of a single order item
 func (o *Order) AdjustItemPrice(number string, price int) error {
 	if price <= 0 {
-		return errors.New("price must be greater than 0")
+		return fmt.Errorf("price must be greater than 0")
 	}
 
 	for i, item := range o.LineItem.Items {
