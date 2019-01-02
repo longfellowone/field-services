@@ -22,14 +22,14 @@ func (l *List) addItem(id ProductID, name string, uom UOM) error {
 	return nil
 }
 
-func (l *List) removeItem(id ProductID) error {
+func (l List) removeItem(id ProductID) (List, error) {
 	for i := range l.Items {
 		if l.Items[i].ProductID == id {
 			l.remove(i)
-			return nil
+			return l, nil
 		}
 	}
-	return ErrItemNotFound
+	return l, ErrItemNotFound
 }
 
 func (l *List) remove(i int) {
@@ -59,7 +59,7 @@ func (l *List) receiveQuantity(id ProductID, q QuantityReceived) error {
 
 	for i, item := range l.Items {
 		if item.ProductID == id {
-			l.Items[i].receive(q)
+			l.Items[i] = l.Items[i].receive(q)
 			return nil
 		}
 	}

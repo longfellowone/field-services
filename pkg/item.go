@@ -34,7 +34,7 @@ func newItem(id ProductID, name string, uom UOM) Item {
 	}
 }
 
-func (l *Item) receive(q QuantityReceived) {
+func (l Item) receive(q QuantityReceived) Item {
 	rec := int(q)
 	req := int(l.QuantityRequested)
 
@@ -49,4 +49,5 @@ func (l *Item) receive(q QuantityReceived) {
 	default:
 		l.Status = Waiting
 	}
+	return l
 }

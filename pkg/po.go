@@ -23,7 +23,7 @@ type OrderPOs struct {
 	POs []PurchaseOrder
 }
 
-func (p *OrderPOs) add(n PONumber, s Supplier) error {
+func (p OrderPOs) add(n PONumber, s Supplier) error {
 	if p.exists(n) {
 		return ErrPOalreadyExists
 	}
@@ -35,7 +35,7 @@ func (p *OrderPOs) add(n PONumber, s Supplier) error {
 	return nil
 }
 
-func (p *OrderPOs) remove(n PONumber) error {
+func (p OrderPOs) remove(n PONumber) error {
 	for i, po := range p.POs {
 		if po.PONumber == n {
 			copy(p.POs[i:], p.POs[i+1:])
@@ -47,7 +47,7 @@ func (p *OrderPOs) remove(n PONumber) error {
 	return ErrPOnotFound
 }
 
-func (p *OrderPOs) exists(n PONumber) bool {
+func (p OrderPOs) exists(n PONumber) bool {
 	for _, po := range p.POs {
 		if po.PONumber == n {
 			return true

@@ -98,8 +98,9 @@ func (o *Order) AddItemToList(id ProductID, name string, uom UOM) error {
 	return o.List.addItem(id, name, uom)
 }
 
-func (o *Order) RemoveItemFromList(id ProductID) error {
-	return o.List.removeItem(id)
+func (o *Order) RemoveItemFromList(id ProductID) (err error) {
+	o.List, err = o.List.removeItem(id)
+	return
 }
 
 func (o *Order) UpdateQuantityRequested(id ProductID, q QuantityRequested) error {

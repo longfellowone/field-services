@@ -62,8 +62,14 @@ func main() {
 	_ = result3[0].AddItemToList("3", "name3", material.FT)
 	_ = result3[0].AddItemToList("4", "name4", material.FT)
 	_ = result3[0].AddItemToList("3", "name3", material.FT)
-	_ = result3[0].RemoveItemFromList("4")
-
+	err := result3[0].RemoveItemFromList("4")
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = result3[0].RemoveItemFromList("4")
+	if err != nil {
+		fmt.Println(err)
+	}
 	_ = result3[1].AddItemToList("1", "name1", material.FT)
 	//_ = result3[1].AddItemToList("1", "name1", material.FT)
 	_ = result3[1].AddItemToList("2", "name2", material.FT)
@@ -87,6 +93,8 @@ func main() {
 	_ = result3[1].RemoveItemPO("1")
 
 	_ = result3[1].UpdateItemPO("1", "po9", "s9")
+
+	_ = result3[1].RemoveItemPO("2")
 
 	_ = result3[1].ReceiveQuantity("1", 12)
 	_ = result3[1].ReceiveQuantity("2", 23)
