@@ -1,4 +1,4 @@
-package ordering
+package grpc
 
 import (
 	"field/pkg"

@@ -3,8 +3,9 @@
 package main
 
 import (
+	"field/pkg"
+	"field/pkg/grpc"
 	"field/pkg/inmem"
-	"field/pkg/ordering"
 	"github.com/google/wire"
 )
 
@@ -17,11 +18,11 @@ import (
 //	return nil
 //}
 
-func initializeFieldServicesInMemory() *ordering.Service {
+func initializeFieldServicesInMemory() *grpc.Service {
 	wire.Build(
 		inmem.NewOrderRepository,
-		ordering.NewOrderingService,
-		wire.Bind(new(ordering.OrderRepository), &inmem.OrderRepository{}),
+		grpc.NewOrderingService,
+		wire.Bind(new(material.OrderRepository), &inmem.OrderRepository{}),
 	)
 	return nil
 }

@@ -6,14 +6,14 @@
 package main
 
 import (
+	"field/pkg/grpc"
 	"field/pkg/inmem"
-	"field/pkg/ordering"
 )
 
 // Injectors from wire.go:
 
-func initializeFieldServicesInMemory() *ordering.Service {
+func initializeFieldServicesInMemory() *grpc.Service {
 	orderRepository := inmem.NewOrderRepository()
-	service := ordering.NewOrderingService(orderRepository)
+	service := grpc.NewOrderingService(orderRepository)
 	return service
 }

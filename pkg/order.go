@@ -111,6 +111,51 @@ func (o *Order) SendOrder() error {
 	}
 }
 
+func (o *Order) AddOrderPO(number string, supplier string) error {
+	_, err := o.findPO(number)
+	if err == nil {
+		return ErrPOalreadyExists
+	}
+	o.POs = append(o.POs, newPO(number, supplier))
+	return nil
+}
+
+func (o *Order) RemoveOrderPO(number string) error {
+	i, err := o.findPO(number)
+	if err != nil {
+		fmt.Println(err)
+	}
+	o.POs = append(o.POs[:i], o.POs[i+1:]...)
+	return nil
+}
+
+func (o *Order) UpdateItemPO(id ProductID, number string, supplier string) error {
+	i, err := o.findItem(id)
+	if err != nil {
+		return ErrPOnotFound
+	}
+	o.List[i].updatePO(number, supplier)
+	return nil
+}
+
+func (o *Order) RemoveItemPO(id ProductID) error {
+	i, err := o.findItem(id)
+	if err != nil {
+		return ErrPOnotFound
+	}
+	o.List[i].removePO()
+	return nil
+}
+
+func (o *Order) findPO(number string) (int, error) {
+	for i, po := range o.POs {
+		if po.PONumber == number {
+			return i, nil
+		}
+	}
+	return 0, ErrItemNotFound
+}
+
 func (o *Order) findItem(id ProductID) (int, error) {
 	for i, item := range o.List {
 		if item.ProductID == id {
@@ -156,51 +201,6 @@ func newStatus(s OrderStatus) Status {
 		Date: time.Time{},
 		Type: s,
 	}
-}
-
-func (o *Order) AddOrderPO(number string, supplier string) error {
-	_, err := o.findPO(number)
-	if err == nil {
-		return ErrPOalreadyExists
-	}
-	o.POs = append(o.POs, newPO(number, supplier))
-	return nil
-}
-
-func (o *Order) RemoveOrderPO(number string) error {
-	i, err := o.findPO(number)
-	if err != nil {
-		fmt.Println(err)
-	}
-	o.POs = append(o.POs[:i], o.POs[i+1:]...)
-	return nil
-}
-
-func (o *Order) UpdateItemPO(id ProductID, number string, supplier string) error {
-	i, err := o.findItem(id)
-	if err != nil {
-		return ErrPOnotFound
-	}
-	o.List[i].updatePO(number, supplier)
-	return nil
-}
-
-func (o *Order) RemoveItemPO(id ProductID) error {
-	i, err := o.findItem(id)
-	if err != nil {
-		return ErrPOnotFound
-	}
-	o.List[i].removePO()
-	return nil
-}
-
-func (o *Order) findPO(number string) (int, error) {
-	for i, po := range o.POs {
-		if po.PONumber == number {
-			return i, nil
-		}
-	}
-	return 0, ErrItemNotFound
 }
 
 type OrderStatus int
