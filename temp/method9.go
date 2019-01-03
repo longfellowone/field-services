@@ -13,12 +13,11 @@ var (
 
 func main() {
 	order := BuildSampleOrder()
-	item := &order.MaterialList.Items[0]
 
+	fmt.Println(order.MaterialList)
 	order.AddItem("Num3")
-	fmt.Println(order.MaterialList.Items)
 
-	fmt.Printf("Old price: %d\n", item.QuantityRequested)
+	fmt.Printf("Old price: %d\n", order.MaterialList[0].QuantityRequested)
 
 	err := order.AdjustItemQuantity("Num1", 1)
 	if err != nil {
@@ -27,13 +26,14 @@ func main() {
 
 	//order.Send()
 
-	fmt.Printf("New price: %d\n", item.QuantityRequested)
+	fmt.Printf("New price: %d\n", order.MaterialList[0].QuantityRequested)
+	fmt.Println(order.MaterialList)
 }
 
 // A unique order
 type Order struct {
-	OrderID      int
-	MaterialList MaterialList
+	OrderID int
+	MaterialList
 	OrderStatus
 }
 
@@ -64,14 +64,13 @@ func (o *Order) AddItem(id ProductUUID) {
 	o.MaterialList = o.MaterialList.addItem(id)
 }
 
-func (o *Order) AdjustItemQuantity(id ProductUUID, qr QuantityRequested) (err error) {
-	list, err := o.MaterialList.adjustItemQuantity(id, qr)
-	if err != nil {
-		log.Println(err)
-	}
-	fmt.Println(list)
-	return nil
-}
+//func (o *Order) AdjustItemQuantity(id ProductUUID, qr QuantityRequested) (err error) {
+//	err = o.MaterialList.adjustItemQuantity(id, qr)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//	return nil
+//}
 
 //Adjust the price of a single order item
 //func (o *Order) AdjustItemQuantity(id ProductUUID, quantity int) (err error) {
@@ -80,36 +79,32 @@ func (o *Order) AdjustItemQuantity(id ProductUUID, qr QuantityRequested) (err er
 //}
 
 // A slice of order items
-type MaterialList struct {
-	Items []Item
-}
-
-func (m MaterialList) addItem(id ProductUUID) MaterialList {
-	item := newItem(id)
-	m.Items = append(m.Items, item)
-	return m
-}
+type MaterialList []Item
 
 // Range threw items and adjust price of item number
-func (m MaterialList) adjustItemQuantity(id ProductUUID, qr QuantityRequested) (MaterialList, error) {
+func (m MaterialList) AdjustItemQuantity(id ProductUUID, qr QuantityRequested) error {
 	if qr <= 0 {
-		return MaterialList{}, ErrQuantityZero
+		return ErrQuantityZero
 	}
 
 	item := m.findItem(id)
 	if item < 0 {
-		return MaterialList{}, ErrItemNotFound
+		return ErrItemNotFound
 	}
 
-	m.Items[item] = m.Items[item].adjustQuantity(qr)
-	fmt.Println(true)
+	m[item].QuantityRequested = qr
+	//m[item] = m[item].adjustQuantity(qr)
 
-	return m, nil
+	return nil
+}
+
+func (m MaterialList) addItem(id ProductUUID) MaterialList {
+	return append(m, newItem(id))
 }
 
 func (m MaterialList) findItem(id ProductUUID) int {
-	for item := range m.Items {
-		if m.Items[item].ProductUUID == id {
+	for item := range m {
+		if m[item].ProductUUID == id {
 			return item
 		}
 	}
@@ -167,10 +162,8 @@ func BuildSampleOrder() *Order {
 	}
 
 	return &Order{
-		OrderID: 0,
-		MaterialList: MaterialList{
-			Items: items,
-		},
+		OrderID:      0,
+		MaterialList: items,
 		OrderStatus: OrderStatus{
 			Statuses: nil,
 		},

@@ -59,12 +59,12 @@ func main() {
 	order1 := orders[0]
 	order2 := orders[1]
 
-	order1.AddItem("3", "name3", material.FT)
-	order1.AddItem("4", "name4", material.FT)
+	order1.AddItem("3", "name3", orders.FT)
+	order1.AddItem("4", "name4", orders.FT)
 	order1.RemoveItem("4")
 
-	order2.AddItem("1", "name1", material.FT)
-	order2.AddItem("2", "name2", material.FT)
+	order2.AddItem("1", "name1", orders.FT)
+	order2.AddItem("2", "name2", orders.FT)
 
 	order2.UpdateQuantityRequested("1", 12)
 	order2.UpdateQuantityRequested("2", 23)
