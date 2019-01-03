@@ -3,6 +3,7 @@
 package main
 
 import (
+	"field/pkg"
 	"field/pkg/inmem"
 	"field/pkg/ordering"
 	"github.com/google/wire"
@@ -21,7 +22,7 @@ func initializeFieldServicesInMemory() *ordering.Service {
 	wire.Build(
 		inmem.NewOrderRepository,
 		ordering.NewOrderingService,
-		wire.Bind(new(ordering.OrderRepository), &inmem.OrderRepository{}),
+		wire.Bind(new(material.OrderRepository), &inmem.OrderRepository{}),
 	)
 	return nil
 }

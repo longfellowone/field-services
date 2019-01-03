@@ -4,18 +4,14 @@ import (
 	"time"
 )
 
-type (
-	ProductID         string
-	QuantityRequested int
-	QuantityReceived  int
-)
+type ProductID string
 
 type Item struct {
 	ProductID         ProductID
 	Name              string
 	UOM               UOM
-	QuantityRequested QuantityRequested
-	QuantityReceived  QuantityReceived
+	QuantityRequested int
+	QuantityReceived  int
 	Status            ItemStatus
 	LastUpdate        time.Time
 	PO                PurchaseOrder
@@ -34,22 +30,32 @@ func newItem(id ProductID, name string, uom UOM) Item {
 	}
 }
 
-func (l Item) receive(q QuantityReceived) Item {
-	rec := int(q)
-	req := int(l.QuantityRequested)
+func (i *Item) adjustQuantity(quantity int) {
+	i.QuantityRequested = quantity
+}
 
-	l.LastUpdate = time.Now()
-	l.QuantityReceived = +q
+func (i *Item) receive(received int) {
+	requested := i.QuantityRequested
+
+	i.LastUpdate = time.Now()
+	i.QuantityReceived = +received
 
 	switch {
-	case rec >= req:
-		l.Status = Filled
-	case rec < req:
-		l.Status = BackOrdered
+	case received >= requested:
+		i.Status = Filled
+	case received < requested:
+		i.Status = BackOrdered
 	default:
-		l.Status = Waiting
+		i.Status = Waiting
 	}
-	return l
+}
+
+func (i *Item) updatePO(number string, supplier string) {
+	i.PO = newPO(number, supplier)
+}
+
+func (i *Item) removePO() {
+	i.PO = PurchaseOrder{}
 }
 
 type ItemStatus int
