@@ -1,4 +1,4 @@
-package grpc
+package ordering
 
 import (
 	"field/pkg"
@@ -15,19 +15,20 @@ func NewOrderingService(db material.OrderRepository) *Service {
 	}
 }
 
-func (s *Service) CreateNewOrder(o material.OrderID, p material.ProjectID) (*material.Order, error) {
+func (s *Service) CreateOrder(o material.OrderID, p material.ProjectID) {
 	order := material.NewOrder(o, p)
 	err := s.db.Save(order)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
-	return order, nil
 }
+
+// READ MODELS
 
 func (s *Service) FindOrder(id material.OrderID) (*material.Order, error) {
 	findAll, err := s.db.Find(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	return findAll, nil
 }
@@ -35,7 +36,7 @@ func (s *Service) FindOrder(id material.OrderID) (*material.Order, error) {
 func (s *Service) FindAllProjectOrders(id material.ProjectID) ([]*material.Order, error) {
 	findAll, err := s.db.FindAllFromProject(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	return findAll, nil
 }

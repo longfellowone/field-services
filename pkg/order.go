@@ -2,7 +2,7 @@ package material
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -14,6 +14,8 @@ var (
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyOnList = errors.New("item already on list")
 	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
+	ErrPOalreadyExists   = errors.New("PO already exists")
+	ErrPOnotFound        = errors.New("PO not found")
 )
 
 type OrderRepository interface {
@@ -48,45 +50,48 @@ func NewOrder(o OrderID, p ProjectID) *Order {
 	}
 }
 
-func (o *Order) AddItem(id ProductID, name string, uom UOM) error {
+func (o *Order) AddItem(id ProductID, name string, uom UOM) {
 	_, err := o.findItem(id)
 	if err == nil {
-		return ErrItemAlreadyOnList
+		log.Println(ErrItemAlreadyOnList)
+		return
 	}
 	item := newItem(id, name, uom)
 	o.List = append(o.List, item)
-	return nil
 }
 
-func (o *Order) RemoveItem(id ProductID) error {
+func (o *Order) RemoveItem(id ProductID) {
 	i, err := o.findItem(id)
 	if err != nil {
-		return err
+		log.Println(ErrItemNotFound)
+		return
 	}
 	o.List = append(o.List[:i], o.List[i+1:]...)
-	return nil
 }
 
-func (o *Order) UpdateQuantityRequested(id ProductID, quantity int) error {
+func (o *Order) UpdateQuantityRequested(id ProductID, quantity int) {
 	if quantity <= 0 {
-		return ErrItemQuantityZero
+		log.Println(ErrItemQuantityZero)
+		return
 	}
 	i, err := o.findItem(id)
 	if err != nil {
-		return err
+		log.Println(ErrItemNotFound)
+		return
 	}
 	o.List[i].adjustQuantity(quantity)
-	return nil
 }
 
-func (o *Order) ReceiveQuantity(id ProductID, quantity int) error {
+func (o *Order) ReceiveQuantity(id ProductID, quantity int) {
 	if quantity <= 0 {
-		return ErrItemQuantityZero
+		log.Println(ErrItemQuantityZero)
+		return
 	}
 
 	i, err := o.findItem(id)
 	if err != nil {
-		return ErrItemNotFound
+		log.Println(ErrItemNotFound)
+		return
 	}
 
 	o.List[i].receive(quantity)
@@ -94,66 +99,19 @@ func (o *Order) ReceiveQuantity(id ProductID, quantity int) error {
 	if o.receivedAll() {
 		o.updateStatus(Complete)
 	}
-	return nil
 }
 
-func (o *Order) SendOrder() error {
+func (o *Order) SendOrder() {
 	switch {
 	case o.List == nil:
-		return ErrMustHaveItems
+		log.Println(ErrMustHaveItems)
 	case o.missingQuantities():
-		return ErrQuantityZero
+		log.Println(ErrQuantityZero)
 	case o.alreadySent():
-		return ErrOrderAlreadySent
+		log.Println(ErrOrderAlreadySent)
 	default:
 		o.updateStatus(Sent)
-		return nil
 	}
-}
-
-func (o *Order) AddOrderPO(number string, supplier string) error {
-	_, err := o.findPO(number)
-	if err == nil {
-		return ErrPOalreadyExists
-	}
-	o.POs = append(o.POs, newPO(number, supplier))
-	return nil
-}
-
-func (o *Order) RemoveOrderPO(number string) error {
-	i, err := o.findPO(number)
-	if err != nil {
-		fmt.Println(err)
-	}
-	o.POs = append(o.POs[:i], o.POs[i+1:]...)
-	return nil
-}
-
-func (o *Order) UpdateItemPO(id ProductID, number string, supplier string) error {
-	i, err := o.findItem(id)
-	if err != nil {
-		return ErrPOnotFound
-	}
-	o.List[i].updatePO(number, supplier)
-	return nil
-}
-
-func (o *Order) RemoveItemPO(id ProductID) error {
-	i, err := o.findItem(id)
-	if err != nil {
-		return ErrPOnotFound
-	}
-	o.List[i].removePO()
-	return nil
-}
-
-func (o *Order) findPO(number string) (int, error) {
-	for i, po := range o.POs {
-		if po.PONumber == number {
-			return i, nil
-		}
-	}
-	return 0, ErrItemNotFound
 }
 
 func (o *Order) findItem(id ProductID) (int, error) {
@@ -189,6 +147,62 @@ func (o *Order) alreadySent() bool {
 
 func (o *Order) updateStatus(s OrderStatus) {
 	o.Statuses = append(o.Statuses, newStatus(s))
+}
+
+type PurchaseOrder struct {
+	PONumber string
+	Supplier string
+}
+
+func newPO(number string, supplier string) PurchaseOrder {
+	return PurchaseOrder{
+		PONumber: number,
+		Supplier: supplier,
+	}
+}
+
+func (o *Order) AddOrderPO(number string, supplier string) {
+	_, err := o.findPO(number)
+	if err == nil {
+		log.Println(ErrPOalreadyExists)
+		return
+	}
+	o.POs = append(o.POs, newPO(number, supplier))
+}
+
+func (o *Order) RemoveOrderPO(number string) {
+	i, err := o.findPO(number)
+	if err != nil {
+		log.Println(ErrPOnotFound)
+		return
+	}
+	o.POs = append(o.POs[:i], o.POs[i+1:]...)
+}
+
+func (o *Order) UpdateItemPO(id ProductID, number string, supplier string) {
+	i, err := o.findItem(id)
+	if err != nil {
+		log.Println(ErrPOnotFound)
+		return
+	}
+	o.List[i].updatePO(number, supplier)
+}
+
+func (o *Order) RemoveItemPO(id ProductID) {
+	i, err := o.findItem(id)
+	if err != nil {
+		log.Println(ErrPOnotFound)
+	}
+	o.List[i].removePO()
+}
+
+func (o *Order) findPO(number string) (int, error) {
+	for i, po := range o.POs {
+		if po.PONumber == number {
+			return i, nil
+		}
+	}
+	return 0, ErrItemNotFound
 }
 
 type Status struct {
