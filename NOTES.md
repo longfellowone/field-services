@@ -40,3 +40,10 @@ Item = Item.DoSomething
 
 ####
 Map PID to slice of Items
+
+####
+[OID]: oid1 - [PID]: pid1 - [STATUS]: ->New [POs]: 
+	3 name3 Back Ordered(6:28PM) req:84 rec:73 po:
+[OID]: oid2 - [PID]: pid1 - [STATUS]: ->New ->Sent ->Complete [POs]: po1 | po3 | 
+	1 name1 Filled(6:28PM) req:12 rec:12 po:po9
+	2 name2 Filled(6:28PM) req:23 rec:23 po:

@@ -53,54 +53,49 @@ func main() {
 	fs.CreateNewOrder("oid1", "pid1")
 	fs.CreateNewOrder("oid2", "pid1")
 
-	result3, _ := fs.FindAllProjectOrders("pid1")
+	orders, _ := fs.FindAllProjectOrders("pid1")
+	order1 := orders[0]
+	order2 := orders[1]
 
-	_ = result3[0].AddItem("3", "name3", material.FT)
-	_ = result3[0].AddItem("4", "name4", material.FT)
-	_ = result3[0].AddItem("3", "name3", material.FT)
-	err := result3[0].RemoveItem("4")
-	if err != nil {
-		fmt.Println(err)
-	}
-	//err = result3[0].RemoveItemFromList("4")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	_ = result3[1].AddItem("1", "name1", material.FT)
-	_ = result3[1].AddItem("1", "name1", material.FT)
-	_ = result3[1].AddItem("2", "name2", material.FT)
-	//
-	_ = result3[1].UpdateQuantityRequested("1", 12)
-	_ = result3[1].UpdateQuantityRequested("2", 23)
-	//
-	_ = result3[1].SendOrder()
+	_ = order1.AddItem("3", "name3", material.FT)
+	_ = order1.AddItem("4", "name4", material.FT)
+	_ = order1.AddItem("3", "name3", material.FT)
+	_ = order1.RemoveItem("4")
 
-	_ = result3[1].AddOrderPO("po1", "s1")
-	_ = result3[1].AddOrderPO("po2", "s2")
-	_ = result3[1].AddOrderPO("po3", "s3")
-	//
-	_ = result3[1].RemoveOrderPO("po2")
-	//
-	_ = result3[1].UpdateItemPO("1", "po4", "s4")
-	_ = result3[1].UpdateItemPO("1", "po5", "s5")
-	_ = result3[1].UpdateItemPO("2", "po7", "s7")
-	_ = result3[1].UpdateItemPO("2", "po6", "s6")
-	//
-	_ = result3[1].RemoveItemPO("1")
-	//
-	_ = result3[1].UpdateItemPO("1", "po9", "s9")
-	//
-	_ = result3[1].RemoveItemPO("2")
+	_ = order2.AddItem("1", "name1", material.FT)
+	_ = order2.AddItem("1", "name1", material.FT)
+	_ = order2.AddItem("2", "name2", material.FT)
 
-	_ = result3[1].ReceiveQuantity("1", 12)
-	_ = result3[1].ReceiveQuantity("2", 23)
+	_ = order2.UpdateQuantityRequested("1", 12)
+	_ = order2.UpdateQuantityRequested("2", 23)
 
-	_ = result3[0].UpdateQuantityRequested("3", 84)
-	_ = result3[0].ReceiveQuantity("3", 73)
+	_ = order2.SendOrder()
 
-	//fmt.Println("Find by project")
-	for _, v := range result3 {
-		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: ", v.OrderID, v.ProjectID) //[len(v.Statuses)-1].Type
+	_ = order2.AddOrderPO("po1", "s1")
+	_ = order2.AddOrderPO("po2", "s2")
+	_ = order2.AddOrderPO("po3", "s3")
+
+	_ = order2.RemoveOrderPO("po2")
+
+	_ = order2.UpdateItemPO("1", "po4", "s4")
+	_ = order2.UpdateItemPO("1", "po5", "s5")
+	_ = order2.UpdateItemPO("2", "po7", "s7")
+	_ = order2.UpdateItemPO("2", "po6", "s6")
+
+	_ = order2.RemoveItemPO("1")
+
+	_ = order2.UpdateItemPO("1", "po9", "s9")
+
+	_ = order2.RemoveItemPO("2")
+
+	_ = order2.ReceiveQuantity("1", 12)
+	_ = order2.ReceiveQuantity("2", 23)
+
+	_ = order1.UpdateQuantityRequested("3", 84)
+	_ = order1.ReceiveQuantity("3", 73)
+
+	for _, v := range orders {
+		fmt.Printf("[OID]: %v - [PID]: %v - [STATUS]: ", v.OrderID, v.ProjectID)
 		for _, v := range v.Statuses {
 			fmt.Printf("->%v ", v.Type)
 		}
