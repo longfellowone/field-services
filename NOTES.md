@@ -37,3 +37,6 @@ https://github.com/altairsix/eventsource/blob/master/pgstore/store.go
 ####
 Dont return pointer item, return full struct
 Item = Item.DoSomething
+
+####
+Map PID to slice of Items
