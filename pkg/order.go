@@ -2,6 +2,7 @@ package field
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -55,22 +56,12 @@ func (o *Order) UpdateMaterialList(item Item) error {
 	case o.lastEvent() == Sent:
 		return ErrOrderSent
 	case o.lastEvent() == OnRoute:
-		o.receive(item)
+		fmt.Println(item)
+		//o.ReceiveItem(item)
 	case o.lastEvent() == Complete:
 		return ErrOrderComplete
 	}
 	return nil
-}
-
-func (o *Order) receive(item Item) {
-	//switch {
-	//case item.QuantityReceived >= item.QuantityRequested:
-	//	fmt.Println("Mark Item Complete")
-	//}
-	//
-	//if o.receivedAll() {
-	//	fmt.Println("Order Complete")
-	//}
 }
 
 func (o *Order) Send() {
@@ -79,9 +70,9 @@ func (o *Order) Send() {
 
 func (o *Order) updateMaterialList(item Item) {
 	switch {
-	case item.QuantityRequested <= 0:
+	case item.QuantityRequested < 0:
 		o.MaterialList = o.MaterialList.removeItem(item.ProductUUID)
-	default:
+	case item.QuantityReceived == 0 || item.ProductUUID != "":
 		o.MaterialList = append(o.MaterialList, item)
 	}
 }

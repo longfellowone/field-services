@@ -2,11 +2,16 @@ package field
 
 type MaterialList []Item
 
-func (m MaterialList) NewItem(uuid ProductUUID, quantity int) (Item, error) {
-	if m.findItem(uuid).ProductUUID != "" {
-		return Item{}, ErrItemAlreadyOnList
-	}
-	return newItem(uuid, quantity), nil
+func (m MaterialList) NewItem(uuid ProductUUID) Item {
+	return newItem(uuid)
+}
+
+func (m MaterialList) UpdateQuantityRequested(uuid ProductUUID, quantity int) Item {
+	return m.findItem(uuid).updateQuantityRequested(quantity)
+}
+
+func (m MaterialList) ReceiveItem(uuid ProductUUID, quantity int) Item {
+	return Item{}
 }
 
 func (m MaterialList) findItem(uuid ProductUUID) Item {

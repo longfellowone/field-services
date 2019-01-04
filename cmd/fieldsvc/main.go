@@ -55,19 +55,21 @@ func main() {
 
 	orders, _ := service.FindAllProjectOrders("pid1")
 
-	item, err := orders[0].NewItem("uuid1", 50)
+	item := orders[0].NewItem("uuid1")
+	err := orders[0].UpdateMaterialList(item)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	orders[0].Send()
+
+	item = orders[0].UpdateQuantityRequested("uuid", 40)
+	//item = orders[0].ReceiveItem("uuid1", 1)
 
 	err = orders[0].UpdateMaterialList(item)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	orders[1].Send()
-
-	//orders[0].
 
 	for _, o := range orders {
 		fmt.Println(o)

@@ -12,21 +12,29 @@ type Item struct {
 	PurchaseOrder
 }
 
-func newItem(id ProductUUID, quantity int) Item {
+func newItem(id ProductUUID) Item {
 	return Item{
 		ProductUUID:       id,
-		QuantityRequested: quantity,
+		QuantityRequested: 0,
 		QuantityReceived:  0,
 	}
 }
 
-func (i Item) ReceiveItem(quantity int) Item {
-	i.QuantityReceived = quantity
+func (i Item) receiveItem(quantity int) Item {
+	i.QuantityReceived += quantity
+	if i.QuantityReceived >= i.QuantityRequested {
+		i.updateStatus(Filled)
+	}
 	return i
 }
 
-func (i Item) UpdateQuantityRequested(quantity int) Item {
+func (i Item) updateQuantityRequested(quantity int) Item {
 	i.QuantityRequested = quantity
+	return i
+}
+
+func (i Item) updateStatus(status ItemStatus) Item {
+	i.ItemStatus = status
 	return i
 }
 
