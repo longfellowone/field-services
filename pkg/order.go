@@ -10,7 +10,7 @@ var (
 	ErrOrderNotFound     = errors.New("order not found")
 	ErrOrderSent         = errors.New("order already sent")
 	ErrMustHaveItems     = errors.New("order must have at least 1 item")
-	ErrQuantityZero      = errors.New("item quantity must be greater than 0")
+	ErrQuantityZero      = errors.New("quantity of all order items must be greater than 0")
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyOnList = errors.New("item already on list")
 	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
@@ -34,7 +34,7 @@ type Order struct {
 	ProjectUUID
 	MaterialList
 	PurchaseOrders
-	Events
+	OrderHistory
 }
 
 func Create(id OrderUUID, pid ProjectUUID) *Order {
@@ -45,7 +45,7 @@ func Create(id OrderUUID, pid ProjectUUID) *Order {
 		ProjectUUID:    pid,
 		MaterialList:   nil,
 		PurchaseOrders: nil,
-		Events:         []Event{event},
+		OrderHistory:   []Event{event},
 	}
 }
 
@@ -69,19 +69,54 @@ func (o *Order) RemoveItem(uuid ProductUUID) {
 	o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
 }
 
+func (o *Order) UpdateQuantityRequested(uuid ProductUUID, quantity uint) {
+	i, item := o.findItem(uuid)
+
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
+	}
+
+	o.MaterialList[i] = o.MaterialList[i].updateQuantityRequested(quantity)
+}
+
+func (m MaterialList) ReceiveItem(uuid ProductUUID, quantity uint) {
+	i, item := m.findItem(uuid)
+
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
+	}
+
+	m[i] = m[i].receiveItem(quantity)
+}
+
 func (o *Order) Send() {
-	o.newEvent(OnRoute)
+	if !o.okToSend() {
+		log.Println(ErrQuantityZero)
+		return
+	}
+	o.newEvent(Sent)
+}
+
+func (o *Order) okToSend() bool {
+	for i := range o.MaterialList {
+		if o.MaterialList[i].QuantityRequested == 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func (o *Order) lastEvent() OrderStatus {
-	return o.Events[len(o.Events)-1].OrderStatus
+	return o.OrderHistory[len(o.OrderHistory)-1].OrderStatus
 }
 
 func (o *Order) newEvent(event OrderStatus) {
-	o.Events = append(o.Events, createEvent(event))
+	o.OrderHistory = append(o.OrderHistory, createEvent(event))
 }
 
-type Events []Event
+type OrderHistory []Event
 
 type Event struct {
 	Date time.Time

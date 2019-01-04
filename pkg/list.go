@@ -1,30 +1,6 @@
 package field
 
-import "log"
-
 type MaterialList []Item
-
-func (m MaterialList) UpdateQuantityRequested(uuid ProductUUID, quantity uint) {
-	i, item := m.findItem(uuid)
-
-	if item.ProductUUID == "" {
-		log.Println(ErrItemNotFound)
-		return
-	}
-
-	m[i] = m[i].updateQuantityRequested(quantity)
-}
-
-func (m MaterialList) ReceiveItem(uuid ProductUUID, quantity uint) {
-	i, item := m.findItem(uuid)
-
-	if item.ProductUUID == "" {
-		log.Println(ErrItemNotFound)
-		return
-	}
-
-	m[i] = m[i].receiveItem(quantity)
-}
 
 func (m MaterialList) findItem(uuid ProductUUID) (int, Item) {
 	for i := range m {
