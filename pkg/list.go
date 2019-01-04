@@ -1,38 +1,38 @@
 package field
 
+import "log"
+
 type MaterialList []Item
 
-func (m MaterialList) NewItem(uuid ProductUUID) Item {
-	return newItem(uuid)
+func (m MaterialList) UpdateQuantityRequested(uuid ProductUUID, quantity uint) {
+	i, item := m.findItem(uuid)
+
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
+	}
+
+	m[i] = m[i].updateQuantityRequested(quantity)
 }
 
-func (m MaterialList) FindItem(uuid ProductUUID) Item {
+func (m MaterialList) ReceiveItem(uuid ProductUUID, quantity uint) {
+	i, item := m.findItem(uuid)
+
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
+	}
+
+	m[i] = m[i].receiveItem(quantity)
+}
+
+func (m MaterialList) findItem(uuid ProductUUID) (int, Item) {
 	for i := range m {
 		if m[i].ProductUUID == uuid {
-			m[i].Index = i
-			return m[i]
+			return i, m[i]
 		}
 	}
-	return Item{}
-}
-
-func (m MaterialList) findItem(uuid ProductUUID) int {
-	for i := range m {
-		if m[i].ProductUUID == uuid {
-			return i
-		}
-	}
-	return -1
-}
-
-func (m MaterialList) removeItem(id ProductUUID) MaterialList {
-	//i := o.FindItem(id)
-	//if i < 0 {
-	//	log.Println(ErrItemNotFound)
-	//	return
-	//}
-	//o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
-	return MaterialList{}
+	return -1, Item{}
 }
 
 func (m MaterialList) receivedAll() bool {
@@ -57,4 +57,14 @@ func (m MaterialList) receivedAll() bool {
 //	}
 //
 //	m[i].QuantityRequested = qr
+//}
+
+//func (m MaterialList) FindItem(uuid ProductUUID) Item {
+//	for i := range m {
+//		if m[i].ProductUUID == uuid {
+//			m[i].Index = i
+//			return m[i]
+//		}
+//	}
+//	return Item{}
 //}

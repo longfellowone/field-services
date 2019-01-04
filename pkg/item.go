@@ -6,8 +6,8 @@ type Item struct {
 	ProductUUID
 	Name string
 	UOM
-	QuantityRequested int
-	QuantityReceived  int
+	QuantityRequested uint
+	QuantityReceived  uint
 	ItemStatus
 	PurchaseOrder
 	Index int
@@ -21,21 +21,20 @@ func newItem(id ProductUUID) Item {
 	}
 }
 
-func (i Item) ReceiveItem(quantity int) Item {
+func (i Item) receiveItem(quantity uint) Item {
 	i.QuantityReceived += quantity
-	if i.QuantityReceived >= i.QuantityRequested {
-		i.updateStatus(Filled)
+
+	switch {
+	case i.QuantityReceived >= i.QuantityRequested:
+		i.ItemStatus = Filled
+	case quantity > 0 && quantity < i.QuantityRequested:
+		i.ItemStatus = BackOrdered
 	}
 	return i
 }
 
-func (i Item) UpdateQuantityRequested(quantity int) Item {
+func (i Item) updateQuantityRequested(quantity uint) Item {
 	i.QuantityRequested = quantity
-	return i
-}
-
-func (i Item) updateStatus(status ItemStatus) Item {
-	i.ItemStatus = status
 	return i
 }
 

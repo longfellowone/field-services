@@ -2,7 +2,7 @@ package field
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -50,37 +50,27 @@ func Create(id OrderUUID, pid ProjectUUID) *Order {
 }
 
 func (o *Order) AddItem(uuid ProductUUID) {
-	o.findItem(uuid)
+	_, item := o.findItem(uuid)
+	if item.ProductUUID != "" {
+		log.Println(ErrItemAlreadyOnList)
+		return
+	}
+
+	o.MaterialList = append(o.MaterialList, newItem(uuid))
 }
 
-func (o *Order) UpdateMaterialList(item Item) error {
-	switch {
-	case o.lastEvent() == Created:
-		o.updateMaterialList(item)
-	case o.lastEvent() == Sent:
-		return ErrOrderSent
-	case o.lastEvent() == OnRoute:
-		fmt.Println(item)
-		//o.ReceiveItem(item)
-	case o.lastEvent() == Complete:
-		return ErrOrderComplete
+func (o *Order) RemoveItem(uuid ProductUUID) {
+	i, item := o.findItem(uuid)
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
 	}
-	return nil
+
+	o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
 }
 
 func (o *Order) Send() {
 	o.newEvent(OnRoute)
-}
-
-func (o *Order) updateMaterialList(item Item) {
-	switch {
-	case item.QuantityRequested < 0:
-		o.MaterialList = o.MaterialList.removeItem(item.ProductUUID)
-	//case item:
-	//	o.MaterialList
-	case item.QuantityReceived == 0 || item.ProductUUID != "":
-		o.MaterialList = append(o.MaterialList, item)
-	}
 }
 
 func (o *Order) lastEvent() OrderStatus {
@@ -127,3 +117,29 @@ func (s OrderStatus) String() string {
 	}
 	return ""
 }
+
+//func (o *Order) UpdateMaterialList(item Item) error {
+//	switch {
+//	case o.lastEvent() == Created:
+//		o.updateMaterialList(item)
+//	case o.lastEvent() == Sent:
+//		return ErrOrderSent
+//	case o.lastEvent() == OnRoute:
+//		fmt.Println(item)
+//		//o.ReceiveItem(item)
+//	case o.lastEvent() == Complete:
+//		return ErrOrderComplete
+//	}
+//	return nil
+//}
+
+//func (o *Order) updateMaterialList(item Item) {
+//	switch {
+//	case item.QuantityRequested < 0:
+//		o.MaterialList = o.MaterialList.removeItem(item.ProductUUID)
+//	//case item:
+//	//	o.MaterialList
+//	case item.QuantityReceived == 0 || item.ProductUUID != "":
+//		o.MaterialList = append(o.MaterialList, item)
+//	}
+//}
