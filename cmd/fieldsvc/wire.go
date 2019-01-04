@@ -22,7 +22,7 @@ func initializeFieldServicesInMemory() *ordering.Service {
 	wire.Build(
 		inmem.NewOrderRepository,
 		ordering.NewOrderingService,
-		wire.Bind(new(orders.OrderRepository), &inmem.OrderRepository{}),
+		wire.Bind(new(field.OrderRepository), &inmem.OrderRepository{}),
 	)
 	return nil
 }

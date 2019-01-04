@@ -6,17 +6,17 @@ import (
 )
 
 type Service struct {
-	db orders.OrderRepository
+	db field.OrderRepository
 }
 
-func NewOrderingService(db orders.OrderRepository) *Service {
+func NewOrderingService(db field.OrderRepository) *Service {
 	return &Service{
 		db: db,
 	}
 }
 
-func (s *Service) CreateOrder(o orders.OrderID, p orders.ProjectID) {
-	order := orders.NewOrder(o, p)
+func (s *Service) CreateOrder(o field.OrderUUID, p field.ProjectUUID) {
+	order := field.Create(o, p)
 	err := s.db.Save(order)
 	if err != nil {
 		log.Println(err)
@@ -25,7 +25,7 @@ func (s *Service) CreateOrder(o orders.OrderID, p orders.ProjectID) {
 
 // READ MODELS
 
-func (s *Service) FindOrder(id orders.OrderID) (*orders.Order, error) {
+func (s *Service) FindOrder(id field.OrderUUID) (*field.Order, error) {
 	findAll, err := s.db.Find(id)
 	if err != nil {
 		log.Println(err)
@@ -33,7 +33,7 @@ func (s *Service) FindOrder(id orders.OrderID) (*orders.Order, error) {
 	return findAll, nil
 }
 
-func (s *Service) FindAllProjectOrders(id orders.ProjectID) ([]*orders.Order, error) {
+func (s *Service) FindAllProjectOrders(id field.ProjectUUID) ([]*field.Order, error) {
 	findAll, err := s.db.FindAllFromProject(id)
 	if err != nil {
 		log.Println(err)

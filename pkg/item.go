@@ -1,61 +1,33 @@
-package orders
+package field
 
-import (
-	"time"
-)
-
-type ProductID string
+type ProductUUID string
 
 type Item struct {
-	ProductID         ProductID
-	Name              string
-	UOM               UOM
+	ProductUUID
+	Name string
+	UOM
 	QuantityRequested int
 	QuantityReceived  int
-	Status            ItemStatus
-	LastUpdate        time.Time
-	PO                PurchaseOrder
+	ItemStatus
+	PurchaseOrder
 }
 
-func newItem(id ProductID, name string, uom UOM) Item {
+func newItem(id ProductUUID, quantity int) Item {
 	return Item{
-		ProductID:         id,
-		Name:              name,
-		UOM:               uom,
-		QuantityRequested: 0,
+		ProductUUID:       id,
+		QuantityRequested: quantity,
 		QuantityReceived:  0,
-		Status:            Waiting,
-		LastUpdate:        time.Now(),
-		PO:                PurchaseOrder{},
 	}
 }
 
-func (i *Item) adjustQuantity(quantity int) {
+func (i Item) ReceiveItem(quantity int) Item {
+	i.QuantityReceived = quantity
+	return i
+}
+
+func (i Item) UpdateQuantityRequested(quantity int) Item {
 	i.QuantityRequested = quantity
-}
-
-func (i *Item) receive(received int) {
-	requested := i.QuantityRequested
-
-	i.LastUpdate = time.Now()
-	i.QuantityReceived = +received
-
-	switch {
-	case received >= requested:
-		i.Status = Filled
-	case received < requested:
-		i.Status = BackOrdered
-	default:
-		i.Status = Waiting
-	}
-}
-
-func (i *Item) updatePO(number string, supplier string) {
-	i.PO = newPO(number, supplier)
-}
-
-func (i *Item) removePO() {
-	i.PO = PurchaseOrder{}
+	return i
 }
 
 type ItemStatus int
