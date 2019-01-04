@@ -6,25 +6,27 @@ func (m MaterialList) NewItem(uuid ProductUUID) Item {
 	return newItem(uuid)
 }
 
-func (m MaterialList) UpdateQuantityRequested(uuid ProductUUID, quantity int) Item {
-	return m.findItem(uuid).updateQuantityRequested(quantity)
-}
-
-func (m MaterialList) ReceiveItem(uuid ProductUUID, quantity int) Item {
-	return Item{}
-}
-
-func (m MaterialList) findItem(uuid ProductUUID) Item {
+func (m MaterialList) FindItem(uuid ProductUUID) Item {
 	for i := range m {
 		if m[i].ProductUUID == uuid {
+			m[i].Index = i
 			return m[i]
 		}
 	}
 	return Item{}
 }
 
+func (m MaterialList) findItem(uuid ProductUUID) int {
+	for i := range m {
+		if m[i].ProductUUID == uuid {
+			return i
+		}
+	}
+	return -1
+}
+
 func (m MaterialList) removeItem(id ProductUUID) MaterialList {
-	//i := o.findItem(id)
+	//i := o.FindItem(id)
 	//if i < 0 {
 	//	log.Println(ErrItemNotFound)
 	//	return
@@ -48,7 +50,7 @@ func (m MaterialList) receivedAll() bool {
 //		return
 //	}
 //
-//	i := m.findItem(id)
+//	i := m.FindItem(id)
 //	if i < 0 {
 //		log.Println(ErrItemNotFound)
 //		return

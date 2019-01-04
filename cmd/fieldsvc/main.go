@@ -61,10 +61,17 @@ func main() {
 		fmt.Println(err)
 	}
 
-	orders[0].Send()
+	item = orders[0].NewItem("uuid2")
+	err = orders[0].UpdateMaterialList(item)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	item = orders[0].UpdateQuantityRequested("uuid", 40)
-	//item = orders[0].ReceiveItem("uuid1", 1)
+	//orders[0].Send()
+
+	item = orders[0].FindItem("uuid1").UpdateQuantityRequested(30)
+
+	fmt.Println(item.Index)
 
 	err = orders[0].UpdateMaterialList(item)
 	if err != nil {

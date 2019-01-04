@@ -49,6 +49,10 @@ func Create(id OrderUUID, pid ProjectUUID) *Order {
 	}
 }
 
+func (o *Order) AddItem(uuid ProductUUID) {
+	o.findItem(uuid)
+}
+
 func (o *Order) UpdateMaterialList(item Item) error {
 	switch {
 	case o.lastEvent() == Created:
@@ -72,6 +76,8 @@ func (o *Order) updateMaterialList(item Item) {
 	switch {
 	case item.QuantityRequested < 0:
 		o.MaterialList = o.MaterialList.removeItem(item.ProductUUID)
+	//case item:
+	//	o.MaterialList
 	case item.QuantityReceived == 0 || item.ProductUUID != "":
 		o.MaterialList = append(o.MaterialList, item)
 	}

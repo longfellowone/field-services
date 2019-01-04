@@ -10,6 +10,7 @@ type Item struct {
 	QuantityReceived  int
 	ItemStatus
 	PurchaseOrder
+	Index int
 }
 
 func newItem(id ProductUUID) Item {
@@ -20,7 +21,7 @@ func newItem(id ProductUUID) Item {
 	}
 }
 
-func (i Item) receiveItem(quantity int) Item {
+func (i Item) ReceiveItem(quantity int) Item {
 	i.QuantityReceived += quantity
 	if i.QuantityReceived >= i.QuantityRequested {
 		i.updateStatus(Filled)
@@ -28,7 +29,7 @@ func (i Item) receiveItem(quantity int) Item {
 	return i
 }
 
-func (i Item) updateQuantityRequested(quantity int) Item {
+func (i Item) UpdateQuantityRequested(quantity int) Item {
 	i.QuantityRequested = quantity
 	return i
 }
