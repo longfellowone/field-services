@@ -55,17 +55,18 @@ func main() {
 
 	orders, _ := service.FindAllProjectOrders("pid1")
 
-	orders[0].AddItem("uuid1")
-	orders[0].AddItem("uuid2")
-	orders[0].AddItem("uuid3")
+	orders[0].AddItem("uuid1", "name1")
+	orders[0].AddItem("uuid2", "name2")
+	orders[0].AddItem("uuid3", "name3")
 
 	orders[0].RemoveItem("uuid1")
-
+	//
 	orders[0].UpdateQuantityRequested("uuid2", 40)
-
-	orders[0].ReceiveItem("uuid2", 23)
-
+	orders[0].UpdateQuantityRequested("uuid3", 30)
+	//
 	orders[0].Send()
+	//
+	orders[0].ReceiveItem("uuid2", 23)
 
 	for _, o := range orders {
 		fmt.Println(o)

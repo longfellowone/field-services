@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"errors"
@@ -52,20 +52,20 @@ func Create(id OrderID, pid ProjectID) *Order {
 }
 
 func (o *Order) AddItem(id ProductUUID) {
-	if o.findItem(id) > 0 {
-		log.Println(ErrItemAlreadyExists)
-		return
-	}
+	//if o.findItem(id) > 0 {
+	//	log.Println(ErrItemAlreadyExists)
+	//	return
+	//}
 	o.MaterialList = append(o.MaterialList, newItem(id))
 }
 
 func (o *Order) RemoveItem(id ProductUUID) {
-	i := o.findItem(id)
-	if i < 0 {
-		log.Println(ErrItemNotFound)
-		return
-	}
-	o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
+	//i := o.findItem(id)
+	//if i < 0 {
+	//	log.Println(ErrItemNotFound)
+	//	return
+	//}
+	//o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
 }
 
 func (o *Order) Send() {
@@ -74,28 +74,33 @@ func (o *Order) Send() {
 
 type MaterialList []Item
 
-func (m MaterialList) AdjustQuantityRequested(id ProductUUID, qr QuantityRequested) {
-	if qr <= 0 {
+func (m MaterialList) AdjustQuantityRequested(id ProductUUID, quantity QuantityRequested) {
+	if quantity <= 0 {
 		log.Println(ErrQuantityZero)
 		return
 	}
 
-	i := m.findItem(id)
-	if i < 0 {
-		log.Println(ErrItemNotFound)
-		return
+	item, err := m.updateItem(id, adjustQuantityRequested, quantity)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	m[i].QuantityRequested = qr
-}
-
-func (m MaterialList) findItem(id ProductUUID) int {
-	for i := range m {
-		if m[i].ProductUUID == id {
-			return i
+	for i, existingItem := range m {
+		if existingItem.ProductUUID == item.ProductUUID {
+			m[i] = item
 		}
 	}
-	return -1
+}
+
+type action func(item Item, quantity QuantityRequested) Item
+
+func (m MaterialList) updateItem(id ProductUUID, action action, quantity QuantityRequested) (Item, error) {
+	for _, item := range m {
+		if item.ProductUUID == id {
+			return action(item, quantity), nil
+		}
+	}
+	return Item{}, ErrItemNotFound
 }
 
 type OrderStatus []Status
@@ -124,6 +129,16 @@ func newItem(id ProductUUID) Item {
 		QuantityReceived:  0,
 	}
 }
+
+func adjustQuantityRequested(item Item, quantity QuantityRequested) Item {
+	item.QuantityRequested = quantity
+	return item
+}
+
+//func (i Item) adjustQuantityRequested(quantity QuantityRequested) Item {
+//	i.QuantityRequested = quantity
+//	return i
+//}
 
 // Build sample order
 func BuildSampleOrder() *Order {

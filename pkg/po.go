@@ -1,4 +1,4 @@
-package field
+package supply
 
 type PurchaseOrders []PurchaseOrder
 

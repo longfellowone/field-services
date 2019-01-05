@@ -1,4 +1,4 @@
-package field
+package supply
 
 import (
 	"errors"
@@ -34,74 +34,51 @@ type Order struct {
 	ProjectUUID
 	MaterialList
 	PurchaseOrders
-	OrderHistory
+	OrderHistory []Event
 }
 
 func Create(id OrderUUID, pid ProjectUUID) *Order {
 	event := createEvent(Created)
 
 	return &Order{
-		OrderUUID:      id,
-		ProjectUUID:    pid,
-		MaterialList:   nil,
-		PurchaseOrders: nil,
-		OrderHistory:   []Event{event},
+		OrderUUID:    id,
+		ProjectUUID:  pid,
+		OrderHistory: []Event{event},
 	}
-}
-
-func (o *Order) AddItem(uuid ProductUUID) {
-	_, item := o.findItem(uuid)
-	if item.ProductUUID != "" {
-		log.Println(ErrItemAlreadyOnList)
-		return
-	}
-
-	o.MaterialList = append(o.MaterialList, newItem(uuid))
-}
-
-func (o *Order) RemoveItem(uuid ProductUUID) {
-	i, item := o.findItem(uuid)
-	if item.ProductUUID == "" {
-		log.Println(ErrItemNotFound)
-		return
-	}
-
-	o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
-}
-
-func (o *Order) UpdateQuantityRequested(uuid ProductUUID, quantity uint) {
-	i, item := o.findItem(uuid)
-
-	if item.ProductUUID == "" {
-		log.Println(ErrItemNotFound)
-		return
-	}
-
-	o.MaterialList[i] = o.MaterialList[i].updateQuantityRequested(quantity)
-}
-
-func (m MaterialList) ReceiveItem(uuid ProductUUID, quantity uint) {
-	i, item := m.findItem(uuid)
-
-	if item.ProductUUID == "" {
-		log.Println(ErrItemNotFound)
-		return
-	}
-
-	m[i] = m[i].receiveItem(quantity)
 }
 
 func (o *Order) Send() {
 	if !o.okToSend() {
-		log.Println(ErrQuantityZero)
 		return
 	}
 	o.newEvent(Sent)
 }
 
+func (o *Order) AddItem(uuid ProductUUID, name string) {
+	if o.lastEvent() != Created {
+		log.Println(ErrOrderSent)
+		return
+	}
+	o.MaterialList = o.addItem(uuid, name)
+}
+
+func (o *Order) RemoveItem(uuid ProductUUID) {
+	if o.lastEvent() != Created {
+		log.Println(ErrOrderSent)
+		return
+	}
+	o.MaterialList = o.removeItem(uuid)
+}
+
+func (o *Order) ReceiveItem(uuid ProductUUID, quantity uint) {
+	o.receiveItem(uuid, quantity)
+}
+
 func (o *Order) okToSend() bool {
-	for i := range o.MaterialList {
-		if o.MaterialList[i].QuantityRequested == 0 {
+	for i := range o.MaterialList.Items {
+		switch {
+		case o.MaterialList.Items[i].QuantityRequested == 0:
+			log.Println(ErrQuantityZero)
 			return false
 		}
 	}
@@ -115,8 +92,6 @@ func (o *Order) lastEvent() OrderStatus {
 func (o *Order) newEvent(event OrderStatus) {
 	o.OrderHistory = append(o.OrderHistory, createEvent(event))
 }
-
-type OrderHistory []Event
 
 type Event struct {
 	Date time.Time

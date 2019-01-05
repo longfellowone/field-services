@@ -1,4 +1,4 @@
-package field
+package supply
 
 type ProductUUID string
 
@@ -8,33 +8,30 @@ type Item struct {
 	UOM
 	QuantityRequested uint
 	QuantityReceived  uint
+	QuantityRemaining uint
 	ItemStatus
 	PurchaseOrder
-	Index int
 }
 
-func newItem(id ProductUUID) Item {
+func newItem(uuid ProductUUID, name string) Item {
 	return Item{
-		ProductUUID:       id,
-		QuantityRequested: 0,
-		QuantityReceived:  0,
+		ProductUUID: uuid,
+		Name:        name,
+		ItemStatus:  Waiting,
 	}
 }
 
-func (i Item) receiveItem(quantity uint) Item {
-	i.QuantityReceived += quantity
+func (i Item) receive(quantity uint) Item {
+	i.QuantityReceived = quantity
 
 	switch {
-	case i.QuantityReceived >= i.QuantityRequested:
+	case i.QuantityReceived == i.QuantityRequested:
 		i.ItemStatus = Filled
 	case quantity > 0 && quantity < i.QuantityRequested:
 		i.ItemStatus = BackOrdered
+	case i.QuantityReceived > i.QuantityRequested:
+		i.ItemStatus = OrderExceeded
 	}
-	return i
-}
-
-func (i Item) updateQuantityRequested(quantity uint) Item {
-	i.QuantityRequested = quantity
 	return i
 }
 
@@ -44,6 +41,7 @@ const (
 	Waiting ItemStatus = iota
 	Filled
 	BackOrdered
+	OrderExceeded
 )
 
 func (s ItemStatus) String() string {
@@ -54,6 +52,8 @@ func (s ItemStatus) String() string {
 		return "Filled"
 	case BackOrdered:
 		return "Back Ordered"
+	case OrderExceeded:
+		return "Order Exceeded"
 	}
 	return ""
 }

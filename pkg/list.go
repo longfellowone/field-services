@@ -1,19 +1,69 @@
-package field
+package supply
 
-type MaterialList []Item
+import (
+	"log"
+)
+
+type MaterialList struct {
+	Items []Item
+}
+
+func (m MaterialList) UpdateQuantityRequested(uuid ProductUUID, quantity uint) {
+	i, item := m.findItem(uuid)
+
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
+	}
+
+	m.Items[i].QuantityRequested = quantity
+}
+
+func (m MaterialList) addItem(uuid ProductUUID, name string) MaterialList {
+	_, item := m.findItem(uuid)
+	if item.ProductUUID != "" {
+		log.Println(ErrItemAlreadyOnList)
+		return m
+	}
+
+	m.Items = append(m.Items, newItem(uuid, name))
+	return m
+}
+
+func (m MaterialList) removeItem(uuid ProductUUID) MaterialList {
+	i, item := m.findItem(uuid)
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return m
+	}
+
+	m.Items = append(m.Items[:i], m.Items[i+1:]...)
+	return m
+}
+
+func (m MaterialList) receiveItem(uuid ProductUUID, quantity uint) {
+	i, item := m.findItem(uuid)
+
+	if item.ProductUUID == "" {
+		log.Println(ErrItemNotFound)
+		return
+	}
+
+	m.Items[i] = m.Items[i].receive(quantity)
+}
 
 func (m MaterialList) findItem(uuid ProductUUID) (int, Item) {
-	for i := range m {
-		if m[i].ProductUUID == uuid {
-			return i, m[i]
+	for i := range m.Items {
+		if m.Items[i].ProductUUID == uuid {
+			return i, m.Items[i]
 		}
 	}
 	return -1, Item{}
 }
 
 func (m MaterialList) receivedAll() bool {
-	for i := range m {
-		if m[i].ItemStatus != Filled {
+	for i := range m.Items {
+		if m.Items[i].ItemStatus != Filled {
 			return false
 		}
 	}
