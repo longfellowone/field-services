@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"field/pkg/ordering"
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"log"
+	"supply/pkg/ordering"
 	"time"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	var service *ordering.Service
 
 	if inMemory {
-		service = initializeFieldServicesInMemory()
+		service = initializeSupplyServiceInMemory()
 	} else {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		client, err := mongo.Connect(ctx, "mongodb://default:password@localhost:27017")
@@ -33,7 +33,7 @@ func main() {
 		//err = client.Disconnect(ctx)
 
 		db := client.Database("field")
-		service = initializeFieldServices(db)
+		service = initializeSupplyService(db)
 	}
 
 	fmt.Println(service)

@@ -3,15 +3,15 @@
 package main
 
 import (
-	"field/pkg"
-	"field/pkg/inmem"
-	mongodb "field/pkg/mongo"
-	"field/pkg/ordering"
 	"github.com/google/wire"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"supply/pkg"
+	"supply/pkg/inmem"
+	mongodb "supply/pkg/mongo"
+	"supply/pkg/ordering"
 )
 
-func initializeFieldServices(db *mongo.Database) *ordering.Service {
+func initializeSupplyService(db *mongo.Database) *ordering.Service {
 	wire.Build(
 		mongodb.NewOrderRepository,
 		ordering.NewOrderingService,
@@ -20,7 +20,7 @@ func initializeFieldServices(db *mongo.Database) *ordering.Service {
 	return nil
 }
 
-func initializeFieldServicesInMemory() *ordering.Service {
+func initializeSupplyServiceInMemory() *ordering.Service {
 	wire.Build(
 		inmem.NewOrderRepository,
 		ordering.NewOrderingService,

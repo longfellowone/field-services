@@ -5,4 +5,4 @@ docker-compose up -d
 echo "Starting supplysvc..."
 cd ../cmd/supplysvc/
 GOOS=linux CGO_ENABLED=0 go build -o fieldsvc .
-./fieldsvc
+./supplysvc

@@ -14,11 +14,6 @@ var (
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyOnList = errors.New("item already on list")
 	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
-	ErrPOalreadyExists   = errors.New("PO already exists")
-	ErrPOnotFound        = errors.New("PO not found")
-	ErrItemAlreadyExists = errors.New("item already exists")
-	ErrOrderComplete     = errors.New("order complete cannot add item")
-	ErrMustReceive       = errors.New("must have received at least 1")
 )
 
 type OrderRepository interface {
@@ -113,8 +108,10 @@ type Event struct {
 }
 
 func createEvent(status OrderStatus) Event {
+	timeNow := time.Now()
+
 	return Event{
-		Date:        time.Now(),
+		Date:        timeNow,
 		OrderStatus: status,
 	}
 }

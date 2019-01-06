@@ -1,7 +1,7 @@
 package inmem
 
 import (
-	"field/pkg"
+	"supply/pkg"
 	"sync"
 )
 
