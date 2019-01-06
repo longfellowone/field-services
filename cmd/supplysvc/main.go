@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"field/pkg/ordering"
+	"fmt"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"log"
 	"time"
@@ -18,19 +19,24 @@ func main() {
 	if inMemory {
 		service = initializeFieldServicesInMemory()
 	} else {
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		client, err := mongo.Connect(ctx, "mongodb://default:password@localhost:27017")
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer cancel()
+		//err = client.Disconnect(ctx)
+
 		db := client.Database("field")
 		service = initializeFieldServices(db)
 	}
 
 	service.CreateOrder("oid1", "pid1")
+
 	//service.CreateOrder("oid2", "pid1")
 
-	//order, _ := service.FindOrder("oid1")
+	order, _ := service.FindOrder("oid1")
+	fmt.Println(order)
 	//
 	//order.AddItem("uuid1", "name1")
 	//order.AddItem("uuid2", "name2")
