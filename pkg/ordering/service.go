@@ -23,18 +23,16 @@ func (s *Service) CreateOrder(o supply.OrderUUID, p supply.ProjectUUID) {
 	}
 }
 
-// READ MODELS
-
-func (s *Service) FindOrder(id supply.OrderUUID) (*supply.Order, error) {
-	findAll, err := s.db.Find(id)
+func (s *Service) FindOrder(uuid supply.OrderUUID) (*supply.Order, error) {
+	findAll, err := s.db.Find(uuid)
 	if err != nil {
 		log.Println(err)
 	}
 	return findAll, nil
 }
 
-func (s *Service) FindAllProjectOrders(id supply.ProjectUUID) ([]*supply.Order, error) {
-	findAll, err := s.db.FindAllFromProject(id)
+func (s *Service) FindAllProjectOrders(uuid supply.ProjectUUID) ([]*supply.Order, error) {
+	findAll, err := s.db.FindAllFromProject(uuid)
 	if err != nil {
 		log.Println(err)
 	}

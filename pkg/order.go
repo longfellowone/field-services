@@ -18,12 +18,13 @@ var (
 	ErrPOnotFound        = errors.New("PO not found")
 	ErrItemAlreadyExists = errors.New("item already exists")
 	ErrOrderComplete     = errors.New("order complete cannot add item")
+	ErrMustReceive       = errors.New("must have received at least 1")
 )
 
 type OrderRepository interface {
 	Save(o *Order) error
-	Find(id OrderUUID) (*Order, error)
-	FindAllFromProject(id ProjectUUID) ([]*Order, error)
+	Find(uuid OrderUUID) (*Order, error)
+	FindAllFromProject(uuid ProjectUUID) ([]*Order, error)
 }
 
 type OrderUUID string
@@ -33,7 +34,6 @@ type Order struct {
 	OrderUUID
 	ProjectUUID
 	MaterialList
-	PurchaseOrders
 	OrderHistory []Event
 }
 
@@ -48,7 +48,15 @@ func Create(id OrderUUID, pid ProjectUUID) *Order {
 }
 
 func (o *Order) Send() {
-	if !o.okToSend() {
+	switch {
+	case o.MaterialList.Items == nil:
+		log.Println(ErrMustHaveItems)
+		return
+	case o.missingQuantities():
+		log.Println(ErrQuantityZero)
+		return
+	case o.alreadySent():
+		log.Println(ErrOrderSent)
 		return
 	}
 	o.newEvent(Sent)
@@ -72,25 +80,31 @@ func (o *Order) RemoveItem(uuid ProductUUID) {
 
 func (o *Order) ReceiveItem(uuid ProductUUID, quantity uint) {
 	o.receiveItem(uuid, quantity)
+
+	if o.receivedAll() {
+		o.newEvent(Complete)
+	}
 }
 
-func (o *Order) okToSend() bool {
+func (o *Order) missingQuantities() bool {
 	for i := range o.MaterialList.Items {
-		switch {
-		case o.MaterialList.Items[i].QuantityRequested == 0:
-			log.Println(ErrQuantityZero)
-			return false
+		if o.MaterialList.Items[i].QuantityRequested == 0 {
+			return true
 		}
 	}
-	return true
+	return false
+}
+
+func (o *Order) newEvent(event OrderStatus) {
+	o.OrderHistory = append(o.OrderHistory, createEvent(event))
 }
 
 func (o *Order) lastEvent() OrderStatus {
 	return o.OrderHistory[len(o.OrderHistory)-1].OrderStatus
 }
 
-func (o *Order) newEvent(event OrderStatus) {
-	o.OrderHistory = append(o.OrderHistory, createEvent(event))
+func (o *Order) alreadySent() bool {
+	return o.OrderHistory[len(o.OrderHistory)-1].OrderStatus != Created
 }
 
 type Event struct {

@@ -1,79 +1,53 @@
 package main
 
 import (
+	"context"
 	"field/pkg/ordering"
-	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/mongodb/mongo-go-driver/mongo"
+	"log"
+	"time"
 )
 
 const (
-	//defaultGRPCPort = 9090
-	//defaultDBHost   = "localhost"
-	//defaultDBPort   = 5432
-	//defaultDBName   = "default"
-	//defaultDBUser   = "default"
-	//defaultDBPasswd = "password"
-	//sslMode         = "disable"
-	inMemory = true
+	inMemory = false
 )
 
 func main() {
-
-	// flags := flag.Parse()
-
-	//var (
-	//	dbHost                   = defaultDBHost
-	//	dbPort                   = defaultDBPort
-	//	dbUser                   = defaultDBUser
-	//	dbPasswd                 = defaultDBPasswd
-	//	dbName                   = defaultDBName
-	//	postgresConnectionString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", dbHost, dbPort, dbUser, dbPasswd, dbName, sslMode)
-	//)
-
 	var service *ordering.Service
 
 	if inMemory {
 		service = initializeFieldServicesInMemory()
+	} else {
+		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		client, err := mongo.Connect(ctx, "mongodb://default:password@localhost:27017")
+		if err != nil {
+			log.Fatal(err)
+		}
+		db := client.Database("field")
+		service = initializeFieldServices(db)
 	}
-
-	//else {
-	//	db, err := sql.Open("postgres", postgresConnectionString)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	defer db.Close()
-	//
-	//	if err = db.Ping(); err != nil {
-	//		log.Fatal(err)
-	//	}
-	//
-	//	fs = initializeFieldServices(db)
-	//}
 
 	service.CreateOrder("oid1", "pid1")
-	service.CreateOrder("oid2", "pid1")
+	//service.CreateOrder("oid2", "pid1")
 
-	orders, _ := service.FindAllProjectOrders("pid1")
-
-	orders[0].AddItem("uuid1", "name1")
-	orders[0].AddItem("uuid2", "name2")
-	orders[0].AddItem("uuid3", "name3")
-
-	orders[0].RemoveItem("uuid1")
+	//order, _ := service.FindOrder("oid1")
 	//
-	orders[0].UpdateQuantityRequested("uuid2", 40)
-	orders[0].UpdateQuantityRequested("uuid3", 30)
+	//order.AddItem("uuid1", "name1")
+	//order.AddItem("uuid2", "name2")
+	//order.AddItem("uuid3", "name3")
 	//
-	orders[0].Send()
+	//order.RemoveItem("uuid1")
 	//
-	orders[0].ReceiveItem("uuid2", 23)
-
-	for _, o := range orders {
-		fmt.Println(o)
-	}
-	//order1 := orders[0]
-	//order2 := orders[1]
-
+	//order.UpdateQuantityRequested("uuid2", 40)
+	//order.UpdateQuantityRequested("uuid3", 30)
+	//order.Send()
+	//
+	//order.ReceiveItem("uuid2", 40)
+	//order.ReceiveItem("uuid3", 30)
+	//
+	//order.UpdatePO("uuid3", "po3")
+	//
+	//fmt.Println(order)
 }
 
 //

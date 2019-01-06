@@ -10,7 +10,7 @@ type Item struct {
 	QuantityReceived  uint
 	QuantityRemaining uint
 	ItemStatus
-	PurchaseOrder
+	PONumber string
 }
 
 func newItem(uuid ProductUUID, name string) Item {
@@ -18,6 +18,7 @@ func newItem(uuid ProductUUID, name string) Item {
 		ProductUUID: uuid,
 		Name:        name,
 		ItemStatus:  Waiting,
+		PONumber:    "N/A",
 	}
 }
 
@@ -27,10 +28,13 @@ func (i Item) receive(quantity uint) Item {
 	switch {
 	case i.QuantityReceived == i.QuantityRequested:
 		i.ItemStatus = Filled
+		i.QuantityRemaining = 0
 	case quantity > 0 && quantity < i.QuantityRequested:
 		i.ItemStatus = BackOrdered
+		i.QuantityRemaining = i.QuantityRequested - i.QuantityReceived
 	case i.QuantityReceived > i.QuantityRequested:
 		i.ItemStatus = OrderExceeded
+		i.QuantityRemaining = 0
 	}
 	return i
 }
@@ -42,6 +46,7 @@ const (
 	Filled
 	BackOrdered
 	OrderExceeded
+	NotOrdered
 )
 
 func (s ItemStatus) String() string {
@@ -54,7 +59,10 @@ func (s ItemStatus) String() string {
 		return "Back Ordered"
 	case OrderExceeded:
 		return "Order Exceeded"
+	case NotOrdered:
+		return "Not Ordered"
 	}
+
 	return ""
 }
 

@@ -7,10 +7,18 @@ package main
 
 import (
 	"field/pkg/inmem"
+	mongo2 "field/pkg/mongo"
 	"field/pkg/ordering"
+	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
 // Injectors from wire.go:
+
+func initializeFieldServices(db *mongo.Database) *ordering.Service {
+	orderRepository := mongo2.NewOrderRepository(db)
+	service := ordering.NewOrderingService(orderRepository)
+	return service
+}
 
 func initializeFieldServicesInMemory() *ordering.Service {
 	orderRepository := inmem.NewOrderRepository()

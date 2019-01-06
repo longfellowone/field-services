@@ -32,25 +32,25 @@ func (r *OrderRepository) Save(order *supply.Order) error {
 	return nil
 }
 
-func (r *OrderRepository) Find(id supply.OrderUUID) (*supply.Order, error) {
+func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if order, ok := r.orders[id]; ok {
+	if order, ok := r.orders[uuid]; ok {
 		return order, nil
 	}
 	return nil, supply.ErrOrderNotFound
 }
 
-func (r *OrderRepository) FindAllFromProject(id supply.ProjectUUID) ([]*supply.Order, error) {
+func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]*supply.Order, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if len(r.porders[id]) == 0 {
+	if len(r.porders[uuid]) == 0 {
 		return nil, supply.ErrOrderNotFound
 	}
 	orders := make([]*supply.Order, 0, len(r.porders))
-	for _, o := range r.porders[id] {
+	for _, o := range r.porders[uuid] {
 		orders = append(orders, o)
 	}
 	return orders, nil
