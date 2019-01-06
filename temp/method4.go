@@ -1,5 +1,5 @@
 // https://play.golang.org/p/iqexBnmob4x
-package test
+package temp
 
 import (
 	"fmt"

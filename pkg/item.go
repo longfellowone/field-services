@@ -1,7 +1,5 @@
 package supply
 
-type ProductUUID string
-
 type Item struct {
 	ProductUUID
 	Name string
@@ -64,25 +62,5 @@ func (s ItemStatus) String() string {
 		return "Not Ordered"
 	}
 
-	return ""
-}
-
-type UOM int
-
-const (
-	EA UOM = iota
-	FT
-	M
-)
-
-func (s UOM) String() string {
-	switch s {
-	case EA:
-		return "ea"
-	case FT:
-		return "ft"
-	case M:
-		return "m"
-	}
 	return ""
 }

@@ -75,7 +75,6 @@ func (o *Order) RemoveItem(uuid ProductUUID) {
 
 func (o *Order) ReceiveItem(uuid ProductUUID, quantity uint) {
 	o.receiveItem(uuid, quantity)
-
 	if o.receivedAll() {
 		o.newEvent(Complete)
 	}
@@ -108,10 +107,8 @@ type Event struct {
 }
 
 func createEvent(status OrderStatus) Event {
-	timeNow := time.Now()
-
 	return Event{
-		Date:        timeNow,
+		Date:        time.Now(),
 		OrderStatus: status,
 	}
 }
@@ -138,29 +135,3 @@ func (s OrderStatus) String() string {
 	}
 	return ""
 }
-
-//func (o *Order) UpdateMaterialList(item Item) error {
-//	switch {
-//	case o.lastEvent() == Created:
-//		o.updateMaterialList(item)
-//	case o.lastEvent() == Sent:
-//		return ErrOrderSent
-//	case o.lastEvent() == OnRoute:
-//		fmt.Println(item)
-//		//o.ReceiveItem(item)
-//	case o.lastEvent() == Complete:
-//		return ErrOrderComplete
-//	}
-//	return nil
-//}
-
-//func (o *Order) updateMaterialList(item Item) {
-//	switch {
-//	case item.QuantityRequested < 0:
-//		o.MaterialList = o.MaterialList.removeItem(item.ProductUUID)
-//	//case item:
-//	//	o.MaterialList
-//	case item.QuantityReceived == 0 || item.ProductUUID != "":
-//		o.MaterialList = append(o.MaterialList, item)
-//	}
-//}

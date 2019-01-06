@@ -15,22 +15,19 @@ func (m MaterialList) UpdateQuantityRequested(uuid ProductUUID, quantity uint) {
 		log.Println(ErrItemNotFound)
 		return
 	}
-
 	m.Items[i].QuantityRequested = quantity
 }
 
 func (m MaterialList) UpdatePO(uuid ProductUUID, po string) {
 	i, item := m.findItem(uuid)
 
-	if item.ProductUUID == "" {
+	switch {
+	case item.ProductUUID == "":
 		log.Println(ErrItemNotFound)
 		return
-	}
-
-	if po == "" {
+	case po == "":
 		po = "N/A"
 	}
-
 	m.Items[i].PONumber = po
 }
 
@@ -41,7 +38,6 @@ func (m MaterialList) receiveItem(uuid ProductUUID, quantity uint) {
 		log.Println(ErrItemNotFound)
 		return
 	}
-
 	m.Items[i] = m.Items[i].receive(quantity)
 }
 
@@ -58,11 +54,11 @@ func (m MaterialList) addItem(uuid ProductUUID, name string, uom UOM) MaterialLi
 
 func (m MaterialList) removeItem(uuid ProductUUID) MaterialList {
 	i, item := m.findItem(uuid)
+
 	if item.ProductUUID == "" {
 		log.Println(ErrItemNotFound)
 		return m
 	}
-
 	m.Items = append(m.Items[:i], m.Items[i+1:]...)
 	return m
 }
