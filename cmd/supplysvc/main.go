@@ -19,12 +19,17 @@ func main() {
 	if inMemory {
 		service = initializeFieldServicesInMemory()
 	} else {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		client, err := mongo.Connect(ctx, "mongodb://default:password@localhost:27017")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer cancel()
+
+		err = client.Ping(context.TODO(), nil)
+		if err != nil {
+			log.Fatal(err)
+		}
 		//err = client.Disconnect(ctx)
 
 		db := client.Database("field")
@@ -32,11 +37,17 @@ func main() {
 	}
 
 	service.CreateOrder("oid1", "pid1")
-
-	//service.CreateOrder("oid2", "pid1")
+	service.CreateOrder("oid2", "pid1")
 
 	order, _ := service.FindOrder("oid1")
+
 	fmt.Println(order)
+
+	//temp, _ := service.FindAllProjectOrders("pid2")
+	//
+	//for _, o := range temp {
+	//	fmt.Println(o.ProjectUUID)
+	//}
 	//
 	//order.AddItem("uuid1", "name1")
 	//order.AddItem("uuid2", "name2")
