@@ -45,14 +45,14 @@ func (m MaterialList) receiveItem(uuid ProductUUID, quantity uint) {
 	m.Items[i] = m.Items[i].receive(quantity)
 }
 
-func (m MaterialList) addItem(uuid ProductUUID, name string) MaterialList {
+func (m MaterialList) addItem(uuid ProductUUID, name string, uom UOM) MaterialList {
 	_, item := m.findItem(uuid)
+
 	if item.ProductUUID != "" {
 		log.Println(ErrItemAlreadyOnList)
 		return m
 	}
-
-	m.Items = append(m.Items, newItem(uuid, name))
+	m.Items = append(m.Items, newItem(uuid, name, uom))
 	return m
 }
 
@@ -84,28 +84,3 @@ func (m MaterialList) receivedAll() bool {
 	}
 	return true
 }
-
-//func (m MaterialList) AdjustQuantityRequested(id ProductUUID, qr QuantityRequested) {
-//	if qr <= 0 {
-//		log.Println(ErrQuantityZero)
-//		return
-//	}
-//
-//	i := m.FindItem(id)
-//	if i < 0 {
-//		log.Println(ErrItemNotFound)
-//		return
-//	}
-//
-//	m[i].QuantityRequested = qr
-//}
-
-//func (m MaterialList) FindItem(uuid ProductUUID) Item {
-//	for i := range m {
-//		if m[i].ProductUUID == uuid {
-//			m[i].Index = i
-//			return m[i]
-//		}
-//	}
-//	return Item{}
-//}

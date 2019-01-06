@@ -41,6 +41,8 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 }
 
 func (r *OrderRepository) Save(o *supply.Order) error {
+	//fmt.Println(o)
+
 	order, err := bson.Marshal(&o)
 	if err != nil {
 		return err
@@ -68,8 +70,8 @@ func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
 	return &order, nil
 }
 
-func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]*supply.Order, error) {
-	var orders []*supply.Order
+func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]supply.Order, error) {
+	var orders []supply.Order
 	filter := bson.D{{"projectuuid", uuid}}
 
 	cur, err := r.db.Find(context.TODO(), filter)
@@ -79,7 +81,7 @@ func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]*supply
 	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
-		var order *supply.Order
+		var order supply.Order
 		err := cur.Decode(&order)
 		if err != nil {
 			log.Fatal(err)

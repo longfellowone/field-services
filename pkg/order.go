@@ -24,7 +24,7 @@ var (
 type OrderRepository interface {
 	Save(o *Order) error
 	Find(uuid OrderUUID) (*Order, error)
-	FindAllFromProject(uuid ProjectUUID) ([]*Order, error)
+	FindAllFromProject(uuid ProjectUUID) ([]Order, error)
 }
 
 type OrderUUID string
@@ -62,12 +62,12 @@ func (o *Order) Send() {
 	o.newEvent(Sent)
 }
 
-func (o *Order) AddItem(uuid ProductUUID, name string) {
+func (o *Order) AddItem(uuid ProductUUID, name string, uom UOM) {
 	if o.lastEvent() != Created {
 		log.Println(ErrOrderSent)
 		return
 	}
-	o.MaterialList = o.addItem(uuid, name)
+	o.MaterialList = o.addItem(uuid, name, uom)
 }
 
 func (o *Order) RemoveItem(uuid ProductUUID) {

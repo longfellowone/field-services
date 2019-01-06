@@ -13,10 +13,11 @@ type Item struct {
 	PONumber string
 }
 
-func newItem(uuid ProductUUID, name string) Item {
+func newItem(uuid ProductUUID, name string, uom UOM) Item {
 	return Item{
 		ProductUUID: uuid,
 		Name:        name,
+		UOM:         uom,
 		ItemStatus:  Waiting,
 		PONumber:    "N/A",
 	}

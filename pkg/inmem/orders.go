@@ -42,16 +42,16 @@ func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
 	return nil, supply.ErrOrderNotFound
 }
 
-func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]*supply.Order, error) {
+func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]supply.Order, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	if len(r.porders[uuid]) == 0 {
 		return nil, supply.ErrOrderNotFound
 	}
-	orders := make([]*supply.Order, 0, len(r.porders))
+	orders := make([]supply.Order, 0, len(r.porders))
 	for _, o := range r.porders[uuid] {
-		orders = append(orders, o)
+		orders = append(orders, *o)
 	}
 	return orders, nil
 }
