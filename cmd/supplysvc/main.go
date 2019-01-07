@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/mongodb/mongo-go-driver/mongo"
 	"log"
 	"supply/pkg/ordering"
 	"time"
+
+	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
 const (

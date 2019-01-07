@@ -76,6 +76,56 @@ func TestMaterialList_UpdateQuantityRequested(t *testing.T) {
 	}
 }
 
+func TestOrder_ReceiveItem(t *testing.T) {
+
+	testCases := []struct {
+		name        string
+		shouldError bool
+		requested   uint
+		received    uint
+		remaining   uint
+		itemStatus  supply.ItemStatus
+		orderStatus supply.OrderStatus
+	}{
+		{
+			name:        "receive all items requested",
+			shouldError: false,
+			requested:   40,
+			received:    39,
+			remaining:   0,
+		},
+	}
+
+	item := supply.Item{
+		ProductUUID: "c3ba26e7-ed1f-4119-b7dd-cf1a8de6dc46",
+	}
+
+	order := supply.Order{
+		OrderHistory: []supply.Event{{
+			OrderStatus: supply.Sent,
+		}},
+	}
+
+	//testOrderStatus := func(t *testing.T, have supply.OrderStatus) {
+	//	if have != supply.Complete {
+	//		t.Errorf("want: [%v] have: [%v]", supply.Complete, have)
+	//	}
+	//}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			order.ReceiveItem(item.ProductUUID, test.received)
+
+			if test.received >= test.requested {
+			}
+		})
+	}
+
+	//if len(order.MaterialList.Items) != len(addItem) {
+	//	t.Errorf("AddItem(): Items not added to list\nHave: %v", order)
+	//}
+}
+
 var orderWithOneItem = supply.Order{
 	OrderUUID:   "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6333",
 	ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
