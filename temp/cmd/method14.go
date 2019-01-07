@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -19,13 +20,20 @@ func main() {
 
 	fmt.Printf("Old price: %d\n", order.materialLists[0].quantityRequested)
 
-	order.AddItem("Num3")
-	order.AddItem("Num4")
-	order.ModifyQuantityRequested("Num2", 3)
-	order.ModifyQuantityRequested("Num3", 7)
-	order.RemoveItem("Num1")
+	err := AddItem("Num3", order)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	order.ReceiveItem("Num2", 1)
+	err = AddItem("Num4", order)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//order.ModifyQuantityRequested("Num2", 3)
+	//order.ModifyQuantityRequested("Num3", 7)
+	//order.RemoveItem("Num1")
+	//
+	//order.ReceiveItem("Num2", 1)
 
 	//order.Send()
 
@@ -41,8 +49,8 @@ type Order struct {
 	status        string
 }
 
-func Create(id string, pid string) *Order {
-	return &Order{
+func Create(id string, pid string) Order {
+	return Order{
 		orderUUID:   id,
 		projectUUID: pid,
 	}
@@ -52,13 +60,14 @@ func (o *Order) Send() {
 
 }
 
-func (o *Order) AddItem(id string) error {
+func AddItem(id string, o *Order) error {
 	_, err := o.findItem(id)
 	if err == nil {
 		return ErrItemAlreadyExists
 	}
 	o.materialLists = append(o.materialLists, newItem(id))
 	return nil
+	// Test for len() then test [len()-1}
 }
 
 func (o *Order) RemoveItem(id string) error {
@@ -134,6 +143,7 @@ func receiveItem(quantity int) ItemOption {
 		}
 	}
 }
+
 // An individual item
 type Item struct {
 	productUUID       string
