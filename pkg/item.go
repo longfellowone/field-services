@@ -2,8 +2,8 @@ package supply
 
 type Item struct {
 	ProductUUID
-	Name string
-	UOM
+	Name              string
+	UOM               UOM
 	QuantityRequested uint
 	QuantityReceived  uint
 	QuantityRemaining uint

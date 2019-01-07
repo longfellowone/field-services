@@ -41,17 +41,6 @@ func (m MaterialList) receiveItem(uuid ProductUUID, quantity uint) {
 	m.Items[i] = m.Items[i].receive(quantity)
 }
 
-func (m MaterialList) addItem(uuid ProductUUID, name string, uom UOM) MaterialList {
-	_, item := m.findItem(uuid)
-
-	if item.ProductUUID != "" {
-		log.Println(ErrItemAlreadyOnList)
-		return m
-	}
-	m.Items = append(m.Items, newItem(uuid, name, uom))
-	return m
-}
-
 func (m MaterialList) removeItem(uuid ProductUUID) MaterialList {
 	i, item := m.findItem(uuid)
 

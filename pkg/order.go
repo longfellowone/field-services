@@ -58,11 +58,22 @@ func (o *Order) Send() {
 }
 
 func (o *Order) AddItem(uuid ProductUUID, name string, uom UOM) {
+	_, item := o.findItem(uuid)
+
+	if item.ProductUUID != "" {
+		log.Println(ErrItemAlreadyOnList)
+		return
+	}
 	if o.lastEvent() != Created {
 		log.Println(ErrOrderSent)
 		return
 	}
-	o.MaterialList = o.addItem(uuid, name, uom)
+
+	o.MaterialList.Items = append(o.MaterialList.Items, newItem(uuid, name, uom))
+}
+
+func (o *Order) updateList() {
+
 }
 
 func (o *Order) RemoveItem(uuid ProductUUID) {

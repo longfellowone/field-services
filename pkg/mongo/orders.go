@@ -2,13 +2,14 @@ package mongo
 
 import (
 	"context"
+	"log"
+	supply "supply/pkg"
+	"time"
+
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/mongo/options"
 	"github.com/mongodb/mongo-go-driver/x/bsonx"
-	"log"
-	"supply/pkg"
-	"time"
 )
 
 type OrderRepository struct {
@@ -22,11 +23,11 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 	// https://godoc.org/github.com/mongodb/mongo-go-driver/mongo/options#IndexOptions
 	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
 	orderIndex := mongo.IndexModel{
-		Keys:    bsonx.Doc{{"orderuuid", bsonx.Int32(1)}},
-		Options: bsonx.Doc{{"unique", bsonx.Boolean(true)}},
+		Keys:    bsonx.Doc{{Key: "orderuuid", Value: bsonx.Int32(1)}},
+		Options: bsonx.Doc{{Key: "unique", Value: bsonx.Boolean(true)}},
 	}
 	projectIndex := mongo.IndexModel{
-		Keys: bsonx.Doc{{"projectuuid", bsonx.Int32(1)}},
+		Keys: bsonx.Doc{{Key: "projectuuid", Value: bsonx.Int32(1)}},
 	}
 	indexModel := []mongo.IndexModel{orderIndex, projectIndex}
 
@@ -48,7 +49,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 		return err
 	}
 
-	filter := bson.D{{"orderuuid", o.OrderUUID}}
+	filter := bson.D{{Key: "orderuuid", Value: o.OrderUUID}}
 	opts := options.Replace().SetUpsert(true)
 
 	_, err = r.db.ReplaceOne(context.TODO(), filter, order, opts)
@@ -61,7 +62,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
 	var order supply.Order
 
-	filter := bson.D{{"orderuuid", uuid}}
+	filter := bson.D{{Key: "orderuuid", Value: uuid}}
 
 	err := r.db.FindOne(context.TODO(), filter).Decode(&order)
 	if err != nil {
@@ -72,7 +73,7 @@ func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
 
 func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]supply.Order, error) {
 	var orders []supply.Order
-	filter := bson.D{{"projectuuid", uuid}}
+	filter := bson.D{{Key: "projectuuid", Value: uuid}}
 
 	cur, err := r.db.Find(context.TODO(), filter)
 	if err != nil {
