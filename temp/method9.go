@@ -52,7 +52,7 @@ type Order struct {
 //}
 
 func (o *Order) Send() {
-	//status := Status{
+	//status := ItemStatus{
 	//	Date: "1",
 	//	Type: "",
 	//}
