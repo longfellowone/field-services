@@ -84,21 +84,21 @@ func (o *Order) ModifyQuantityRequested(id ProductUUID, quantity QuantityRequest
 	o.updateItem(id, modifyQuantityRequested(quantity))
 }
 
-type UpdateOption func(item *Item)
+type UpdateOption func(item Item) Item
 
 func (o *Order) updateItem(id ProductUUID, update UpdateOption) {
-	for i := range o.MaterialList {
-		item := &o.MaterialList[i]
+	for i, item := range o.MaterialList {
 		if  item.ProductUUID == id {
-			update(item)
+			o.MaterialList[i] = update(item)
 		}
 	}
 	log.Println(ErrItemNotFound)
 }
 
-func modifyQuantityRequested(quantity QuantityRequested) func(item *Item) {
-	return func(item *Item) {
+func modifyQuantityRequested(quantity QuantityRequested) func(item Item) Item {
+	return func(item Item) Item {
 		item.QuantityRequested = quantity
+		return item
 	}
 }
 
