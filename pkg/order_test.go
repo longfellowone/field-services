@@ -12,8 +12,8 @@ var timeNow = time.Now()
 func TestCreate(t *testing.T) {
 	have := supply.Create("cc80e4ba-79ec-42e5-8f85-d46bff29a7d6", "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8")
 	want := &supply.Order{
-		OrderUUID: "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6",
-		//ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
+		OrderUUID:   "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6",
+		ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
 	}
 
 	if have.OrderUUID != want.OrderUUID {
@@ -21,15 +21,39 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestOrder_AddItem(t *testing.T) {
-	order := orderWithOneItem
-	order.AddItem(supply.ProductUUID("1ed57fbc-230b-4730-9766-a26235efe79b"), "Pencil2", supply.UOM(supply.EA))
-	want := orderWithTwoItems
+type AddItem struct {
+	id   supply.ProductUUID
+	name string
+	uom  supply.UOM
+}
 
-	if !reflect.DeepEqual(want, order) {
-		t.Errorf("\nHave %v\nWant %v", order, want)
+var addItem = []AddItem{
+	{supply.ProductUUID("cc80e4ba-79ec-42e5-8f85-d46bff29a7d6"), "Marker", supply.EA},
+	{supply.ProductUUID("a19ca654-db0b-450f-8b89-2a24a910bf7d"), "Pencil", supply.EA},
+	{supply.ProductUUID("e07b043e-e4cd-40d0-aefc-32a52ee7edda"), "1/2\" EMT Conduit", supply.FT},
+}
+
+func TestOrder_AddItem(t *testing.T) {
+	order := supply.Create("", "")
+
+	for _, test := range addItem {
+		order.AddItem(test.id, test.name, test.uom)
+	}
+
+	if len(order.MaterialList.Items) != len(addItem) {
+		t.Errorf("AddItem(): Items not added to list\nHave: %v", order)
 	}
 }
+
+//func TestOrder_AddItem(t *testing.T) {
+//	order := orderWithOneItem
+//	order.AddItem(supply.ProductUUID("1ed57fbc-230b-4730-9766-a26235efe79b"), "Pencil2", supply.UOM(supply.EA))
+//	want := orderWithTwoItems
+//
+//	if !reflect.DeepEqual(want, order) {
+//		t.Errorf("\nHave %v\nWant %v", order, want)
+//	}
+//}
 
 func TestOrder_RemoveItem(t *testing.T) {
 	order := orderWithTwoItems
