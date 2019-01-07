@@ -1,50 +1,48 @@
 package supply_test
 
 import (
-	"reflect"
 	"supply/pkg"
 	"testing"
-	"time"
 )
 
-func TestCreate(t *testing.T) {
-	type args struct {
-		id  supply.OrderUUID
-		pid supply.ProjectUUID
-	}
-	tests := []struct {
-		name string
-		args args
-		want *supply.Order
-	}{
-		{
-			name: "check create order",
-			args: args{
-				id:  "ada612cb-7663-4c64-8fcd-5f3701daeace",
-				pid: "f4e06842-311f-4f21-a10a-06a24e1221de",
-			},
-			want: &supply.Order{
-				OrderUUID:   "ada612cb-7663-4c64-8fcd-5f3701daeace",
-				ProjectUUID: "f4e06842-311f-4f21-a10a-06a24e1221de",
-				MaterialList: supply.MaterialList{
-					Items: nil,
-				},
-				OrderHistory: []supply.Event{{
-					Date:        time.Time{},
-					OrderStatus: supply.Created,
-				}},
-			},
-		},
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := supply.Create(tt.args.id, tt.args.pid); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Create() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+//func TestCreate(t *testing.T) {
+//	type args struct {
+//		id  supply.OrderUUID
+//		pid supply.ProjectUUID
+//	}
+//	tests := []struct {
+//		name string
+//		args args
+//		want *supply.Order
+//	}{
+//		{
+//			name: "check create order",
+//			args: args{
+//				id:  "ada612cb-7663-4c64-8fcd-5f3701daeace",
+//				pid: "f4e06842-311f-4f21-a10a-06a24e1221de",
+//			},
+//			want: &supply.Order{
+//				OrderUUID:   "ada612cb-7663-4c64-8fcd-5f3701daeace",
+//				ProjectUUID: "f4e06842-311f-4f21-a10a-06a24e1221de",
+//				MaterialList: supply.MaterialList{
+//					Items: nil,
+//				},
+//				OrderHistory: []supply.Event{{
+//					Date:        time.Time{},
+//					OrderStatus: supply.Created,
+//				}},
+//			},
+//		},
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			if got := supply.Create(tt.args.id, tt.args.pid); !reflect.DeepEqual(got, tt.want) {
+//				t.Errorf("Create() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
 
 func TestOrder_Send(t *testing.T) {
 	type fields struct {
@@ -54,28 +52,20 @@ func TestOrder_Send(t *testing.T) {
 		OrderHistory []supply.Event
 	}
 	tests := []struct {
-		name   string
-		fields fields
+		name       string
+		shouldFail bool
+		fields     fields
 	}{
 		{
-			name: "test order marked complete",
+			name:       "order fails to update status to send having an item with 0 quantity",
+			shouldFail: true,
 			fields: fields{
 				MaterialList: supply.MaterialList{
 					Items: []supply.Item{{
-						ProductUUID:       "",
-						Name:              "",
-						UOM:               0,
 						QuantityRequested: 0,
-						QuantityReceived:  0,
-						QuantityRemaining: 0,
-						ItemStatus:        0,
-						PONumber:          "",
 					}},
 				},
-				OrderHistory: []supply.Event{{
-					Date:        time.Time{},
-					OrderStatus: 0,
-				}},
+				OrderHistory: []supply.Event{{}},
 			},
 		},
 		// TODO: Add test cases.
@@ -89,6 +79,10 @@ func TestOrder_Send(t *testing.T) {
 				OrderHistory: tt.fields.OrderHistory,
 			}
 			o.Send()
+
+			if o.OrderHistory[len(o.OrderHistory)-1].OrderStatus == supply.Sent {
+				t.Errorf("have: [%v] want: [%v]", o.OrderHistory[len(o.OrderHistory)-1].OrderStatus, supply.Sent)
+			}
 		})
 	}
 }
