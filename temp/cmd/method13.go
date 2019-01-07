@@ -1,4 +1,4 @@
-package test
+package main
 
 import (
 	"errors"
@@ -20,7 +20,7 @@ func main() {
 	fmt.Printf("Old price: %d\n", order.MaterialList[0].QuantityRequested)
 
 	order.AddItem("Num3")
-	fmt.Println(order.AddItem("Num4"))
+	order.AddItem("Num4")
 	order.ModifyQuantityRequested("Num1", 7)
 	order.ModifyQuantityRequested("Num1", 3)
 
@@ -38,7 +38,7 @@ type ProjectID int
 type Order struct {
 	OrderID
 	ProjectID
-	MaterialList
+	MaterialList []Item
 	OrderStatus
 }
 
@@ -72,31 +72,34 @@ func (o *Order) Send() {
 
 }
 
-type MaterialList []Item
-
-func (m MaterialList) AddItem(id ProductUUID) MaterialList {
-	list := append(m, newItem(id))
-	return list
+func (o *Order) AddItem(id ProductUUID) {
+	o.MaterialList = append(o.MaterialList, newItem(id))
 }
 
-func (m MaterialList) ModifyQuantityRequested(id ProductUUID, quantity QuantityRequested) {
+func (o *Order) ModifyQuantityRequested(id ProductUUID, quantity QuantityRequested) {
 	if quantity <= 0 {
 		log.Println(ErrQuantityZero)
 		return
 	}
-
-	m.updateItem(id, modifyQuantityRequested(quantity))
+	o.updateItem(id, modifyQuantityRequested(quantity))
 }
 
-func (m MaterialList) updateItem(id ProductUUID, update func(item Item) Item) MaterialList {
-	for item := range m {
-		if m[item].ProductUUID == id {
-			m[item] = update(m[item])
-			return m
+type UpdateOption func(item *Item)
+
+func (o *Order) updateItem(id ProductUUID, update UpdateOption) {
+	for i := range o.MaterialList {
+		item := &o.MaterialList[i]
+		if  item.ProductUUID == id {
+			update(item)
 		}
 	}
 	log.Println(ErrItemNotFound)
-	return m
+}
+
+func modifyQuantityRequested(quantity QuantityRequested) func(item *Item) {
+	return func(item *Item) {
+		item.QuantityRequested = quantity
+	}
 }
 
 type OrderStatus []Status
@@ -123,15 +126,6 @@ func newItem(id ProductUUID) Item {
 		ProductUUID:       id,
 		QuantityRequested: 0,
 		QuantityReceived:  0,
-	}
-}
-
-//type action func(quantity QuantityRequested) func(item Item) Item
-
-func modifyQuantityRequested(quantity QuantityRequested) func(item Item) Item {
-	return func(item Item) Item {
-		item.QuantityRequested = quantity
-		return item
 	}
 }
 
