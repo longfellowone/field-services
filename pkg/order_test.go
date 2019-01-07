@@ -7,202 +7,361 @@ import (
 	"time"
 )
 
-var timeNow = time.Now()
-
 func TestCreate(t *testing.T) {
-	have := supply.Create("cc80e4ba-79ec-42e5-8f85-d46bff29a7d6", "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8")
-	want := &supply.Order{
-		OrderUUID:   "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6",
-		ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
+	type args struct {
+		id  supply.OrderUUID
+		pid supply.ProjectUUID
 	}
-
-	if have.OrderUUID != want.OrderUUID {
-		t.Errorf("have %v\n want %v\n", have, want)
+	tests := []struct {
+		name string
+		args args
+		want *supply.Order
+	}{
+		{
+			name: "check create order",
+			args: args{
+				id:  "ada612cb-7663-4c64-8fcd-5f3701daeace",
+				pid: "f4e06842-311f-4f21-a10a-06a24e1221de",
+			},
+			want: &supply.Order{
+				OrderUUID:   "ada612cb-7663-4c64-8fcd-5f3701daeace",
+				ProjectUUID: "f4e06842-311f-4f21-a10a-06a24e1221de",
+				MaterialList: supply.MaterialList{
+					Items: nil,
+				},
+				OrderHistory: []supply.Event{{
+					Date:        time.Time{},
+					OrderStatus: supply.Created,
+				}},
+			},
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := supply.Create(tt.args.id, tt.args.pid); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Create() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
-type AddItem struct {
-	id   supply.ProductUUID
-	name string
-	uom  supply.UOM
-}
-
-var addItem = []AddItem{
-	{supply.ProductUUID("cc80e4ba-79ec-42e5-8f85-d46bff29a7d6"), "Marker", supply.EA},
-	{supply.ProductUUID("a19ca654-db0b-450f-8b89-2a24a910bf7d"), "Pencil", supply.EA},
-	{supply.ProductUUID("e07b043e-e4cd-40d0-aefc-32a52ee7edda"), "1/2\" EMT Conduit", supply.FT},
+func TestOrder_Send(t *testing.T) {
+	type fields struct {
+		OrderUUID    supply.OrderUUID
+		ProjectUUID  supply.ProjectUUID
+		MaterialList supply.MaterialList
+		OrderHistory []supply.Event
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		{
+			name: "test order marked complete",
+			fields: fields{
+				MaterialList: supply.MaterialList{
+					Items: []supply.Item{{
+						ProductUUID:       "",
+						Name:              "",
+						UOM:               0,
+						QuantityRequested: 0,
+						QuantityReceived:  0,
+						QuantityRemaining: 0,
+						ItemStatus:        0,
+						PONumber:          "",
+					}},
+				},
+				OrderHistory: []supply.Event{{
+					Date:        time.Time{},
+					OrderStatus: 0,
+				}},
+			},
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := &supply.Order{
+				OrderUUID:    tt.fields.OrderUUID,
+				ProjectUUID:  tt.fields.ProjectUUID,
+				MaterialList: tt.fields.MaterialList,
+				OrderHistory: tt.fields.OrderHistory,
+			}
+			o.Send()
+		})
+	}
 }
 
 func TestOrder_AddItem(t *testing.T) {
-	order := supply.Create("", "")
-
-	for _, test := range addItem {
-		order.AddItem(test.id, test.name, test.uom)
+	type fields struct {
+		OrderUUID    supply.OrderUUID
+		ProjectUUID  supply.ProjectUUID
+		MaterialList supply.MaterialList
+		OrderHistory []supply.Event
 	}
-
-	if len(order.MaterialList.Items) != len(addItem) {
-		t.Errorf("AddItem(): Items not added to list\nHave: %v", order)
+	type args struct {
+		uuid supply.ProductUUID
+		name string
+		uom  supply.UOM
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := &supply.Order{
+				OrderUUID:    tt.fields.OrderUUID,
+				ProjectUUID:  tt.fields.ProjectUUID,
+				MaterialList: tt.fields.MaterialList,
+				OrderHistory: tt.fields.OrderHistory,
+			}
+			o.AddItem(tt.args.uuid, tt.args.name, tt.args.uom)
+		})
 	}
 }
 
-//func TestOrder_AddItem(t *testing.T) {
-//	order := orderWithOneItem
-//	order.AddItem(supply.ProductUUID("1ed57fbc-230b-4730-9766-a26235efe79b"), "Pencil2", supply.UOM(supply.EA))
-//	want := orderWithTwoItems
-//
-//	if !reflect.DeepEqual(want, order) {
-//		t.Errorf("\nHave %v\nWant %v", order, want)
+//func TestOrder_updateList(t *testing.T) {
+//	type fields struct {
+//		OrderUUID    supply.OrderUUID
+//		ProjectUUID  supply.ProjectUUID
+//		MaterialList supply.MaterialList
+//		OrderHistory []supply.Event
+//	}
+//	tests := []struct {
+//		name   string
+//		fields fields
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			o := &supply.Order{
+//				OrderUUID:    tt.fields.OrderUUID,
+//				ProjectUUID:  tt.fields.ProjectUUID,
+//				MaterialList: tt.fields.MaterialList,
+//				OrderHistory: tt.fields.OrderHistory,
+//			}
+//			o.updateList()
+//		})
 //	}
 //}
 
 func TestOrder_RemoveItem(t *testing.T) {
-	order := orderWithTwoItems
-	order.RemoveItem(supply.ProductUUID("1ed57fbc-230b-4730-9766-a26235efe79b"))
-	want := orderWithOneItem
-
-	if !reflect.DeepEqual(want, order) {
-		t.Errorf("\nHave %v\nWant %v", order, want)
+	type fields struct {
+		OrderUUID    supply.OrderUUID
+		ProjectUUID  supply.ProjectUUID
+		MaterialList supply.MaterialList
+		OrderHistory []supply.Event
 	}
-}
-
-func TestMaterialList_UpdateQuantityRequested(t *testing.T) {
-	order := orderWithTwoItems
-	order.UpdateQuantityRequested("1ed57fbc-230b-4730-9766-a26235efe79b", 30)
-
-	want := orderRequestQuantity
-
-	if !reflect.DeepEqual(want, order) {
-		t.Errorf("\nHave %v\nWant %v", order, want)
+	type args struct {
+		uuid supply.ProductUUID
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := &supply.Order{
+				OrderUUID:    tt.fields.OrderUUID,
+				ProjectUUID:  tt.fields.ProjectUUID,
+				MaterialList: tt.fields.MaterialList,
+				OrderHistory: tt.fields.OrderHistory,
+			}
+			o.RemoveItem(tt.args.uuid)
+		})
 	}
 }
 
 func TestOrder_ReceiveItem(t *testing.T) {
-
-	testCases := []struct {
-		name        string
-		shouldError bool
-		requested   uint
-		received    uint
-		remaining   uint
-		itemStatus  supply.ItemStatus
-		orderStatus supply.OrderStatus
+	type fields struct {
+		OrderUUID    supply.OrderUUID
+		ProjectUUID  supply.ProjectUUID
+		MaterialList supply.MaterialList
+		OrderHistory []supply.Event
+	}
+	type args struct {
+		uuid     supply.ProductUUID
+		quantity uint
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
 	}{
-		{
-			name:        "receive all items requested",
-			shouldError: false,
-			requested:   40,
-			received:    39,
-			remaining:   0,
-		},
+		// TODO: Add test cases.
 	}
-
-	item := supply.Item{
-		ProductUUID: "c3ba26e7-ed1f-4119-b7dd-cf1a8de6dc46",
-	}
-
-	order := supply.Order{
-		OrderHistory: []supply.Event{{
-			OrderStatus: supply.Sent,
-		}},
-	}
-
-	//testOrderStatus := func(t *testing.T, have supply.OrderStatus) {
-	//	if have != supply.Complete {
-	//		t.Errorf("want: [%v] have: [%v]", supply.Complete, have)
-	//	}
-	//}
-
-	for _, test := range testCases {
-		t.Run(test.name, func(t *testing.T) {
-			order.ReceiveItem(item.ProductUUID, test.received)
-
-			if test.received >= test.requested {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := &supply.Order{
+				OrderUUID:    tt.fields.OrderUUID,
+				ProjectUUID:  tt.fields.ProjectUUID,
+				MaterialList: tt.fields.MaterialList,
+				OrderHistory: tt.fields.OrderHistory,
 			}
+			o.ReceiveItem(tt.args.uuid, tt.args.quantity)
 		})
 	}
-
-	//if len(order.MaterialList.Items) != len(addItem) {
-	//	t.Errorf("AddItem(): Items not added to list\nHave: %v", order)
-	//}
 }
 
-var orderWithOneItem = supply.Order{
-	OrderUUID:   "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6333",
-	ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
-	MaterialList: supply.MaterialList{
-		Items: []supply.Item{{
-			ProductUUID:       "10484a5a-1b60-4442-ba5c-8e306ec863f89",
-			Name:              "Pencil1",
-			UOM:               supply.EA,
-			QuantityRequested: 40,
-			QuantityReceived:  0,
-			QuantityRemaining: 0,
-			ItemStatus:        0,
-			PONumber:          "N/A",
-		}},
-	},
-	OrderHistory: []supply.Event{{
-		Date:        timeNow,
-		OrderStatus: supply.Created,
-	}},
-}
+//func TestOrder_missingQuantities(t *testing.T) {
+//	type fields struct {
+//		OrderUUID    supply.OrderUUID
+//		ProjectUUID  supply.ProjectUUID
+//		MaterialList supply.MaterialList
+//		OrderHistory []supply.Event
+//	}
+//	tests := []struct {
+//		name   string
+//		fields fields
+//		want   bool
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			o := &supply.Order{
+//				OrderUUID:    tt.fields.OrderUUID,
+//				ProjectUUID:  tt.fields.ProjectUUID,
+//				MaterialList: tt.fields.MaterialList,
+//				OrderHistory: tt.fields.OrderHistory,
+//			}
+//			if got := o.missingQuantities(); got != tt.want {
+//				t.Errorf("Order.missingQuantities() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
 
-var orderWithTwoItems = supply.Order{
-	OrderUUID:   "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6333",
-	ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
-	MaterialList: supply.MaterialList{
-		Items: []supply.Item{{
-			ProductUUID:       "10484a5a-1b60-4442-ba5c-8e306ec863f89",
-			Name:              "Pencil1",
-			UOM:               supply.EA,
-			QuantityRequested: 40,
-			QuantityReceived:  0,
-			QuantityRemaining: 0,
-			ItemStatus:        0,
-			PONumber:          "N/A",
-		}, {
-			ProductUUID:       "1ed57fbc-230b-4730-9766-a26235efe79b",
-			Name:              "Pencil2",
-			UOM:               supply.EA,
-			QuantityRequested: 0,
-			QuantityReceived:  0,
-			QuantityRemaining: 0,
-			ItemStatus:        0,
-			PONumber:          "N/A",
-		}},
-	},
-	OrderHistory: []supply.Event{{
-		Date:        timeNow,
-		OrderStatus: supply.Created,
-	}},
-}
+//func TestOrder_newEvent(t *testing.T) {
+//	type fields struct {
+//		OrderUUID    supply.OrderUUID
+//		ProjectUUID  supply.ProjectUUID
+//		MaterialList supply.MaterialList
+//		OrderHistory []supply.Event
+//	}
+//	type args struct {
+//		event OrderStatus
+//	}
+//	tests := []struct {
+//		name   string
+//		fields fields
+//		args   args
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			o := &supply.Order{
+//				OrderUUID:    tt.fields.OrderUUID,
+//				ProjectUUID:  tt.fields.ProjectUUID,
+//				MaterialList: tt.fields.MaterialList,
+//				OrderHistory: tt.fields.OrderHistory,
+//			}
+//			o.newEvent(tt.args.event)
+//		})
+//	}
+//}
 
-var orderRequestQuantity = supply.Order{
-	OrderUUID:   "cc80e4ba-79ec-42e5-8f85-d46bff29a7d6333",
-	ProjectUUID: "259d9ebc-1080-40e0-8e2d-3bbeec82dcb8",
-	MaterialList: supply.MaterialList{
-		Items: []supply.Item{{
-			ProductUUID:       "10484a5a-1b60-4442-ba5c-8e306ec863f89",
-			Name:              "Pencil1",
-			UOM:               supply.EA,
-			QuantityRequested: 40,
-			QuantityReceived:  0,
-			QuantityRemaining: 0,
-			ItemStatus:        0,
-			PONumber:          "N/A",
-		}, {
-			ProductUUID:       "1ed57fbc-230b-4730-9766-a26235efe79b",
-			Name:              "Pencil2",
-			UOM:               supply.EA,
-			QuantityRequested: 30,
-			QuantityReceived:  0,
-			QuantityRemaining: 0,
-			ItemStatus:        0,
-			PONumber:          "N/A",
-		}},
-	},
-	OrderHistory: []supply.Event{{
-		Date:        timeNow,
-		OrderStatus: supply.Created,
-	}},
-}
+//func TestOrder_lastEvent(t *testing.T) {
+//	type fields struct {
+//		OrderUUID    OrderUUID
+//		ProjectUUID  ProjectUUID
+//		MaterialList MaterialList
+//		OrderHistory []Event
+//	}
+//	tests := []struct {
+//		name   string
+//		fields fields
+//		want   OrderStatus
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			o := &Order{
+//				OrderUUID:    tt.fields.OrderUUID,
+//				ProjectUUID:  tt.fields.ProjectUUID,
+//				MaterialList: tt.fields.MaterialList,
+//				OrderHistory: tt.fields.OrderHistory,
+//			}
+//			if got := o.lastEvent(); got != tt.want {
+//				t.Errorf("Order.lastEvent() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
+
+//func TestOrder_alreadySent(t *testing.T) {
+//	type fields struct {
+//		OrderUUID    OrderUUID
+//		ProjectUUID  ProjectUUID
+//		MaterialList MaterialList
+//		OrderHistory []Event
+//	}
+//	tests := []struct {
+//		name   string
+//		fields fields
+//		want   bool
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			o := &Order{
+//				OrderUUID:    tt.fields.OrderUUID,
+//				ProjectUUID:  tt.fields.ProjectUUID,
+//				MaterialList: tt.fields.MaterialList,
+//				OrderHistory: tt.fields.OrderHistory,
+//			}
+//			if got := o.alreadySent(); got != tt.want {
+//				t.Errorf("Order.alreadySent() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
+
+//func Test_createEvent(t *testing.T) {
+//	type args struct {
+//		status OrderStatus
+//	}
+//	tests := []struct {
+//		name string
+//		args args
+//		want Event
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			if got := createEvent(tt.args.status); !reflect.DeepEqual(got, tt.want) {
+//				t.Errorf("createEvent() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
+
+//func TestOrderStatus_String(t *testing.T) {
+//	tests := []struct {
+//		name string
+//		s    OrderStatus
+//		want string
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			if got := tt.s.String(); got != tt.want {
+//				t.Errorf("OrderStatus.String() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
