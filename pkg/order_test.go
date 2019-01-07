@@ -24,7 +24,7 @@ import (
 //			want: &supply.Order{
 //				OrderUUID:   "ada612cb-7663-4c64-8fcd-5f3701daeace",
 //				ProjectUUID: "f4e06842-311f-4f21-a10a-06a24e1221de",
-//				MaterialList: supply.MaterialList{
+//				materialLists: supply.materialLists{
 //					Items: nil,
 //				},
 //				OrderHistory: []supply.Event{{
@@ -123,7 +123,7 @@ func TestOrder_AddItem(t *testing.T) {
 //	type fields struct {
 //		OrderUUID    supply.OrderUUID
 //		ProjectUUID  supply.ProjectUUID
-//		MaterialList supply.MaterialList
+//		materialLists supply.materialLists
 //		OrderHistory []supply.Event
 //	}
 //	tests := []struct {
@@ -137,7 +137,7 @@ func TestOrder_AddItem(t *testing.T) {
 //			o := &supply.Order{
 //				OrderUUID:    tt.fields.OrderUUID,
 //				ProjectUUID:  tt.fields.ProjectUUID,
-//				MaterialList: tt.fields.MaterialList,
+//				materialLists: tt.fields.materialLists,
 //				OrderHistory: tt.fields.OrderHistory,
 //			}
 //			o.updateList()
@@ -210,7 +210,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //	type fields struct {
 //		OrderUUID    supply.OrderUUID
 //		ProjectUUID  supply.ProjectUUID
-//		MaterialList supply.MaterialList
+//		materialLists supply.materialLists
 //		OrderHistory []supply.Event
 //	}
 //	tests := []struct {
@@ -225,7 +225,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //			o := &supply.Order{
 //				OrderUUID:    tt.fields.OrderUUID,
 //				ProjectUUID:  tt.fields.ProjectUUID,
-//				MaterialList: tt.fields.MaterialList,
+//				materialLists: tt.fields.materialLists,
 //				OrderHistory: tt.fields.OrderHistory,
 //			}
 //			if got := o.missingQuantities(); got != tt.want {
@@ -239,7 +239,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //	type fields struct {
 //		OrderUUID    supply.OrderUUID
 //		ProjectUUID  supply.ProjectUUID
-//		MaterialList supply.MaterialList
+//		materialLists supply.materialLists
 //		OrderHistory []supply.Event
 //	}
 //	type args struct {
@@ -257,7 +257,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //			o := &supply.Order{
 //				OrderUUID:    tt.fields.OrderUUID,
 //				ProjectUUID:  tt.fields.ProjectUUID,
-//				MaterialList: tt.fields.MaterialList,
+//				materialLists: tt.fields.materialLists,
 //				OrderHistory: tt.fields.OrderHistory,
 //			}
 //			o.newEvent(tt.args.event)
@@ -269,7 +269,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //	type fields struct {
 //		OrderUUID    OrderUUID
 //		ProjectUUID  ProjectUUID
-//		MaterialList MaterialList
+//		materialLists materialLists
 //		OrderHistory []Event
 //	}
 //	tests := []struct {
@@ -284,7 +284,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //			o := &Order{
 //				OrderUUID:    tt.fields.OrderUUID,
 //				ProjectUUID:  tt.fields.ProjectUUID,
-//				MaterialList: tt.fields.MaterialList,
+//				materialLists: tt.fields.materialLists,
 //				OrderHistory: tt.fields.OrderHistory,
 //			}
 //			if got := o.lastEvent(); got != tt.want {
@@ -298,7 +298,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //	type fields struct {
 //		OrderUUID    OrderUUID
 //		ProjectUUID  ProjectUUID
-//		MaterialList MaterialList
+//		materialLists materialLists
 //		OrderHistory []Event
 //	}
 //	tests := []struct {
@@ -313,7 +313,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 //			o := &Order{
 //				OrderUUID:    tt.fields.OrderUUID,
 //				ProjectUUID:  tt.fields.ProjectUUID,
-//				MaterialList: tt.fields.MaterialList,
+//				materialLists: tt.fields.materialLists,
 //				OrderHistory: tt.fields.OrderHistory,
 //			}
 //			if got := o.alreadySent(); got != tt.want {

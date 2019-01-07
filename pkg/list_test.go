@@ -101,7 +101,7 @@ func TestMaterialList_removeItem(t *testing.T) {
 				Items: tt.fields.Items,
 			}
 			if got := m.removeItem(tt.args.uuid); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MaterialList.removeItem() = %v, want %v", got, tt.want)
+				t.Errorf("materialLists.removeItem() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -130,10 +130,10 @@ func TestMaterialList_findItem(t *testing.T) {
 			}
 			got, got1 := m.findItem(tt.args.uuid)
 			if got != tt.want {
-				t.Errorf("MaterialList.findItem() got = %v, want %v", got, tt.want)
+				t.Errorf("materialLists.findItem() got = %v, want %v", got, tt.want)
 			}
 			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("MaterialList.findItem() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("materialLists.findItem() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
@@ -156,7 +156,7 @@ func TestMaterialList_receivedAll(t *testing.T) {
 				Items: tt.fields.Items,
 			}
 			if got := m.receivedAll(); got != tt.want {
-				t.Errorf("MaterialList.receivedAll() = %v, want %v", got, tt.want)
+				t.Errorf("materialLists.receivedAll() = %v, want %v", got, tt.want)
 			}
 		})
 	}

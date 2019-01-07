@@ -65,7 +65,7 @@ func (o *Order) RemoveItem(id ProductUUID) {
 	//	log.Println(ErrItemNotFound)
 	//	return
 	//}
-	//o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
+	//o.materialLists = append(o.materialLists[:i], o.materialLists[i+1:]...)
 }
 
 func (o *Order) Send() {
@@ -135,8 +135,8 @@ func adjustQuantityRequested(item Item, quantity QuantityRequested) Item {
 	return item
 }
 
-//func (i Item) adjustQuantityRequested(quantity QuantityRequested) Item {
-//	i.QuantityRequested = quantity
+//func (i Item) adjustQuantityRequested(quantity quantityRequested) Item {
+//	i.quantityRequested = quantity
 //	return i
 //}
 

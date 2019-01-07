@@ -65,7 +65,7 @@ func (o *Order) RemoveItem(id ProductUUID) {
 	//	log.Println(ErrItemNotFound)
 	//	return
 	//}
-	//o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
+	//o.materialLists = append(o.materialLists[:i], o.materialLists[i+1:]...)
 }
 
 func (o *Order) Send() {

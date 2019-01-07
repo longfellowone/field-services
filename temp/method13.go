@@ -15,9 +15,9 @@ var (
 func main() {
 	order := BuildSampleOrder()
 
-	fmt.Println(order.MaterialList)
+	fmt.Println(order.materialLists)
 
-	fmt.Printf("Old price: %d\n", order.MaterialList[0].QuantityRequested)
+	fmt.Printf("Old price: %d\n", order.materialLists[0].quantityRequested)
 
 	order.AddItem("Num3")
 	order.AddItem("Num4")
@@ -29,25 +29,22 @@ func main() {
 
 	//order.Send()
 
-	fmt.Printf("New price: %d\n", order.MaterialList[0].QuantityRequested)
-	fmt.Println(order.MaterialList)
+	fmt.Printf("New price: %d\n", order.materialLists[0].quantityRequested)
+	fmt.Println(order.materialLists)
 }
 
 type Order struct {
-	OrderID string
-	ProjectID string
-	MaterialList []Item
-	LastChange time.Time
-	DateOrdered time.Time
+	orderUUID     string
+	projectUUID   string
+	materialLists []Item
+	dateOrdered   time.Time
+	status        string
 }
 
 func Create(id string, pid string) *Order {
 	return &Order{
-		OrderID:      id,
-		ProjectID:    pid,
-		MaterialList: nil,
-		LastChange:   time.Time{},
-		DateOrdered:  time.Time{},
+		orderUUID:   id,
+		projectUUID: pid,
 	}
 }
 
@@ -60,7 +57,7 @@ func (o *Order) AddItem(id string) error {
 	if err == nil {
 		return ErrItemAlreadyExists
 	}
-	o.MaterialList = append(o.MaterialList, newItem(id))
+	o.materialLists = append(o.materialLists, newItem(id))
 	return nil
 }
 
@@ -69,7 +66,7 @@ func (o *Order) RemoveItem(id string) error {
 	if err != nil {
 		return err
 	}
-	o.MaterialList = append(o.MaterialList[:i], o.MaterialList[i+1:]...)
+	o.materialLists = append(o.materialLists[:i], o.materialLists[i+1:]...)
 	return nil
 }
 
@@ -96,8 +93,8 @@ func (o *Order) ReceiveItem(id string, quantity int) error {
 }
 
 func (o *Order) findItem(id string) (int, error) {
-	for i := range o.MaterialList {
-		if o.MaterialList[i].ProductUUID == id {
+	for i := range o.materialLists {
+		if o.materialLists[i].productUUID == id {
 			return i, nil
 		}
 	}
@@ -111,46 +108,46 @@ func (o *Order) updateItem(id string, opt ItemOption) error {
 	if err != nil {
 		return err
 	}
-	opt(&o.MaterialList[i])
+	opt(&o.materialLists[i])
 	return nil
 }
 
 func modifyQuantityRequested(quantity int) ItemOption {
 	return func(i *Item) {
-		i.QuantityRequested = quantity
+		i.quantityRequested = quantity
 	}
 }
 
 func receiveItem(quantity int) ItemOption {
 	return func(i *Item) {
-		i.QuantityReceived = quantity
+		i.quantityReceived = quantity
 		switch {
-		case i.QuantityReceived == i.QuantityRequested:
-			//i.ItemStatus = Filled
-			i.QuantityRemaining = 0
-		case quantity > 0 && quantity < i.QuantityRequested:
-			//i.ItemStatus = BackOrdered
-			i.QuantityRemaining = i.QuantityRequested - i.QuantityReceived
-		case i.QuantityReceived > i.QuantityRequested:
-			//i.ItemStatus = OrderExceeded
-			i.QuantityRemaining = 0
+		case i.quantityReceived == i.quantityRequested:
+			i.quantityRemaining = 0
+			//i.itemStatus = Filled
+		case quantity > 0 && quantity < i.quantityRequested:
+			i.quantityRemaining = i.quantityRequested - i.quantityReceived
+			//i.itemStatus = BackOrdered
+		case i.quantityReceived > i.quantityRequested:
+			i.quantityRemaining = 0
+			//i.itemStatus = OrderExceeded
 		}
 	}
 }
 // An individual item
 type Item struct {
-	ProductUUID string
-	QuantityRequested int
-	QuantityReceived int
-	QuantityRemaining int
-	ItemStatus string
+	productUUID       string
+	quantityRequested int
+	quantityReceived  int
+	quantityRemaining int
+	itemStatus        string
 }
 
 func newItem(id string) Item {
 	return Item{
-		ProductUUID:       id,
-		QuantityRequested: 0,
-		QuantityReceived:  0,
+		productUUID:       id,
+		quantityRequested: 0,
+		quantityReceived:  0,
 	}
 }
 
@@ -158,19 +155,19 @@ func newItem(id string) Item {
 func BuildSampleOrder() *Order {
 	items := []Item{
 		{
-			ProductUUID:       "Num1",
-			QuantityRequested: 50,
-			QuantityReceived:  0,
+			productUUID:       "Num1",
+			quantityRequested: 50,
+			quantityReceived:  0,
 		},
 		{
-			ProductUUID:       "Num2",
-			QuantityRequested: 100,
-			QuantityReceived:  0,
+			productUUID:       "Num2",
+			quantityRequested: 100,
+			quantityReceived:  0,
 		},
 	}
 
 	return &Order{
-		OrderID:      "orderid1",
-		MaterialList: items,
+		orderUUID:     "orderid1",
+		materialLists: items,
 	}
 }

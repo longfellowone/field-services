@@ -37,22 +37,22 @@ type Order struct {
 	OrderStatus
 }
 
-//func (o *Order) AddItem(id ProductUUID) {
+//func (o *Order) AddItem(id productUUID) {
 //	item := newItem(id)
-//	o.MaterialList = append(o.MaterialList, item)
+//	o.materialLists = append(o.materialLists, item)
 //}
 
-//func (o *Order) RemoveItem(id ProductUUID) error {
+//func (o *Order) RemoveItem(id productUUID) error {
 //	item := o.findItem(id)
 //	if item < 0 {
 //		return ErrItemNotFound
 //	}
-//	o.MaterialList = append(o.MaterialList.Items[:item], o.MaterialList[item+1:]...)
+//	o.materialLists = append(o.materialLists.Items[:item], o.materialLists[item+1:]...)
 //	return nil
 //}
 
 func (o *Order) Send() {
-	//status := ItemStatus{
+	//status := itemStatus{
 	//	Date: "1",
 	//	Type: "",
 	//}
@@ -64,8 +64,8 @@ func (o *Order) AddItem(id ProductUUID) {
 	o.MaterialList = o.MaterialList.addItem(id)
 }
 
-//func (o *Order) AdjustItemQuantity(id ProductUUID, qr QuantityRequested) (err error) {
-//	err = o.MaterialList.adjustItemQuantity(id, qr)
+//func (o *Order) AdjustItemQuantity(id productUUID, qr quantityRequested) (err error) {
+//	err = o.materialLists.adjustItemQuantity(id, qr)
 //	if err != nil {
 //		log.Println(err)
 //	}
@@ -73,8 +73,8 @@ func (o *Order) AddItem(id ProductUUID) {
 //}
 
 //Adjust the price of a single order item
-//func (o *Order) AdjustItemQuantity(id ProductUUID, quantity int) (err error) {
-//	o.MaterialList, err = o.adjustItemQuantity(id, quantity)
+//func (o *Order) AdjustItemQuantity(id productUUID, quantity int) (err error) {
+//	o.materialLists, err = o.adjustItemQuantity(id, quantity)
 //	return
 //}
 
