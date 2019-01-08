@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package Todo;
+
+service Todo {
+    rpc ListTasks (Empty) returns (TaskResponse) {}
+    rpc NewTask (Task) returns (Empty) {}
+    rpc RemoveTask (RemoveTaskRequest) returns (Empty) {}
+    rpc FindProduct (FindProductRequest) returns (FindProductResponse) {}
+}
+
+message Empty {}
+
+message Task {
+    string uuid = 1;
+    string message = 2;
+}
+
+message TaskResponse {
+    repeated Task tasks = 1;
+}
+
+message RemoveTaskRequest {
+    string uuid = 1;
+}
+
+message Product {
+    string uuid = 1;
+    string name = 2;
+    repeated Index indexes = 3;
+}
+
+message Index {
+    string index = 1;
+}
+
+message FindProductRequest {
+    string name = 1;
+}
+
+message FindProductResponse {
+    repeated Product products = 1;
+}
+
+/* eslint-disable */
+
+/** Generate JS Todo proto
+ protoc -I=. ./proto/todo.proto \
+  --js_out=import_style=commonjs:./src/Todo \
+  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Todo
+ */
+
+//  import _"github.com/jnewmano/grpc-json-proxy/codec"
+//  go run github.com/jnewmano/grpc-json-proxy grpc-json-proxy
+//  http://www.objgen.com/json?demo=true

@@ -19,10 +19,10 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - 27017:27017
-    volumes:
-      - type: bind
-        source: ./mongo/data
-        target: /data/db
+#    volumes:
+#      - type: bind
+#        source: ./mongo/data
+#        target: /data/db
 
   mongo-express:
     image: mongo-express
