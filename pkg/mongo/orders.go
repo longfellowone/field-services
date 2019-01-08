@@ -23,11 +23,11 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 	// https://godoc.org/github.com/mongodb/mongo-go-driver/mongo/options#IndexOptions
 	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
 	orderIndex := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "orderuuid", Value: bsonx.Int32(1)}},
+		Keys:    bsonx.Doc{{Key: "orderid", Value: bsonx.Int32(1)}},
 		Options: bsonx.Doc{{Key: "unique", Value: bsonx.Boolean(true)}},
 	}
 	projectIndex := mongo.IndexModel{
-		Keys: bsonx.Doc{{Key: "projectuuid", Value: bsonx.Int32(1)}},
+		Keys: bsonx.Doc{{Key: "projectid", Value: bsonx.Int32(1)}},
 	}
 	indexModel := []mongo.IndexModel{orderIndex, projectIndex}
 
@@ -47,7 +47,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 		return err
 	}
 
-	filter := bson.D{{Key: "orderuuid", Value: o.OrderUUID}}
+	filter := bson.D{{Key: "orderid", Value: o.OrderID}}
 	opts := options.Replace().SetUpsert(true)
 
 	_, err = r.db.ReplaceOne(context.TODO(), filter, order, opts)
@@ -57,10 +57,10 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	return nil
 }
 
-func (r *OrderRepository) Find(uuid string) (*supply.Order, error) {
+func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	var order supply.Order
 
-	filter := bson.D{{Key: "orderuuid", Value: uuid}}
+	filter := bson.D{{Key: "orderid", Value: id}}
 
 	err := r.db.FindOne(context.TODO(), filter).Decode(&order)
 	if err != nil {
@@ -69,9 +69,9 @@ func (r *OrderRepository) Find(uuid string) (*supply.Order, error) {
 	return &order, nil
 }
 
-func (r *OrderRepository) FindAllFromProject(uuid string) ([]supply.Order, error) {
+func (r *OrderRepository) FindAllFromProject(id string) ([]supply.Order, error) {
 	var orders []supply.Order
-	filter := bson.D{{Key: "projectuuid", Value: uuid}}
+	filter := bson.D{{Key: "projectid", Value: id}}
 
 	cur, err := r.db.Find(context.TODO(), filter)
 	if err != nil {

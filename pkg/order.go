@@ -8,32 +8,64 @@ import (
 var (
 	ErrMustHaveItems     = errors.New("order must have at least 1 Item")
 	ErrQuantityZero      = errors.New("quantity of all order Items must be greater than 0")
-	ErrItemNotFound      = errors.New("Item not found")
-	ErrItemAlreadyOnList = errors.New("Item already on list")
+	ErrItemNotFound      = errors.New("item not found")
+	ErrItemAlreadyOnList = errors.New("item already on list")
 )
 
 type OrderRepository interface {
 	Save(o *Order) error
-	Find(uuid string) (*Order, error)
-	FindAllFromProject(uuid string) ([]Order, error)
+	Find(id string) (*Order, error)
+	FindAllFromProject(id string) ([]Order, error)
 }
 
 type Order struct {
-	OrderUUID   string
-	ProjectUUID string
-	Items       []Item
-	OrderDate   time.Time
-	Status      OrderStatus
+	OrderID   string
+	ProjectID string
+	Items     []Item
+	OrderDate time.Time
+	Status    OrderStatus
 }
 
+// Returns a new *Order
 func Create(id, pid string) *Order {
 	return &Order{
-		OrderUUID:   id,
-		ProjectUUID: pid,
-		Status:      New,
+		OrderID:   id,
+		ProjectID: pid,
+		Status:    New,
 	}
 }
 
+// Adds an item to order
+func (o *Order) AddItem(id, name, uom string) error {
+	_, err := o.findItem(id)
+	if err == nil {
+		return ErrItemAlreadyOnList
+	}
+	o.Items = append(o.Items, *newItem(id, name, uom))
+	return nil
+}
+
+// Removes an item from order
+func (o *Order) RemoveItem(id string) error {
+	i, err := o.findItem(id)
+	if err != nil {
+		return err
+	}
+	o.Items = append(o.Items[:i], o.Items[i+1:]...)
+	return nil
+}
+
+// Updates the quantity requested of a single order item
+func (o *Order) UpdateQuantityRequested(id string, quantity uint) error {
+	i, err := o.findItem(id)
+	if err != nil {
+		return err
+	}
+	o.Items[i].QuantityRequested = quantity
+	return nil
+}
+
+// Marks an order sent
 func (o *Order) Send() error {
 	switch {
 	case len(o.Items) == 0:
@@ -48,36 +80,22 @@ func (o *Order) Send() error {
 	return nil
 }
 
-func (o *Order) AddItem(uuid, name, uom string) error {
-	_, err := o.findItem(uuid)
-	if err == nil {
-		return ErrItemAlreadyOnList
-	}
-	o.Items = append(o.Items, newItem(uuid, name, uom))
-	return nil
-	// Test for len() then test [len()-1}
-}
-
-func (o *Order) RemoveItem(id string) error {
+// Updates the PO number an item
+func (o *Order) UpdatePO(id, po string) error {
 	i, err := o.findItem(id)
 	if err != nil {
 		return err
 	}
-	o.Items = append(o.Items[:i], o.Items[i+1:]...)
-	return nil
-}
-
-func (o *Order) UpdateQuantityRequested(uuid string, quantity uint) error {
-	i, err := o.findItem(uuid)
-	if err != nil {
-		return err
+	if po == "" {
+		po = "N/A"
 	}
-	o.Items[i].QuantityRequested = quantity
+	o.Items[i].PONumber = po
 	return nil
 }
 
-func (o *Order) ReceiveItem(uuid string, quantity uint) error {
-	i, err := o.findItem(uuid)
+// Updates the quantity received of an item
+func (o *Order) ReceiveItem(id string, quantity uint) error {
+	i, err := o.findItem(id)
 	if err != nil {
 		return err
 	}
@@ -90,27 +108,17 @@ func (o *Order) ReceiveItem(uuid string, quantity uint) error {
 	return nil
 }
 
-func (o *Order) UpdatePO(uuid, po string) error {
-	i, err := o.findItem(uuid)
-	if err != nil {
-		return err
-	}
-	if po == "" {
-		po = "N/A"
-	}
-	o.Items[i].PONumber = po
-	return nil
-}
-
-func (o *Order) findItem(uuid string) (int, error) {
+// Finds index of an item
+func (o *Order) findItem(id string) (int, error) {
 	for i := range o.Items {
-		if o.Items[i].ProductUUID == uuid {
+		if o.Items[i].ProductID == id {
 			return i, nil
 		}
 	}
 	return 0, ErrItemNotFound
 }
 
+// Checks to make sure all items have been received
 func (o *Order) receivedAll() bool {
 	for i := range o.Items {
 		if o.Items[i].ItemStatus == Waiting {
@@ -120,6 +128,7 @@ func (o *Order) receivedAll() bool {
 	return true
 }
 
+// Checks an order to make sure all items requested have a quantity
 func (o *Order) missingQuantities() bool {
 	for i := range o.Items {
 		if o.Items[i].QuantityRequested == 0 {

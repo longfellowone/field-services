@@ -10,7 +10,7 @@ import (
 	"supply/pkg/ordering"
 )
 
-func initializeOrderingService(db *mongo.Database) *ordering.Service {
+func InitializeOrderingService(db *mongo.Database) *ordering.Service {
 	wire.Build(
 		mongodb.NewOrderRepository,
 		ordering.NewOrderingService,

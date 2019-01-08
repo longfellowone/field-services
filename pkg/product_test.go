@@ -18,13 +18,13 @@ func TestProduct_ModifyProduct(t *testing.T) {
 		want *supply.Product
 	}{
 		{
-			name: "uuid must not change",
+			name: "id must not change",
 			got: &supply.Product{
-				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
+				ProductID: "d5820c15-7295-420b-838c-33d04209e882",
 			},
 			args: args{},
 			want: &supply.Product{
-				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
+				ProductID: "d5820c15-7295-420b-838c-33d04209e882",
 			},
 		}, {
 			name: "name must change",
@@ -63,7 +63,7 @@ func TestProduct_ModifyProduct(t *testing.T) {
 
 func TestNewProduct(t *testing.T) {
 	type args struct {
-		uuid string
+		id   string
 		name string
 		uom  string
 	}
@@ -75,20 +75,20 @@ func TestNewProduct(t *testing.T) {
 		{
 			name: "must return a *Product",
 			args: args{
-				uuid: "649739bf-66ee-4023-90bf-2e931c94e024",
+				id:   "649739bf-66ee-4023-90bf-2e931c94e024",
 				name: "Pencil",
 				uom:  "ea",
 			},
 			want: &supply.Product{
-				ProductUUID: "649739bf-66ee-4023-90bf-2e931c94e024",
-				Name:        "Pencil",
-				UOM:         "ea",
+				ProductID: "649739bf-66ee-4023-90bf-2e931c94e024",
+				Name:      "Pencil",
+				UOM:       "ea",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := supply.NewProduct(tt.args.uuid, tt.args.name, tt.args.uom); !reflect.DeepEqual(got, tt.want) {
+			if got := supply.NewProduct(tt.args.id, tt.args.name, tt.args.uom); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewProduct() = %v, want %v", got, tt.want)
 			}
 		})

@@ -25,25 +25,7 @@ func (s *Service) CreateOrder(orderid, projectid string) error {
 	return nil
 }
 
-func (s *Service) SendOrder(orderid string) error {
-	order, err := s.db.Find(orderid)
-	if err != nil {
-		return err
-	}
-
-	err = order.Send()
-	if err != nil {
-		return err
-	}
-
-	err = s.db.Save(order)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) AddItemToOrder(orderid, productid, name, uom string) error {
+func (s *Service) AddOrderItem(orderid, productid, name, uom string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
@@ -61,31 +43,13 @@ func (s *Service) AddItemToOrder(orderid, productid, name, uom string) error {
 	return nil
 }
 
-func (s *Service) RemoveItemFromOrder(orderid, productid string) error {
+func (s *Service) RemoveOrderItem(orderid, productid string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
 
 	err = order.RemoveItem(productid)
-	if err != nil {
-		return err
-	}
-
-	err = s.db.Save(order)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) error {
-	order, err := s.db.Find(orderid)
-	if err != nil {
-		return err
-	}
-
-	err = order.ReceiveItem(productid, quantity)
 	if err != nil {
 		return err
 	}
@@ -115,6 +79,24 @@ func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity ui
 	return nil
 }
 
+func (s *Service) SendOrder(orderid string) error {
+	order, err := s.db.Find(orderid)
+	if err != nil {
+		return err
+	}
+
+	err = order.Send()
+	if err != nil {
+		return err
+	}
+
+	err = s.db.Save(order)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
@@ -122,6 +104,24 @@ func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
 	}
 
 	err = order.UpdatePO(productid, ponumber)
+	if err != nil {
+		return err
+	}
+
+	err = s.db.Save(order)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) error {
+	order, err := s.db.Find(orderid)
+	if err != nil {
+		return err
+	}
+
+	err = order.ReceiveItem(productid, quantity)
 	if err != nil {
 		return err
 	}

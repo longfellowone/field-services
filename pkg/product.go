@@ -1,20 +1,22 @@
 package supply
 
 type Product struct {
-	ProductUUID string
-	Name        string
-	UOM         string
+	ProductID string
+	Name      string
+	UOM       string
 }
 
+// Modifies a product name and uom
 func (p *Product) ModifyProduct(name, uom string) {
 	p.Name = name
 	p.UOM = uom
 }
 
-func NewProduct(uuid, name, uom string) *Product {
+// Returns a new *Product
+func NewProduct(id, name, uom string) *Product {
 	return &Product{
-		ProductUUID: uuid,
-		Name:        name,
-		UOM:         uom,
+		ProductID: id,
+		Name:      name,
+		UOM:       uom,
 	}
 }

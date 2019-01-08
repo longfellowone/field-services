@@ -1,7 +1,7 @@
 package supply
 
 type Item struct {
-	ProductUUID       string
+	ProductID         string
 	Name              string
 	UOM               string
 	QuantityRequested uint
@@ -11,20 +11,23 @@ type Item struct {
 	PONumber string
 }
 
-func newItem(uuid, name, uom string) Item {
-	return Item{
-		ProductUUID: uuid,
-		Name:        name,
-		UOM:         uom,
-		ItemStatus:  Waiting,
-		PONumber:    "N/A",
+// Returns a new *Item
+func newItem(id, name, uom string) *Item {
+	return &Item{
+		ProductID:  id,
+		Name:       name,
+		UOM:        uom,
+		ItemStatus: Waiting,
+		PONumber:   "N/A",
 	}
 }
 
+// Updates the quantity requested of an item
 func (i *Item) updateRequested(quantity uint) {
 	i.QuantityRequested = quantity
 }
 
+// Updates quantity received, remaining and item status
 func (i *Item) receive(quantity uint) {
 	i.QuantityReceived = quantity
 

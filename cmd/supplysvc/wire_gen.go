@@ -13,7 +13,7 @@ import (
 
 // Injectors from wire.go:
 
-func initializeOrderingService(db *mongo.Database) *ordering.Service {
+func InitializeOrderingService(db *mongo.Database) *ordering.Service {
 	orderRepository := mongo2.NewOrderRepository(db)
 	service := ordering.NewOrderingService(orderRepository)
 	return service
