@@ -95,12 +95,12 @@ func (o *Order) UpdateQuantityRequested(uuid string, quantity uint) error {
 }
 
 func (o *Order) UpdatePO(uuid, po string) error {
-	if po == "" {
-		po = "N/A"
-	}
 	i, err := o.findItem(uuid)
 	if err != nil {
 		return err
+	}
+	if po == "" {
+		po = "N/A"
 	}
 	o.Items[i].PONumber = po
 	return nil
