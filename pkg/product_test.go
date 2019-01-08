@@ -73,7 +73,7 @@ func TestNewProduct(t *testing.T) {
 		want *supply.Product
 	}{
 		{
-			name: "must return a *Product",
+			name: "must return a new *Product",
 			args: args{
 				id:   "649739bf-66ee-4023-90bf-2e931c94e024",
 				name: "Pencil",

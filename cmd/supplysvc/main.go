@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	db, err := mongo.NewConnection("default", "password", "supply")
+	db, err := mongo.Connect("default", "password", "supply")
 	if err != nil {
-		log.Printf("failed to connector to database %v", err)
+		log.Printf("failed to connect to database %v", err)
 	}
 	service := InitializeOrderingService(db)
 

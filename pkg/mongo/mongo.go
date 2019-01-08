@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func NewConnection(username, passwrd, dbname string) (*mongo.Database, error) {
+func Connect(username, passwrd, dbname string) (*mongo.Database, error) {
 	conn := fmt.Sprintf("mongodb://%s:%s@localhost:27017", username, passwrd)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
