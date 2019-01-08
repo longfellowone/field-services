@@ -6,12 +6,10 @@ import (
 )
 
 var (
-	ErrOrderSent         = errors.New("order already sent")
 	ErrMustHaveItems     = errors.New("order must have at least 1 item")
 	ErrQuantityZero      = errors.New("quantity of all order Items must be greater than 0")
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyOnList = errors.New("item already on list")
-	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
 )
 
 type OrderRepository interface {
@@ -68,10 +66,16 @@ func (o *Order) RemoveItem(id string) error {
 	return nil
 }
 
-func (o *Order) ReceiveItem(uuid string, quantity uint) error {
-	if quantity <= 0 {
-		return ErrItemQuantityZero
+func (o *Order) UpdateQuantityRequested(uuid string, quantity uint) error {
+	i, err := o.findItem(uuid)
+	if err != nil {
+		return err
 	}
+	o.Items[i].QuantityRequested = quantity
+	return nil
+}
+
+func (o *Order) ReceiveItem(uuid string, quantity uint) error {
 	i, err := o.findItem(uuid)
 	if err != nil {
 		return err
@@ -82,15 +86,6 @@ func (o *Order) ReceiveItem(uuid string, quantity uint) error {
 	if o.receivedAll() {
 		o.Status = Complete
 	}
-	return nil
-}
-
-func (o *Order) UpdateQuantityRequested(uuid string, quantity uint) error {
-	i, err := o.findItem(uuid)
-	if err != nil {
-		return err
-	}
-	o.Items[i].QuantityRequested = quantity
 	return nil
 }
 
@@ -106,15 +101,6 @@ func (o *Order) UpdatePO(uuid, po string) error {
 	return nil
 }
 
-func (o *Order) receivedAll() bool {
-	for i := range o.Items {
-		if o.Items[i].ItemStatus != Filled && o.Items[i].ItemStatus != OrderExceeded {
-			return false
-		}
-	}
-	return true
-}
-
 func (o *Order) findItem(uuid string) (int, error) {
 	for i := range o.Items {
 		if o.Items[i].ProductUUID == uuid {
@@ -122,6 +108,15 @@ func (o *Order) findItem(uuid string) (int, error) {
 		}
 	}
 	return 0, ErrItemNotFound
+}
+
+func (o *Order) receivedAll() bool {
+	for i := range o.Items {
+		if o.Items[i].ItemStatus == Waiting {
+			return false
+		}
+	}
+	return true
 }
 
 func (o *Order) missingQuantities() bool {
