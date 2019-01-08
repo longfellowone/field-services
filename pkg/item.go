@@ -1,6 +1,6 @@
 package supply
 
-type item struct {
+type Item struct {
 	ProductUUID       string
 	Name              string
 	UOM               string
@@ -11,8 +11,8 @@ type item struct {
 	PONumber string
 }
 
-func newItem(uuid, name, uom string) item {
-	return item{
+func newItem(uuid, name, uom string) Item {
+	return Item{
 		ProductUUID: uuid,
 		Name:        name,
 		UOM:         uom,
@@ -21,11 +21,11 @@ func newItem(uuid, name, uom string) item {
 	}
 }
 
-func (i *item) updateRequested(quantity uint) {
+func (i *Item) updateRequested(quantity uint) {
 	i.QuantityRequested = quantity
 }
 
-func (i *item) receive(quantity uint) {
+func (i *Item) receive(quantity uint) {
 	i.QuantityReceived = quantity
 
 	switch {

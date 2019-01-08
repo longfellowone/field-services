@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	ErrMustHaveItems     = errors.New("order must have at least 1 item")
+	ErrMustHaveItems     = errors.New("order must have at least 1 Item")
 	ErrQuantityZero      = errors.New("quantity of all order Items must be greater than 0")
-	ErrItemNotFound      = errors.New("item not found")
-	ErrItemAlreadyOnList = errors.New("item already on list")
+	ErrItemNotFound      = errors.New("Item not found")
+	ErrItemAlreadyOnList = errors.New("Item already on list")
 )
 
 type OrderRepository interface {
@@ -21,7 +21,7 @@ type OrderRepository interface {
 type Order struct {
 	OrderUUID   string
 	ProjectUUID string
-	Items       []item
+	Items       []Item
 	OrderDate   time.Time
 	Status      OrderStatus
 }
@@ -38,6 +38,7 @@ func (o *Order) Send() error {
 	switch {
 	case len(o.Items) == 0:
 		return ErrMustHaveItems
+
 	case o.missingQuantities():
 		return ErrQuantityZero
 	}
