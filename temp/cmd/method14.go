@@ -8,9 +8,8 @@ import (
 )
 
 var (
-	ErrQuantityZero      = errors.New("price must be greater than 0")
-	ErrItemNotFound      = errors.New("item not found")
-	ErrItemAlreadyExists = errors.New("item already exists")
+	ErrQuantityZero = errors.New("price must be greater than 0")
+	ErrItemNotFound = errors.New("item not found")
 )
 
 func main() {

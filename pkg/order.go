@@ -2,15 +2,13 @@ package supply
 
 import (
 	"errors"
-	"log"
 	"time"
 )
 
 var (
-	ErrOrderNotFound     = errors.New("order not found")
 	ErrOrderSent         = errors.New("order already sent")
 	ErrMustHaveItems     = errors.New("order must have at least 1 item")
-	ErrQuantityZero      = errors.New("quantity of all order items must be greater than 0")
+	ErrQuantityZero      = errors.New("quantity of all order Items must be greater than 0")
 	ErrItemNotFound      = errors.New("item not found")
 	ErrItemAlreadyOnList = errors.New("item already on list")
 	ErrItemQuantityZero  = errors.New("item quantity must be greater than 0")
@@ -18,116 +16,127 @@ var (
 
 type OrderRepository interface {
 	Save(o *Order) error
-	Find(uuid OrderUUID) (*Order, error)
-	FindAllFromProject(uuid ProjectUUID) ([]Order, error)
+	Find(uuid string) (*Order, error)
+	FindAllFromProject(uuid string) ([]Order, error)
 }
-
-type OrderUUID string
-type ProjectUUID string
 
 type Order struct {
-	OrderUUID
-	ProjectUUID
-	MaterialList
-	OrderHistory []Event
+	OrderUUID   string
+	ProjectUUID string
+	Items       []item
+	OrderDate   time.Time
+	Status      OrderStatus
 }
 
-func Create(id OrderUUID, pid ProjectUUID) *Order {
-	event := createEvent(Created)
-
+func Create(id, pid string) *Order {
 	return &Order{
-		OrderUUID:    id,
-		ProjectUUID:  pid,
-		OrderHistory: []Event{event},
+		OrderUUID:   id,
+		ProjectUUID: pid,
+		Status:      New,
 	}
 }
 
-func (o *Order) Send() {
+func (o *Order) Send() error {
 	switch {
-	case o.MaterialList.Items == nil:
-		log.Println(ErrMustHaveItems)
-		return
+	case len(o.Items) == 0:
+		return ErrMustHaveItems
 	case o.missingQuantities():
-		log.Println(ErrQuantityZero)
-		return
-	case o.alreadySent():
-		log.Println(ErrOrderSent)
-		return
-	}
-	o.newEvent(Sent)
-}
-
-func (o *Order) AddItem(uuid ProductUUID, name string, uom UOM) {
-	_, item := o.findItem(uuid)
-
-	if item.ProductUUID != "" {
-		log.Println(ErrItemAlreadyOnList)
-		return
-	}
-	if o.lastEvent() != Created {
-		log.Println(ErrOrderSent)
-		return
+		return ErrQuantityZero
 	}
 
-	o.MaterialList.Items = append(o.MaterialList.Items, newItem(uuid, name, uom))
+	o.Status = Sent
+	o.OrderDate = time.Now()
+	return nil
 }
 
-func (o *Order) updateList() {
-
-}
-
-func (o *Order) RemoveItem(uuid ProductUUID) {
-	if o.lastEvent() != Created {
-		log.Println(ErrOrderSent)
-		return
+func (o *Order) AddItem(uuid, name, uom string) error {
+	_, err := o.findItem(uuid)
+	if err == nil {
+		return ErrItemAlreadyOnList
 	}
-	o.MaterialList = o.removeItem(uuid)
+	o.Items = append(o.Items, newItem(uuid, name, uom))
+	return nil
+	// Test for len() then test [len()-1}
 }
 
-func (o *Order) ReceiveItem(uuid ProductUUID, quantity uint) {
-	o.receiveItem(uuid, quantity)
+func (o *Order) RemoveItem(id string) error {
+	i, err := o.findItem(id)
+	if err != nil {
+		return err
+	}
+	o.Items = append(o.Items[:i], o.Items[i+1:]...)
+	return nil
+}
+
+func (o *Order) ReceiveItem(uuid string, quantity uint) error {
+	if quantity <= 0 {
+		return ErrItemQuantityZero
+	}
+	i, err := o.findItem(uuid)
+	if err != nil {
+		return err
+	}
+
+	o.Items[i].receive(quantity)
+
 	if o.receivedAll() {
-		o.newEvent(Complete)
+		o.Status = Complete
 	}
+	return nil
+}
+
+func (o *Order) UpdateQuantityRequested(uuid string, quantity uint) error {
+	i, err := o.findItem(uuid)
+	if err != nil {
+		return err
+	}
+	o.Items[i].QuantityRequested = quantity
+	return nil
+}
+
+func (o *Order) UpdatePO(uuid, po string) error {
+	if po == "" {
+		po = "N/A"
+	}
+	i, err := o.findItem(uuid)
+	if err != nil {
+		return err
+	}
+	o.Items[i].PONumber = po
+	return nil
+}
+
+func (o *Order) receivedAll() bool {
+	for i := range o.Items {
+		if o.Items[i].ItemStatus != Filled && o.Items[i].ItemStatus != OrderExceeded {
+			return false
+		}
+	}
+	return true
+}
+
+func (o *Order) findItem(uuid string) (int, error) {
+	for i := range o.Items {
+		if o.Items[i].ProductUUID == uuid {
+			return i, nil
+		}
+	}
+	return 0, ErrItemNotFound
 }
 
 func (o *Order) missingQuantities() bool {
-	for i := range o.MaterialList.Items {
-		if o.MaterialList.Items[i].QuantityRequested == 0 {
+	for i := range o.Items {
+		if o.Items[i].QuantityRequested == 0 {
 			return true
 		}
 	}
 	return false
 }
 
-func (o *Order) newEvent(event OrderStatus) {
-	o.OrderHistory = append(o.OrderHistory, createEvent(event))
-}
-
-func (o *Order) lastEvent() OrderStatus {
-	return o.OrderHistory[len(o.OrderHistory)-1].OrderStatus
-}
-
-func (o *Order) alreadySent() bool {
-	return o.OrderHistory[len(o.OrderHistory)-1].OrderStatus != Created
-}
-
-type Event struct {
-	Date time.Time
-	OrderStatus
-}
-
-func createEvent(status OrderStatus) Event {
-	return Event{
-		Date:        time.Now(),
-		OrderStatus: status,
-	}
-}
-
 type OrderStatus int
 
 const (
-	Created OrderStatus = iota
+	New OrderStatus = iota
 	Sent
 	OnRoute
 	Complete
@@ -135,7 +144,7 @@ const (
 
 func (s OrderStatus) String() string {
 	switch s {
-	case Created:
+	case New:
 		return "New"
 	case Sent:
 		return "Sent"

@@ -18,7 +18,7 @@ func main() {
 	var service *ordering.Service
 
 	if inMemory {
-		service = initializeSupplyServiceInMemory()
+		//service = initializeSupplyServiceInMemory()
 	} else {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		client, err := mongo.Connect(ctx, "mongodb://default:password@localhost:27017")

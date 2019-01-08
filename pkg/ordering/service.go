@@ -1,7 +1,6 @@
 package ordering
 
 import (
-	"github.com/pkg/errors"
 	"log"
 	"supply/pkg"
 )
@@ -16,16 +15,26 @@ func NewOrderingService(db supply.OrderRepository) *Service {
 	}
 }
 
-func (s *Service) CreateOrder(orderid supply.OrderUUID, projectid supply.ProjectUUID) error {
+func (s *Service) CreateOrder(orderid, projectid string) error {
+	order := supply.Create(orderid, projectid)
+
+	err := s.db.Save(order)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) SendOrder(orderid string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
 
-	if order.OrderUUID == orderid {
-		return errors.New("order already exists")
+	err = order.Send()
+	if err != nil {
+		return err
 	}
-	order = supply.Create(orderid, projectid)
 
 	err = s.db.Save(order)
 	if err != nil {
@@ -34,12 +43,16 @@ func (s *Service) CreateOrder(orderid supply.OrderUUID, projectid supply.Project
 	return nil
 }
 
-func (s *Service) SendOrder(orderid supply.OrderUUID) error {
+func (s *Service) AddItemToOrder(orderid, productid, name, uom string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
-	order.Send()
+
+	err = order.AddItem(productid, name, uom)
+	if err != nil {
+		return err
+	}
 
 	err = s.db.Save(order)
 	if err != nil {
@@ -48,12 +61,16 @@ func (s *Service) SendOrder(orderid supply.OrderUUID) error {
 	return nil
 }
 
-func (s *Service) AddItemToOrder(orderid supply.OrderUUID, productid supply.ProductUUID, name string, uom supply.UOM) error {
+func (s *Service) RemoveItemFromOrder(orderid, productid string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
-	order.AddItem(productid, name, uom)
+
+	err = order.RemoveItem(productid)
+	if err != nil {
+		return err
+	}
 
 	err = s.db.Save(order)
 	if err != nil {
@@ -62,12 +79,16 @@ func (s *Service) AddItemToOrder(orderid supply.OrderUUID, productid supply.Prod
 	return nil
 }
 
-func (s *Service) RemoveItemFromOrder(orderid supply.OrderUUID, productid supply.ProductUUID) error {
+func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
-	order.RemoveItem(productid)
+
+	err = order.ReceiveItem(productid, quantity)
+	if err != nil {
+		return err
+	}
 
 	err = s.db.Save(order)
 	if err != nil {
@@ -76,12 +97,16 @@ func (s *Service) RemoveItemFromOrder(orderid supply.OrderUUID, productid supply
 	return nil
 }
 
-func (s *Service) ReceiveOrderItem(orderid supply.OrderUUID, productid supply.ProductUUID, quantity uint) error {
+func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity uint) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
-	order.ReceiveItem(productid, quantity)
+
+	err = order.UpdateQuantityRequested(productid, quantity)
+	if err != nil {
+		return err
+	}
 
 	err = s.db.Save(order)
 	if err != nil {
@@ -90,12 +115,16 @@ func (s *Service) ReceiveOrderItem(orderid supply.OrderUUID, productid supply.Pr
 	return nil
 }
 
-func (s *Service) ModifyRequestedQuantity(orderid supply.OrderUUID, productid supply.ProductUUID, quantity uint) error {
+func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
 	order, err := s.db.Find(orderid)
 	if err != nil {
 		return err
 	}
-	order.UpdateQuantityRequested(productid, quantity)
+
+	err = order.UpdatePO(productid, ponumber)
+	if err != nil {
+		return err
+	}
 
 	err = s.db.Save(order)
 	if err != nil {
@@ -104,21 +133,7 @@ func (s *Service) ModifyRequestedQuantity(orderid supply.OrderUUID, productid su
 	return nil
 }
 
-func (s *Service) UpdateItemPO(orderid supply.OrderUUID, productid supply.ProductUUID, ponumber string) error {
-	order, err := s.db.Find(orderid)
-	if err != nil {
-		return err
-	}
-	order.UpdatePO(productid, ponumber)
-
-	err = s.db.Save(order)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) FindAllProjectOrders(uuid supply.ProjectUUID) ([]supply.Order, error) {
+func (s *Service) FindAllProjectOrders(uuid string) ([]supply.Order, error) {
 	findAll, err := s.db.FindAllFromProject(uuid)
 	if err != nil {
 		log.Println(err)
@@ -126,7 +141,7 @@ func (s *Service) FindAllProjectOrders(uuid supply.ProjectUUID) ([]supply.Order,
 	return findAll, nil
 }
 
-func (s *Service) FindOrder(uuid supply.OrderUUID) (*supply.Order, error) {
+func (s *Service) FindOrder(uuid string) (*supply.Order, error) {
 	findAll, err := s.db.Find(uuid)
 	if err != nil {
 		log.Println(err)

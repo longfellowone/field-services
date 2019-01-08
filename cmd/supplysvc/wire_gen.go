@@ -7,7 +7,6 @@ package main
 
 import (
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"supply/pkg/inmem"
 	mongo2 "supply/pkg/mongo"
 	"supply/pkg/ordering"
 )
@@ -20,8 +19,8 @@ func initializeSupplyService(db *mongo.Database) *ordering.Service {
 	return service
 }
 
-func initializeSupplyServiceInMemory() *ordering.Service {
-	orderRepository := inmem.NewOrderRepository()
-	service := ordering.NewOrderingService(orderRepository)
-	return service
-}
+//func initializeSupplyServiceInMemory() *ordering.Service {
+//	orderRepository := inmem.NewOrderRepository()
+//	service := ordering.NewOrderingService(orderRepository)
+//	return service
+//}

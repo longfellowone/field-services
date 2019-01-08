@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 	"log"
-	supply "supply/pkg"
+	"supply/pkg"
 	"time"
 
 	"github.com/mongodb/mongo-go-driver/bson"
@@ -42,8 +42,6 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 }
 
 func (r *OrderRepository) Save(o *supply.Order) error {
-	//fmt.Println(o)
-
 	order, err := bson.Marshal(&o)
 	if err != nil {
 		return err
@@ -59,7 +57,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	return nil
 }
 
-func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
+func (r *OrderRepository) Find(uuid string) (*supply.Order, error) {
 	var order supply.Order
 
 	filter := bson.D{{Key: "orderuuid", Value: uuid}}
@@ -71,7 +69,7 @@ func (r *OrderRepository) Find(uuid supply.OrderUUID) (*supply.Order, error) {
 	return &order, nil
 }
 
-func (r *OrderRepository) FindAllFromProject(uuid supply.ProjectUUID) ([]supply.Order, error) {
+func (r *OrderRepository) FindAllFromProject(uuid string) ([]supply.Order, error) {
 	var orders []supply.Order
 	filter := bson.D{{Key: "projectuuid", Value: uuid}}
 
