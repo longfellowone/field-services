@@ -1,59 +1,1 @@
-package supply_test
-
-import (
-	"reflect"
-	"supply/pkg"
-	"testing"
-)
-
-func TestProduct_ModifyProduct(t *testing.T) {
-	type fields struct {
-		ProductUUID string
-		Name        string
-		UOM         string
-	}
-	type args struct {
-		uuid string
-		name string
-		uom  string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &supply.Product{
-				ProductUUID: tt.fields.ProductUUID,
-				Name:        tt.fields.Name,
-				UOM:         tt.fields.UOM,
-			}
-			p.ModifyProduct(tt.args.uuid, tt.args.name, tt.args.uom)
-		})
-	}
-}
-
-func TestNewProduct(t *testing.T) {
-	type args struct {
-		uuid string
-		name string
-		uom  string
-	}
-	tests := []struct {
-		name string
-		args args
-		want *supply.Product
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := supply.NewProduct(tt.args.uuid, tt.args.name, tt.args.uom); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewProduct() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+package supply_testimport (	"reflect"	"supply/pkg"	"testing")func TestProduct_ModifyProduct(t *testing.T) {	type args struct {		uuid string		name string		uom  string	}	tests := []struct {		name string		got  *supply.Product		args args		want *supply.Product	}{		{			name: "name must change",			got: &supply.Product{				Name: "Pencil",			},			args: args{				name: "Marker",			},			want: &supply.Product{				Name: "Marker",			},		}, {			name: "uom must change",			got: &supply.Product{				UOM: "ft",			},			args: args{				uom: "ea",			},			want: &supply.Product{				UOM: "ea",			},		},	}	for _, tt := range tests {		t.Run(tt.name, func(t *testing.T) {			p := tt.got			p.ModifyProduct(tt.args.name, tt.args.uom)			if got := p; !reflect.DeepEqual(got, tt.want) {				t.Errorf("ModifyProduct() = %v, want %v", got, tt.want)			}		})	}}func TestNewProduct(t *testing.T) {	type args struct {		uuid string		name string		uom  string	}	tests := []struct {		name string		args args		want *supply.Product	}{		{			name: "return a product",			args: args{				uuid: "649739bf-66ee-4023-90bf-2e931c94e024",				name: "Pencil",				uom:  "ea",			},			want: &supply.Product{				ProductUUID: "649739bf-66ee-4023-90bf-2e931c94e024",				Name:        "Pencil",				UOM:         "ea",			},		},	}	for _, tt := range tests {		t.Run(tt.name, func(t *testing.T) {			if got := supply.NewProduct(tt.args.uuid, tt.args.name, tt.args.uom); !reflect.DeepEqual(got, tt.want) {				t.Errorf("NewProduct() = %v, want %v", got, tt.want)			}		})	}}
