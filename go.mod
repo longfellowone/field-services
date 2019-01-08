@@ -3,6 +3,7 @@ module supply
 require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
+	github.com/google/wire v0.2.0
 	github.com/mongodb/mongo-go-driver v0.1.0
 	github.com/pkg/errors v0.8.1
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect

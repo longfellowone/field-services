@@ -18,6 +18,15 @@ func TestProduct_ModifyProduct(t *testing.T) {
 		want *supply.Product
 	}{
 		{
+			name: "uuid must not change",
+			got: &supply.Product{
+				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
+			},
+			args: args{},
+			want: &supply.Product{
+				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
+			},
+		}, {
 			name: "name must change",
 			got: &supply.Product{
 				Name: "Pencil",
@@ -38,15 +47,6 @@ func TestProduct_ModifyProduct(t *testing.T) {
 			},
 			want: &supply.Product{
 				UOM: "ea",
-			},
-		}, {
-			name: "uuid must not change",
-			got: &supply.Product{
-				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
-			},
-			args: args{},
-			want: &supply.Product{
-				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
 			},
 		},
 	}
