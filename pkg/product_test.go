@@ -8,7 +8,6 @@ import (
 
 func TestProduct_ModifyProduct(t *testing.T) {
 	type args struct {
-		uuid string
 		name string
 		uom  string
 	}
@@ -40,6 +39,15 @@ func TestProduct_ModifyProduct(t *testing.T) {
 			want: &supply.Product{
 				UOM: "ea",
 			},
+		}, {
+			name: "uuid must not change",
+			got: &supply.Product{
+				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
+			},
+			args: args{},
+			want: &supply.Product{
+				ProductUUID: "d5820c15-7295-420b-838c-33d04209e882",
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -65,7 +73,7 @@ func TestNewProduct(t *testing.T) {
 		want *supply.Product
 	}{
 		{
-			name: "return a product",
+			name: "must return a *Product",
 			args: args{
 				uuid: "649739bf-66ee-4023-90bf-2e931c94e024",
 				name: "Pencil",

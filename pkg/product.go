@@ -6,7 +6,7 @@ type Product struct {
 	UOM         string
 }
 
-func (p *Product) ModifyProduct(name string, uom string) {
+func (p *Product) ModifyProduct(name, uom string) {
 	p.Name = name
 	p.UOM = uom
 }
