@@ -54,7 +54,7 @@ func (s *Server) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyReque
 func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
 	err := s.svc.SendOrder(in.OrderUuid)
 	if err != nil {
-		return &pb.SendOrderResponse{}, nil
+		return &pb.SendOrderResponse{}, err
 	}
 	return &pb.SendOrderResponse{}, nil
 }
@@ -62,7 +62,7 @@ func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.Se
 func (s *Server) UpdateItemPO(ctx context.Context, in *pb.UpdateItemPORequest) (*pb.UpdateItemPOResponse, error) {
 	err := s.svc.UpdateItemPO(in.OrderId, in.ProductId, in.Ponumber)
 	if err != nil {
-		return &pb.UpdateItemPOResponse{}, nil
+		return &pb.UpdateItemPOResponse{}, err
 	}
 	return &pb.UpdateItemPOResponse{}, nil
 }
@@ -70,7 +70,7 @@ func (s *Server) UpdateItemPO(ctx context.Context, in *pb.UpdateItemPORequest) (
 func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
 	err := s.svc.ReceiveOrderItem(in.OrderId, in.ProductId, uint(in.Quantity))
 	if err != nil {
-		return &pb.ReceiveOrderItemResponse{}, nil
+		return &pb.ReceiveOrderItemResponse{}, err
 	}
 	return &pb.ReceiveOrderItemResponse{}, nil
 }
