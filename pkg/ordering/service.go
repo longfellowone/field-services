@@ -5,6 +5,16 @@ import (
 	"supply/pkg"
 )
 
+type OrderingService interface {
+	CreateOrder(orderid, projectid string) error
+	AddOrderItem(orderid, productid, name, uom string) error
+	RemoveOrderItem(orderid, productid string) error
+	ModifyRequestedQuantity(orderid, productid string, quantity uint) error
+	SendOrder(orderid string) error
+	UpdateItemPO(orderid, productid, ponumber string) error
+	ReceiveOrderItem(orderid, productid string, quantity uint) error
+}
+
 type Service struct {
 	db supply.OrderRepository
 }

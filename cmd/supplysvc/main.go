@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -10,7 +11,7 @@ import (
 func main() {
 	db, err := mongo.Connect("default", "password", "supply")
 	if err != nil {
-		log.Printf("failed to connect to database %v", err)
+		log.Fatalf("failed to connect to database: %v", err)
 	}
 
 	lis, err := net.Listen("tcp", ":9090")
@@ -20,6 +21,8 @@ func main() {
 
 	s := grpc.NewServer()
 	InitializeOrderingService(db, s)
+
+	fmt.Println("Listening...")
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

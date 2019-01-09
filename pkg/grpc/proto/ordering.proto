@@ -45,7 +45,7 @@ message RemoveOrderItemResponse {
 message ModifyRequestedQuantityRequest {
     string order_id = 1;
     string product_id = 2;
-    int32 quantity = 3;
+    uint32 quantity = 3;
 }
 message ModifyRequestedQuantityResponse {
 }
@@ -61,7 +61,7 @@ message SendOrderResponse {
 message UpdateItemPORequest {
     string order_id = 1;
     string product_id = 2;
-    int32 ponumber = 3;
+    string ponumber = 3;
 }
 message UpdateItemPOResponse {
 }
@@ -70,7 +70,7 @@ message UpdateItemPOResponse {
 message ReceiveOrderItemRequest {
     string order_id = 1;
     string product_id = 2;
-    int32 quantity = 3;
+    uint32 quantity = 3;
 }
 message ReceiveOrderItemResponse {
 }
@@ -78,7 +78,7 @@ message ReceiveOrderItemResponse {
 /* eslint-disable */
 
 /** Generate GO proto
-protoc -I . ./ordering.proto --go_out=plugins=grpc:./
+protoc --go_out=plugins=grpc:. *.proto
  */
 
 /** Generate JS proto

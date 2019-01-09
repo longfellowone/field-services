@@ -19,12 +19,11 @@ type OrderRepository struct {
 func NewOrderRepository(db *mongo.Database) *OrderRepository {
 	coll := db.Collection("orders")
 
-	// Update after next release, see options.IndexOptions struct
-	// https://godoc.org/github.com/mongodb/mongo-go-driver/mongo/options#IndexOptions
 	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
+
 	orderIndex := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "orderid", Value: bsonx.Int32(1)}},
-		Options: bsonx.Doc{{Key: "unique", Value: bsonx.Boolean(true)}},
+		Options: options.Index().SetUnique(true),
 	}
 	projectIndex := mongo.IndexModel{
 		Keys: bsonx.Doc{{Key: "projectid", Value: bsonx.Int32(1)}},

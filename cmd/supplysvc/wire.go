@@ -7,7 +7,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"google.golang.org/grpc"
 	"supply/pkg"
-	server "supply/pkg/grpc"
+	"supply/pkg/grpc"
 	mongodb "supply/pkg/mongo"
 	"supply/pkg/ordering"
 )
@@ -18,7 +18,7 @@ func InitializeOrderingService(db *mongo.Database, svr *grpc.Server) *server.Ser
 		ordering.NewOrderingService,
 		wire.Bind(new(supply.OrderRepository), &mongodb.OrderRepository{}),
 		server.NewOrderingServer,
-		wire.Bind(new(server.OrderingService), &ordering.Service{}),
+		wire.Bind(new(ordering.OrderingService), &ordering.Service{}),
 	)
 	return nil
 }
