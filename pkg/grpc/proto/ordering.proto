@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package Todo;
+package ordering;
 
-service Todo {
+service ordering {
     rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {}
     rpc SendOrder (SendOrderRequest) returns (SendOrderResponse) {}
     rpc AddOrderItem (AddOrderItemRequest) returns (AddOrderItemResponse) {}
@@ -18,7 +18,7 @@ message Empty {}
 // CreateOrder
 message CreateOrderRequest {
     string order_uuid = 1;
-    string project_uuid = 1;
+    string project_uuid = 2;
 }
 message CreateOrderResponse {
 }
@@ -77,7 +77,11 @@ message ReceiveOrderItemResponse {
 
 /* eslint-disable */
 
-/** Generate JS Todo proto
+/** Generate GO proto
+protoc -I . ./ordering.proto --go_out=plugins=grpc:./
+ */
+
+/** Generate JS proto
  protoc -I=. ./proto/todo.proto \
   --js_out=import_style=commonjs:./src/Todo \
   --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Todo
