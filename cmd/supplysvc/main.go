@@ -31,11 +31,11 @@ func main() {
 		OrderUuid:   "order1",
 		ProjectUuid: "project1",
 	}
-	response, err := server.CreateOrder(context.TODO(), order)
+	_, err = server.CreateOrder(context.TODO(), order)
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(response)
+	// End test
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

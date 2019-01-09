@@ -1,5 +1,7 @@
 package supply
 
+import "fmt"
+
 type Item struct {
 	ProductID         string
 	Name              string
@@ -7,8 +9,8 @@ type Item struct {
 	QuantityRequested uint
 	QuantityReceived  uint
 	QuantityRemaining uint
-	ItemStatus
-	PONumber string
+	ItemStatus        ItemStatus
+	PONumber          string
 }
 
 // Returns a new *Item
@@ -68,7 +70,7 @@ func (s ItemStatus) String() string {
 		return "Order Exceeded"
 	case NotOrdered:
 		return "Not Ordered"
+	default:
+		return fmt.Sprintf("%d", int(s))
 	}
-
-	return ""
 }

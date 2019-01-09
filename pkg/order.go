@@ -2,6 +2,7 @@ package supply
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -31,6 +32,7 @@ func Create(id, pid string) *Order {
 	return &Order{
 		OrderID:   id,
 		ProjectID: pid,
+		Items:     []Item{},
 		Status:    New,
 	}
 }
@@ -121,7 +123,7 @@ func (o *Order) findItem(id string) (int, error) {
 // Checks to make sure all items have been received
 func (o *Order) receivedAll() bool {
 	for i := range o.Items {
-		if o.Items[i].ItemStatus == Waiting {
+		if o.Items[i].ItemStatus == Waiting || o.Items[i].ItemStatus == BackOrdered {
 			return false
 		}
 	}
@@ -157,6 +159,7 @@ func (s OrderStatus) String() string {
 		return "OnRoute"
 	case Complete:
 		return "Complete"
+	default:
+		return fmt.Sprintf("%d", int(s))
 	}
-	return ""
 }
