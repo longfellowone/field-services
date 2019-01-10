@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"supply/pkg"
 	"testing"
-	"time"
 )
 
 func TestCreate(t *testing.T) {
@@ -26,7 +25,7 @@ func TestCreate(t *testing.T) {
 			OrderID:   "650aab76-6e98-4d4f-9380-beb76bb7cb9d",
 			ProjectID: "5341fe74-8dde-48e4-bb5b-fb30c473a51f",
 			Items:     []supply.Item{},
-			Status:    0,
+			Status:    supply.New,
 		},
 	}}
 	for _, tt := range tests {
@@ -193,7 +192,6 @@ func TestOrder_UpdateQuantityRequested(t *testing.T) {
 }
 
 func TestOrder_Send(t *testing.T) {
-	timeNow := time.Now()
 	tests := []struct {
 		name    string
 		got     *supply.Order
@@ -225,17 +223,15 @@ func TestOrder_Send(t *testing.T) {
 		name: "can update order status to sent",
 		got: &supply.Order{
 			Items: []supply.Item{{
-				QuantityRequested: 100,
+				QuantityRequested: 50,
 			}},
-			OrderDate: timeNow,
-			Status:    supply.New,
+			Status: supply.New,
 		},
 		want: &supply.Order{
 			Items: []supply.Item{{
-				QuantityRequested: 100,
+				QuantityRequested: 50,
 			}},
-			OrderDate: timeNow,
-			Status:    supply.Sent,
+			Status: supply.Sent,
 		},
 		wantErr: false,
 	}}
@@ -245,7 +241,7 @@ func TestOrder_Send(t *testing.T) {
 			if err := o.Send(); (err != nil) != tt.wantErr {
 				t.Errorf("Order.Send() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if got := o; !reflect.DeepEqual(got, tt.want) {
+			if got := o; !reflect.DeepEqual(got.Status, tt.want.Status) {
 				t.Errorf("Order.Send() = %v, want %v", got, tt.want)
 			}
 		})
@@ -354,6 +350,33 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		wantErr: false,
 	}, {
+		name: "order must be marked back to sent if received was modified to < requested",
+		got: &supply.Order{
+			Items: []supply.Item{{
+				ProductID:         "abe76ff6-fa91-43ca-ba60-cb057920b9a7",
+				QuantityRequested: 50,
+				QuantityReceived:  50,
+				QuantityRemaining: 0,
+				ItemStatus:        supply.Filled,
+			}},
+			Status: supply.Complete,
+		},
+		args: args{
+			id:       "abe76ff6-fa91-43ca-ba60-cb057920b9a7",
+			quantity: 49,
+		},
+		want: &supply.Order{
+			Items: []supply.Item{{
+				ProductID:         "abe76ff6-fa91-43ca-ba60-cb057920b9a7",
+				QuantityRequested: 50,
+				QuantityReceived:  49,
+				QuantityRemaining: 1,
+				ItemStatus:        supply.BackOrdered,
+			}},
+			Status: supply.Sent,
+		},
+		wantErr: false,
+	}, {
 		name: "item status must update to filled when requested quantity received",
 		got: &supply.Order{
 			Items: []supply.Item{{
@@ -379,7 +402,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		wantErr: false,
 	}, {
-		name: "item must be marked backordered when > 0 received && < requested",
+		name: "item must be marked back ordered when received > 0 && < requested",
 		got: &supply.Order{
 			Items: []supply.Item{{
 				ProductID:         "47b2acf7-147a-47ff-ae16-18f02e668ecd",
