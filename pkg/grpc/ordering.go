@@ -59,14 +59,6 @@ func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.Se
 	return &pb.SendOrderResponse{}, nil
 }
 
-func (s *Server) UpdateItemPO(ctx context.Context, in *pb.UpdateItemPORequest) (*pb.UpdateItemPOResponse, error) {
-	err := s.svc.UpdateItemPO(in.OrderId, in.ProductId, in.Ponumber)
-	if err != nil {
-		return &pb.UpdateItemPOResponse{}, err
-	}
-	return &pb.UpdateItemPOResponse{}, nil
-}
-
 func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
 	err := s.svc.ReceiveOrderItem(in.OrderId, in.ProductId, uint(in.Quantity))
 	if err != nil {

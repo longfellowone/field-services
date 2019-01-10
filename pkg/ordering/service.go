@@ -11,24 +11,23 @@ type OrderingService interface {
 	RemoveOrderItem(orderid, productid string) error
 	ModifyRequestedQuantity(orderid, productid string, quantity uint) error
 	SendOrder(orderid string) error
-	UpdateItemPO(orderid, productid, ponumber string) error
 	ReceiveOrderItem(orderid, productid string, quantity uint) error
 }
 
 type Service struct {
-	db supply.OrderRepository
+	order supply.OrderRepository
 }
 
-func NewOrderingService(db supply.OrderRepository) *Service {
+func NewOrderingService(order supply.OrderRepository) *Service {
 	return &Service{
-		db: db,
+		order: order,
 	}
 }
 
 func (s *Service) CreateOrder(orderid, projectid string) error {
 	order := supply.Create(orderid, projectid)
 
-	err := s.db.Save(order)
+	err := s.order.Save(order)
 	if err != nil {
 		return err
 	}
@@ -36,7 +35,7 @@ func (s *Service) CreateOrder(orderid, projectid string) error {
 }
 
 func (s *Service) AddOrderItem(orderid, productid, name, uom string) error {
-	order, err := s.db.Find(orderid)
+	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
 	}
@@ -46,7 +45,7 @@ func (s *Service) AddOrderItem(orderid, productid, name, uom string) error {
 		return err
 	}
 
-	err = s.db.Save(order)
+	err = s.order.Save(order)
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,7 @@ func (s *Service) AddOrderItem(orderid, productid, name, uom string) error {
 }
 
 func (s *Service) RemoveOrderItem(orderid, productid string) error {
-	order, err := s.db.Find(orderid)
+	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
 	}
@@ -64,7 +63,7 @@ func (s *Service) RemoveOrderItem(orderid, productid string) error {
 		return err
 	}
 
-	err = s.db.Save(order)
+	err = s.order.Save(order)
 	if err != nil {
 		return err
 	}
@@ -72,7 +71,7 @@ func (s *Service) RemoveOrderItem(orderid, productid string) error {
 }
 
 func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity uint) error {
-	order, err := s.db.Find(orderid)
+	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
 	}
@@ -82,7 +81,7 @@ func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity ui
 		return err
 	}
 
-	err = s.db.Save(order)
+	err = s.order.Save(order)
 	if err != nil {
 		return err
 	}
@@ -90,7 +89,7 @@ func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity ui
 }
 
 func (s *Service) SendOrder(orderid string) error {
-	order, err := s.db.Find(orderid)
+	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
 	}
@@ -100,25 +99,7 @@ func (s *Service) SendOrder(orderid string) error {
 		return err
 	}
 
-	err = s.db.Save(order)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
-	order, err := s.db.Find(orderid)
-	if err != nil {
-		return err
-	}
-
-	err = order.UpdatePO(productid, ponumber)
-	if err != nil {
-		return err
-	}
-
-	err = s.db.Save(order)
+	err = s.order.Save(order)
 	if err != nil {
 		return err
 	}
@@ -126,7 +107,7 @@ func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
 }
 
 func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) error {
-	order, err := s.db.Find(orderid)
+	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
 	}
@@ -136,7 +117,7 @@ func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) err
 		return err
 	}
 
-	err = s.db.Save(order)
+	err = s.order.Save(order)
 	if err != nil {
 		return err
 	}
@@ -144,7 +125,7 @@ func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) err
 }
 
 func (s *Service) FindAllProjectOrders(uuid string) ([]supply.Order, error) {
-	findAll, err := s.db.FindAllFromProject(uuid)
+	findAll, err := s.order.FindAllFromProject(uuid)
 	if err != nil {
 		log.Println(err)
 	}
@@ -152,7 +133,7 @@ func (s *Service) FindAllProjectOrders(uuid string) ([]supply.Order, error) {
 }
 
 func (s *Service) FindOrder(uuid string) (*supply.Order, error) {
-	findAll, err := s.db.Find(uuid)
+	findAll, err := s.order.Find(uuid)
 	if err != nil {
 		log.Println(err)
 	}

@@ -82,6 +82,11 @@ func (o *Order) Send() error {
 	return nil
 }
 
+// Mark the order processed
+func (o *Order) Process() {
+	o.Status = Processed
+}
+
 // Updates the PO number an item
 func (o *Order) UpdatePO(id, po string) error {
 	i, err := o.findItem(id)
@@ -106,7 +111,10 @@ func (o *Order) ReceiveItem(id string, quantity uint) error {
 
 	if o.receivedAll() {
 		o.Status = Complete
+		return nil
 	}
+
+	o.Status = Processed
 	return nil
 }
 
@@ -145,7 +153,7 @@ type OrderStatus int
 const (
 	New OrderStatus = iota
 	Sent
-	OnRoute
+	Processed
 	Complete
 )
 
@@ -155,8 +163,8 @@ func (s OrderStatus) String() string {
 		return "New"
 	case Sent:
 		return "Sent"
-	case OnRoute:
-		return "OnRoute"
+	case Processed:
+		return "Processed"
 	case Complete:
 		return "Complete"
 	default:

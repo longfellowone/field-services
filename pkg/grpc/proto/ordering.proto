@@ -9,7 +9,6 @@ service ordering {
     rpc RemoveOrderItem (RemoveOrderItemRequest) returns (RemoveOrderItemResponse) {}
     rpc ReceiveOrderItem (ReceiveOrderItemRequest) returns (ReceiveOrderItemResponse) {}
     rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
-    rpc UpdateItemPO (UpdateItemPORequest) returns (UpdateItemPOResponse) {}
     //rpc 000 (Request) returns (Response) {}
 }
 
@@ -20,8 +19,7 @@ message CreateOrderRequest {
     string order_uuid = 1;
     string project_uuid = 2;
 }
-message CreateOrderResponse {
-}
+message CreateOrderResponse {}
 
 // AddOrderItem
 message AddOrderItemRequest {
@@ -30,16 +28,14 @@ message AddOrderItemRequest {
     string name = 3;
     string uom = 4;
 }
-message AddOrderItemResponse {
-}
+message AddOrderItemResponse {}
 
 // RemoveOrderItem
 message RemoveOrderItemRequest {
     string order_id = 1;
     string product_id = 2;
 }
-message RemoveOrderItemResponse {
-}
+message RemoveOrderItemResponse {}
 
 // ModifyRequestedQuantity
 message ModifyRequestedQuantityRequest {
@@ -47,24 +43,13 @@ message ModifyRequestedQuantityRequest {
     string product_id = 2;
     uint32 quantity = 3;
 }
-message ModifyRequestedQuantityResponse {
-}
+message ModifyRequestedQuantityResponse {}
 
 // SendOrder
 message SendOrderRequest {
     string order_uuid = 1;
 }
-message SendOrderResponse {
-}
-
-// UpdateItemPO
-message UpdateItemPORequest {
-    string order_id = 1;
-    string product_id = 2;
-    string ponumber = 3;
-}
-message UpdateItemPOResponse {
-}
+message SendOrderResponse {}
 
 // ReceiveOrderItem
 message ReceiveOrderItemRequest {
@@ -72,8 +57,7 @@ message ReceiveOrderItemRequest {
     string product_id = 2;
     uint32 quantity = 3;
 }
-message ReceiveOrderItemResponse {
-}
+message ReceiveOrderItemResponse {}
 
 /* eslint-disable */
 

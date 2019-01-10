@@ -13,7 +13,7 @@ import (
 )
 
 type OrderRepository struct {
-	db *mongo.Collection
+	coll *mongo.Collection
 }
 
 func NewOrderRepository(db *mongo.Database) *OrderRepository {
@@ -36,7 +36,7 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 	}
 
 	return &OrderRepository{
-		db: coll,
+		coll: coll,
 	}
 }
 
@@ -49,7 +49,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	filter := bson.D{{Key: "orderid", Value: o.OrderID}}
 	opts := options.Replace().SetUpsert(true)
 
-	_, err = r.db.ReplaceOne(context.TODO(), filter, order, opts)
+	_, err = r.coll.ReplaceOne(context.TODO(), filter, order, opts)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 
 	filter := bson.D{{Key: "orderid", Value: id}}
 
-	err := r.db.FindOne(context.TODO(), filter).Decode(&order)
+	err := r.coll.FindOne(context.TODO(), filter).Decode(&order)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (r *OrderRepository) FindAllFromProject(id string) ([]supply.Order, error) 
 	var orders []supply.Order
 	filter := bson.D{{Key: "projectid", Value: id}}
 
-	cur, err := r.db.Find(context.TODO(), filter)
+	cur, err := r.coll.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
 	}

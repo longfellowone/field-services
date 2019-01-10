@@ -1,5 +1,10 @@
 package supply
 
+type ProductRepository interface {
+	Save(p *Product) error
+	Find(id string) (*Product, error)
+}
+
 type Product struct {
 	ProductID string
 	Name      string

@@ -1,1 +1,64 @@
 package mongo
+
+import (
+	"context"
+	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/mongodb/mongo-go-driver/mongo/options"
+	"github.com/mongodb/mongo-go-driver/x/bsonx"
+	"log"
+	"supply/pkg"
+	"time"
+)
+
+type ProductRepository struct {
+	db *mongo.Collection
+}
+
+func NewProductRepository(db *mongo.Database) *ProductRepository {
+	coll := db.Collection("products")
+
+	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
+
+	indexModel := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "productid", Value: bsonx.Int32(1)}},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err := coll.Indexes().CreateOne(context.TODO(), indexModel, opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &ProductRepository{
+		db: coll,
+	}
+}
+
+func (r *ProductRepository) Save(p *supply.Product) error {
+	Product, err := bson.Marshal(&p)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.D{{Key: "productid", Value: p.ProductID}}
+	opts := options.Replace().SetUpsert(true)
+
+	_, err = r.db.ReplaceOne(context.TODO(), filter, Product, opts)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ProductRepository) Find(id string) (*supply.Product, error) {
+	var product supply.Product
+
+	filter := bson.D{{Key: "productid", Value: id}}
+
+	err := r.db.FindOne(context.TODO(), filter).Decode(&product)
+	if err != nil {
+		return nil, err
+	}
+	return &product, nil
+}

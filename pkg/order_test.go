@@ -248,6 +248,31 @@ func TestOrder_Send(t *testing.T) {
 	}
 }
 
+func TestOrder_Process(t *testing.T) {
+	tests := []struct {
+		name string
+		got  *supply.Order
+		want *supply.Order
+	}{{
+		name: "must mark item processed",
+		got: &supply.Order{
+			Status: supply.Sent,
+		},
+		want: &supply.Order{
+			Status: supply.Processed,
+		},
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			o := tt.got
+			o.Process()
+			if got := o; !reflect.DeepEqual(got.Status, tt.want.Status) {
+				t.Errorf("Order.Process() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrder_UpdatePO(t *testing.T) {
 	type args struct {
 		id string
@@ -332,7 +357,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 				QuantityRemaining: 0,
 				ItemStatus:        supply.Waiting,
 			}},
-			Status: supply.Sent,
+			Status: supply.Processed,
 		},
 		args: args{
 			id:       "c9bfa352-6395-4031-9936-9b317f9d5f21",
@@ -350,7 +375,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		wantErr: false,
 	}, {
-		name: "order must be marked back to sent if received was modified to < requested",
+		name: "order must be marked back to processed if received was modified to < requested",
 		got: &supply.Order{
 			Items: []supply.Item{{
 				ProductID:         "abe76ff6-fa91-43ca-ba60-cb057920b9a7",
@@ -373,7 +398,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 				QuantityRemaining: 1,
 				ItemStatus:        supply.BackOrdered,
 			}},
-			Status: supply.Sent,
+			Status: supply.Processed,
 		},
 		wantErr: false,
 	}, {
@@ -385,7 +410,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 				QuantityReceived:  0,
 				ItemStatus:        supply.Waiting,
 			}},
-			Status: supply.Sent,
+			Status: supply.Processed,
 		},
 		args: args{
 			id:       "57837a3d-691e-4bb1-8c55-2cdf9146ebd5",
@@ -411,7 +436,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 				QuantityRemaining: 50,
 				ItemStatus:        supply.Waiting,
 			}},
-			Status: supply.Sent,
+			Status: supply.Processed,
 		},
 		args: args{
 			id:       "47b2acf7-147a-47ff-ae16-18f02e668ecd",
@@ -425,7 +450,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 				QuantityRemaining: 1,
 				ItemStatus:        supply.BackOrdered,
 			}},
-			Status: supply.Sent,
+			Status: supply.Processed,
 		},
 		wantErr: false,
 	}, {
@@ -438,7 +463,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 				QuantityRemaining: 0,
 				ItemStatus:        supply.BackOrdered,
 			}},
-			Status: supply.Sent,
+			Status: supply.Processed,
 		},
 		args: args{
 			id:       "ea7d18f9-25ac-4f95-bfd0-c6c54fa5cced",
