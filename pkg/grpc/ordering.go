@@ -7,19 +7,19 @@ import (
 	"supply/pkg/ordering"
 )
 
-type Server struct {
+type OrderingServer struct {
 	svc ordering.OrderingService
 }
 
-func NewOrderingServer(svr *grpc.Server, svc ordering.OrderingService) *Server {
-	pb.RegisterOrderingServer(svr, &Server{})
+func NewOrderingServer(svr *grpc.Server, svc ordering.OrderingService) *OrderingServer {
+	pb.RegisterOrderingServer(svr, &OrderingServer{})
 
-	return &Server{
+	return &OrderingServer{
 		svc: svc,
 	}
 }
 
-func (s *Server) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+func (s *OrderingServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	err := s.svc.CreateOrder(in.OrderUuid, in.ProjectUuid)
 	if err != nil {
 		return &pb.CreateOrderResponse{}, err
@@ -27,7 +27,7 @@ func (s *Server) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*p
 	return &pb.CreateOrderResponse{}, nil
 }
 
-func (s *Server) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
+func (s *OrderingServer) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
 	err := s.svc.AddOrderItem(in.OrderId, in.ProductId, in.Name, in.Uom)
 	if err != nil {
 		return &pb.AddOrderItemResponse{}, err
@@ -35,7 +35,7 @@ func (s *Server) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (
 	return &pb.AddOrderItemResponse{}, nil
 }
 
-func (s *Server) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequest) (*pb.RemoveOrderItemResponse, error) {
+func (s *OrderingServer) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequest) (*pb.RemoveOrderItemResponse, error) {
 	err := s.svc.RemoveOrderItem(in.OrderId, in.ProductId)
 	if err != nil {
 		return &pb.RemoveOrderItemResponse{}, err
@@ -43,7 +43,7 @@ func (s *Server) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequ
 	return &pb.RemoveOrderItemResponse{}, nil
 }
 
-func (s *Server) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
+func (s *OrderingServer) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
 	err := s.svc.ModifyRequestedQuantity(in.OrderId, in.ProductId, uint(in.Quantity))
 	if err != nil {
 		return &pb.ModifyRequestedQuantityResponse{}, err
@@ -51,7 +51,7 @@ func (s *Server) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyReque
 	return &pb.ModifyRequestedQuantityResponse{}, nil
 }
 
-func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
+func (s *OrderingServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
 	err := s.svc.SendOrder(in.OrderUuid)
 	if err != nil {
 		return &pb.SendOrderResponse{}, err
@@ -59,7 +59,7 @@ func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.Se
 	return &pb.SendOrderResponse{}, nil
 }
 
-func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
+func (s *OrderingServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
 	err := s.svc.ReceiveOrderItem(in.OrderId, in.ProductId, uint(in.Quantity))
 	if err != nil {
 		return &pb.ReceiveOrderItemResponse{}, err

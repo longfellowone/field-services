@@ -2,7 +2,7 @@ package purchasing
 
 import "supply/pkg"
 
-type ProductService interface {
+type PurchasingService interface {
 	UpdateProduct(name, uom string)
 	AddProduct(id, name, uom string) *supply.Product
 	UpdateItemPO(orderid, productid, ponumber string) error
@@ -14,7 +14,7 @@ type Service struct {
 	order   supply.OrderRepository
 }
 
-func NewProductService(p supply.ProductRepository, o supply.OrderRepository) *Service {
+func NewPurchasingService(p supply.ProductRepository, o supply.OrderRepository) *Service {
 	return &Service{
 		product: p,
 		order:   o,

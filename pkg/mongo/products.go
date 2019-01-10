@@ -12,7 +12,7 @@ import (
 )
 
 type ProductRepository struct {
-	db *mongo.Collection
+	coll *mongo.Collection
 }
 
 func NewProductRepository(db *mongo.Database) *ProductRepository {
@@ -31,7 +31,7 @@ func NewProductRepository(db *mongo.Database) *ProductRepository {
 	}
 
 	return &ProductRepository{
-		db: coll,
+		coll: coll,
 	}
 }
 
@@ -44,7 +44,7 @@ func (r *ProductRepository) Save(p *supply.Product) error {
 	filter := bson.D{{Key: "productid", Value: p.ProductID}}
 	opts := options.Replace().SetUpsert(true)
 
-	_, err = r.db.ReplaceOne(context.TODO(), filter, Product, opts)
+	_, err = r.coll.ReplaceOne(context.TODO(), filter, Product, opts)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (r *ProductRepository) Find(id string) (*supply.Product, error) {
 
 	filter := bson.D{{Key: "productid", Value: id}}
 
-	err := r.db.FindOne(context.TODO(), filter).Decode(&product)
+	err := r.coll.FindOne(context.TODO(), filter).Decode(&product)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ordering;
+package purchasing;
 
 //service ordering {
 //    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {}
