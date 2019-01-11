@@ -2,11 +2,8 @@ package main
 
 import (
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net"
-	"supply/pkg/grpc"
-	pb "supply/pkg/grpc/proto"
 	"supply/pkg/mongo"
 )
 
@@ -21,10 +18,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	s := grpc.NewServer()
-	pb.RegisterOrderingServer(s, &server.OrderingServer{})
-
-	InitializeOrderingServices(db)
+	s := InitializeOrderingServices(db)
 	//ps := InitializePurchasingServices(db, s)
 
 	fmt.Println("Listening...")

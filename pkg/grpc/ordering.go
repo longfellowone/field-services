@@ -10,12 +10,6 @@ type OrderingServer struct {
 	svc ordering.OrderingService
 }
 
-func NewOrderingServer(svc ordering.OrderingService) *OrderingServer {
-	return &OrderingServer{
-		svc: svc,
-	}
-}
-
 func (s *OrderingServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	err := s.svc.CreateOrder(in.OrderUuid, in.ProjectUuid)
 	if err != nil {

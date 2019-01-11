@@ -5,18 +5,19 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"google.golang.org/grpc"
 	"supply/pkg/grpc"
 	mongodb "supply/pkg/mongo"
 	"supply/pkg/ordering"
 )
 
-func InitializeOrderingServices(db *mongo.Database) *server.OrderingServer {
+func InitializeOrderingServices(db *mongo.Database) *grpc.Server {
 	wire.Build(
 		mongodb.NewOrderRepository,
 		wire.Bind(new(ordering.OrderRepository), &mongodb.OrderRepository{}),
 		ordering.NewOrderingService,
 		wire.Bind(new(ordering.OrderingService), &ordering.Service{}),
-		server.NewOrderingServer,
+		server.New,
 	)
 	return nil
 }

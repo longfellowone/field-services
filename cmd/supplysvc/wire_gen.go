@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"google.golang.org/grpc"
 	"supply/pkg/grpc"
 	mongo2 "supply/pkg/mongo"
 	"supply/pkg/ordering"
@@ -14,9 +15,9 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeOrderingServices(db *mongo.Database) *server.OrderingServer {
+func InitializeOrderingServices(db *mongo.Database) *grpc.Server {
 	orderRepository := mongo2.NewOrderRepository(db)
 	service := ordering.NewOrderingService(orderRepository)
-	orderingServer := server.NewOrderingServer(service)
-	return orderingServer
+	grpcServer := server.New(service)
+	return grpcServer
 }
