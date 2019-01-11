@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"supply/pkg/grpc"
 	pb "supply/pkg/grpc/proto"
 	"supply/pkg/mongo"
 )
@@ -22,20 +22,23 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	server := InitializeSupplyServices(db, s)
+	pb.RegisterOrderingServer(s, &server.OrderingServer{})
+
+	InitializeOrderingServices(db)
+	//ps := InitializePurchasingServices(db, s)
 
 	fmt.Println("Listening...")
 
 	// Test
-	order := &pb.CreateOrderRequest{
-		OrderUuid:   "order1",
-		ProjectUuid: "project1",
-	}
-	_, err = server.CreateOrder(context.TODO(), order)
-	if err != nil {
-		log.Println(err)
-	}
-	// End test
+	//order := &pb.CreateOrderRequest{
+	//	OrderUuid:   "order1",
+	//	ProjectUuid: "project1",
+	//}
+	//_, err = os.CreateOrder(context.TODO(), order)
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//End test
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

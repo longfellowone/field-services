@@ -69,7 +69,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	return &order, nil
 }
 
-func (r *OrderRepository) QueryOrdersFromProject(projectid string) ([]ordering.ProjectOrder, error) {
+func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, error) {
 	var orders []ordering.ProjectOrder
 	filter := bson.D{{Key: "projectid", Value: projectid}}
 

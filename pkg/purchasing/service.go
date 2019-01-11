@@ -3,21 +3,29 @@ package purchasing
 import "supply/pkg"
 
 type PurchasingService interface {
-	UpdateProduct(name, uom string)
-	AddProduct(id, name, uom string) *supply.Product
+	//UpdateProduct(name, uom string)
+	//AddProduct(id, name, uom string) *supply.Product
 	UpdateItemPO(orderid, productid, ponumber string) error
-	Process(orderid string)
+	Process(orderid string) error
+}
+
+type ProductRepository interface {
+	supply.ProductRepository
+}
+
+type OrderRepository interface {
+	supply.OrderRepository
 }
 
 type Service struct {
-	product supply.ProductRepository
-	order   supply.OrderRepository
+	product ProductRepository
+	order   OrderRepository
 }
 
-func NewPurchasingService(p supply.ProductRepository, o supply.OrderRepository) *Service {
+func NewPurchasingService(product ProductRepository, order OrderRepository) *Service {
 	return &Service{
-		product: p,
-		order:   o,
+		product: product,
+		order:   order,
 	}
 }
 

@@ -13,12 +13,12 @@ type OrderingService interface {
 	SendOrder(orderid string) error
 	ReceiveOrderItem(orderid, productid string, quantity uint) error
 	FindOrder(orderid string) (supply.Order, error)
-	QueryOrdersFromProject(projectid string) ([]ProjectOrder, error)
+	FindProjectOrderDates(projectid string) ([]ProjectOrder, error)
 }
 
 type OrderRepository interface {
 	supply.OrderRepository
-	QueryOrdersFromProject(projectid string) ([]ProjectOrder, error)
+	FindDates(projectid string) ([]ProjectOrder, error)
 }
 
 type Service struct {
@@ -145,8 +145,8 @@ type ProjectOrder struct {
 	OrderDate time.Time
 }
 
-func (s *Service) QueryOrdersFromProject(projectid string) ([]ProjectOrder, error) {
-	order, err := s.order.QueryOrdersFromProject(projectid)
+func (s *Service) FindProjectOrderDates(projectid string) ([]ProjectOrder, error) {
+	order, err := s.order.FindDates(projectid)
 	if err != nil {
 		return []ProjectOrder{}, err
 	}

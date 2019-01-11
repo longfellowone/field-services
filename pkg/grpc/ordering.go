@@ -2,8 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
-	"google.golang.org/grpc"
 	pb "supply/pkg/grpc/proto"
 	"supply/pkg/ordering"
 )
@@ -12,15 +10,7 @@ type OrderingServer struct {
 	svc ordering.OrderingService
 }
 
-func NewOrderingServer(svr *grpc.Server, svc ordering.OrderingService) *OrderingServer {
-	pb.RegisterOrderingServer(svr, &OrderingServer{})
-
-	temp, err := svc.QueryOrdersFromProject("project1")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(temp)
-
+func NewOrderingServer(svc ordering.OrderingService) *OrderingServer {
 	return &OrderingServer{
 		svc: svc,
 	}

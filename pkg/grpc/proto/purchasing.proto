@@ -2,91 +2,31 @@ syntax = "proto3";
 
 package purchasing;
 
-//service ordering {
-//    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {}
-//    rpc SendOrder (SendOrderRequest) returns (SendOrderResponse) {}
-//    rpc AddOrderItem (AddOrderItemRequest) returns (AddOrderItemResponse) {}
-//    rpc RemoveOrderItem (RemoveOrderItemRequest) returns (RemoveOrderItemResponse) {}
-//    rpc ReceiveOrderItem (ReceiveOrderItemRequest) returns (ReceiveOrderItemResponse) {}
-//    rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
-//    rpc UpdateItemPO (UpdateItemPORequest) returns (UpdateItemPOResponse) {}
-//    //rpc 000 (Request) returns (Response) {}
-//}
+service ordering {
+    rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
+    //rpc 000 (Request) returns (Response) {}
+}
+
 //
-//message Empty {}
-//
-//// CreateOrder
-//message CreateOrderRequest {
-//    string order_uuid = 1;
-//    string project_uuid = 2;
-//}
-//message CreateOrderResponse {
-//}
-//
-//// AddOrderItem
-//message AddOrderItemRequest {
-//    string order_id = 1;
-//    string product_id = 2;
-//    string name = 3;
-//    string uom = 4;
-//}
-//message AddOrderItemResponse {
-//}
-//
-//// RemoveOrderItem
-//message RemoveOrderItemRequest {
-//    string order_id = 1;
-//    string product_id = 2;
-//}
-//message RemoveOrderItemResponse {
-//}
-//
-//// ModifyRequestedQuantity
-//message ModifyRequestedQuantityRequest {
-//    string order_id = 1;
-//    string product_id = 2;
-//    uint32 quantity = 3;
-//}
-//message ModifyRequestedQuantityResponse {
-//}
-//
-//// SendOrder
-//message SendOrderRequest {
-//    string order_uuid = 1;
-//}
-//message SendOrderResponse {
-//}
-//
-//// UpdateItemPO
-//message UpdateItemPORequest {
-//    string order_id = 1;
-//    string product_id = 2;
-//    string ponumber = 3;
-//}
-//message UpdateItemPOResponse {
-//}
-//
-//// ReceiveOrderItem
-//message ReceiveOrderItemRequest {
-//    string order_id = 1;
-//    string product_id = 2;
-//    uint32 quantity = 3;
-//}
-//message ReceiveOrderItemResponse {
-//}
-//
-///* eslint-disable */
-//
-///** Generate GO proto
-//protoc --go_out=plugins=grpc:. *.proto
-// */
-//
-///** Generate JS proto
-// protoc -I=. ./proto/todo.proto \
-//  --js_out=import_style=commonjs:./src/Todo \
-//  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Todo
-// */
-//
-////  import _"github.com/jnewmano/grpc-json-proxy/codec"
-////  go run github.com/jnewmano/grpc-json-proxy grpc-json-proxy
-////  http://www.objgen.com/json?demo=true
+message ProcessOrderRequest {
+    string order_uuid = 1;
+}
+message ProcessOrderResponse {
+}
+
+
+/* eslint-disable */
+
+/** Generate GO proto
+protoc --go_out=plugins=grpc:. *.proto
+ */
+
+/** Generate JS proto
+ protoc -I=. ./proto/todo.proto \
+  --js_out=import_style=commonjs:./src/Todo \
+  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Todo
+ */
+
+//  import _"github.com/jnewmano/grpc-json-proxy/codec"
+//  go run github.com/jnewmano/grpc-json-proxy grpc-json-proxy
+//  http://www.objgen.com/json?demo=true
