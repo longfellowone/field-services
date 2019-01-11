@@ -16,7 +16,6 @@ var (
 type OrderRepository interface {
 	Save(o *Order) error
 	Find(id string) (*Order, error)
-	FindAllFromProject(id string) ([]Order, error)
 }
 
 type Order struct {

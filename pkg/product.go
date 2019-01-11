@@ -7,20 +7,23 @@ type ProductRepository interface {
 
 type Product struct {
 	ProductID string
+	Category  string
 	Name      string
 	UOM       string
 }
 
 // Modifies a product name and uom
-func (p *Product) ModifyProduct(name, uom string) {
+func (p *Product) ModifyProduct(category, name, uom string) {
+	p.Category = category
 	p.Name = name
 	p.UOM = uom
 }
 
 // Returns a new *Product
-func NewProduct(id, name, uom string) *Product {
+func NewProduct(id, category, name, uom string) *Product {
 	return &Product{
 		ProductID: id,
+		Category:  category,
 		Name:      name,
 		UOM:       uom,
 	}

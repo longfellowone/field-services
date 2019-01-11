@@ -8,8 +8,9 @@ import (
 
 func TestProduct_ModifyProduct(t *testing.T) {
 	type args struct {
-		name string
-		uom  string
+		category string
+		name     string
+		uom      string
 	}
 	tests := []struct {
 		name string
@@ -17,13 +18,15 @@ func TestProduct_ModifyProduct(t *testing.T) {
 		args args
 		want *supply.Product
 	}{{
-		name: "id must not change",
+		name: "category must change",
 		got: &supply.Product{
-			ProductID: "d5820c15-7295-420b-838c-33d04209e882",
+			Category: "Misc",
 		},
-		args: args{},
+		args: args{
+			category: "Consumables",
+		},
 		want: &supply.Product{
-			ProductID: "d5820c15-7295-420b-838c-33d04209e882",
+			Category: "Consumables",
 		},
 	}, {
 		name: "name must change",
@@ -51,7 +54,7 @@ func TestProduct_ModifyProduct(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := tt.got
-			p.ModifyProduct(tt.args.name, tt.args.uom)
+			p.ModifyProduct(tt.args.category, tt.args.name, tt.args.uom)
 			if got := p; !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ModifyProduct() = %v, want %v", got, tt.want)
 			}
@@ -61,9 +64,10 @@ func TestProduct_ModifyProduct(t *testing.T) {
 
 func TestNewProduct(t *testing.T) {
 	type args struct {
-		id   string
-		name string
-		uom  string
+		id       string
+		category string
+		name     string
+		uom      string
 	}
 	tests := []struct {
 		name string
@@ -72,19 +76,21 @@ func TestNewProduct(t *testing.T) {
 	}{{
 		name: "must return a new *Product",
 		args: args{
-			id:   "649739bf-66ee-4023-90bf-2e931c94e024",
-			name: "Pencil",
-			uom:  "ea",
+			id:       "pid1",
+			category: "Consumables",
+			name:     "Pencil",
+			uom:      "ea",
 		},
 		want: &supply.Product{
-			ProductID: "649739bf-66ee-4023-90bf-2e931c94e024",
+			ProductID: "pid1",
+			Category:  "Consumables",
 			Name:      "Pencil",
 			UOM:       "ea",
 		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := supply.NewProduct(tt.args.id, tt.args.name, tt.args.uom); !reflect.DeepEqual(got, tt.want) {
+			if got := supply.NewProduct(tt.args.id, tt.args.category, tt.args.name, tt.args.uom); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewProduct() = %v, want %v", got, tt.want)
 			}
 		})

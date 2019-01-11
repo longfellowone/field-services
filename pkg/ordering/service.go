@@ -1,8 +1,8 @@
 package ordering
 
 import (
-	"log"
 	"supply/pkg"
+	"time"
 )
 
 type OrderingService interface {
@@ -12,13 +12,20 @@ type OrderingService interface {
 	ModifyRequestedQuantity(orderid, productid string, quantity uint) error
 	SendOrder(orderid string) error
 	ReceiveOrderItem(orderid, productid string, quantity uint) error
+	FindOrder(orderid string) (supply.Order, error)
+	QueryOrdersFromProject(projectid string) ([]ProjectOrder, error)
+}
+
+type OrderRepository interface {
+	supply.OrderRepository
+	QueryOrdersFromProject(projectid string) ([]ProjectOrder, error)
 }
 
 type Service struct {
-	order supply.OrderRepository
+	order OrderRepository
 }
 
-func NewOrderingService(order supply.OrderRepository) *Service {
+func NewOrderingService(order OrderRepository) *Service {
 	return &Service{
 		order: order,
 	}
@@ -124,18 +131,24 @@ func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) err
 	return nil
 }
 
-func (s *Service) FindAllProjectOrders(uuid string) ([]supply.Order, error) {
-	findAll, err := s.order.FindAllFromProject(uuid)
+func (s *Service) FindOrder(orderid string) (supply.Order, error) {
+	order, err := s.order.Find(orderid)
 	if err != nil {
-		log.Println(err)
+		return supply.Order{}, err
 	}
-	return findAll, nil
+	return *order, nil
 }
 
-func (s *Service) FindOrder(uuid string) (*supply.Order, error) {
-	findAll, err := s.order.Find(uuid)
+// Order read models
+
+type ProjectOrder struct {
+	OrderDate time.Time
+}
+
+func (s *Service) QueryOrdersFromProject(projectid string) ([]ProjectOrder, error) {
+	order, err := s.order.QueryOrdersFromProject(projectid)
 	if err != nil {
-		log.Println(err)
+		return []ProjectOrder{}, err
 	}
-	return findAll, nil
+	return order, nil
 }

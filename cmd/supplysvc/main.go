@@ -22,7 +22,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	server := InitializeOrderingService(db, s)
+	server := InitializeSupplyServices(db, s)
 
 	fmt.Println("Listening...")
 

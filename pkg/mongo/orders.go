@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"supply/pkg"
+	"supply/pkg/ordering"
 	"time"
 
 	"github.com/mongodb/mongo-go-driver/bson"
@@ -68,9 +69,9 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	return &order, nil
 }
 
-func (r *OrderRepository) FindAllFromProject(id string) ([]supply.Order, error) {
-	var orders []supply.Order
-	filter := bson.D{{Key: "projectid", Value: id}}
+func (r *OrderRepository) QueryOrdersFromProject(projectid string) ([]ordering.ProjectOrder, error) {
+	var orders []ordering.ProjectOrder
+	filter := bson.D{{Key: "projectid", Value: projectid}}
 
 	cur, err := r.coll.Find(context.TODO(), filter)
 	if err != nil {
@@ -79,7 +80,7 @@ func (r *OrderRepository) FindAllFromProject(id string) ([]supply.Order, error) 
 	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
-		var order supply.Order
+		var order ordering.ProjectOrder
 		err := cur.Decode(&order)
 		if err != nil {
 			log.Fatal(err)

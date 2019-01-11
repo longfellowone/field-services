@@ -11,10 +11,10 @@ import (
 	"supply/pkg/ordering"
 )
 
-func InitializeOrderingService(db *mongo.Database, svr *grpc.Server) *server.OrderingServer {
+func InitializeSupplyServices(db *mongo.Database, svr *grpc.Server) *server.OrderingServer {
 	wire.Build(
 		mongodb.NewOrderRepository,
-		wire.Bind(new(supply.OrderRepository), &mongodb.OrderRepository{}),
+		wire.Bind(new(ordering.OrderRepository), &mongodb.OrderRepository{}),
 		ordering.NewOrderingService,
 		wire.Bind(new(ordering.OrderingService), &ordering.Service{}),
 		server.NewOrderingServer,
