@@ -75,7 +75,7 @@ func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, 
 
 	cur, err := r.coll.Find(context.TODO(), filter)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer cur.Close(context.TODO())
 
@@ -83,13 +83,13 @@ func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, 
 		var order ordering.ProjectOrder
 		err := cur.Decode(&order)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		orders = append(orders, order)
 	}
 
 	if err := cur.Err(); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	return orders, nil
 }

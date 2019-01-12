@@ -12,7 +12,8 @@ import (
 )
 
 type ProductRepository struct {
-	coll *mongo.Collection
+	coll  *mongo.Collection
+	cache []supply.Product
 }
 
 func NewProductRepository(db *mongo.Database) *ProductRepository {
@@ -61,4 +62,28 @@ func (r *ProductRepository) Find(id string) (*supply.Product, error) {
 		return nil, err
 	}
 	return &product, nil
+}
+
+func (r *ProductRepository) FindAll() ([]supply.Product, error) {
+	var products []supply.Product
+
+	cur, err := r.coll.Find(context.TODO(), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(context.TODO())
+
+	for cur.Next(context.TODO()) {
+		var product supply.Product
+		err := cur.Decode(&product)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return products, nil
 }

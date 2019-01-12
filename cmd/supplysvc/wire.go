@@ -9,28 +9,24 @@ import (
 	"supply/pkg/grpc"
 	mongodb "supply/pkg/mongo"
 	"supply/pkg/ordering"
+	"supply/pkg/purchasing"
 )
 
-func InitializeOrderingServices(db *mongo.Database) *grpc.Server {
+func InitializeOrderingServices(db *mongo.Database) (*grpc.Server, error) {
 	wire.Build(
+		// Ordering service
 		mongodb.NewOrderRepository,
 		wire.Bind(new(ordering.OrderRepository), &mongodb.OrderRepository{}),
 		ordering.NewOrderingService,
 		wire.Bind(new(ordering.OrderingService), &ordering.Service{}),
+		// Purchasing service
+		mongodb.NewProductRepository,
+		wire.Bind(new(purchasing.ProductRepository), &mongodb.ProductRepository{}),
+		wire.Bind(new(purchasing.OrderRepository), &mongodb.OrderRepository{}),
+		purchasing.NewPurchasingService,
+		wire.Bind(new(purchasing.PurchasingService), &purchasing.Service{}),
+		// gRPC server
 		server.New,
 	)
-	return nil
+	return &grpc.Server{}, nil
 }
-
-//func InitializePurchasingServices(db *mongo.Database, svr *grpc.Server) *server.PurchasingServer {
-//	wire.Build(
-//		mongodb.NewOrderRepository,
-//		mongodb.NewProductRepository,
-//		wire.Bind(new(purchasing.OrderRepository), &mongodb.OrderRepository{}),
-//		wire.Bind(new(purchasing.ProductRepository), &mongodb.ProductRepository{}),
-//		purchasing.NewPurchasingService,
-//		wire.Bind(new(purchasing.PurchasingService), &purchasing.Service{}),
-//		server.NewPurchasingServer,
-//	)
-//	return nil
-//}

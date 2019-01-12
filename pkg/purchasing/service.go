@@ -1,16 +1,21 @@
 package purchasing
 
-import "supply/pkg"
+import (
+	"fmt"
+	"supply/pkg"
+)
 
 type PurchasingService interface {
-	//UpdateProduct(name, uom string)
-	//AddProduct(id, name, uom string) *supply.Product
+	ProductSearch(query string) []supply.Product
+	UpdateProduct(id, category, name, uom string) error
+	AddProduct(id, category, name, uom string) error
 	UpdateItemPO(orderid, productid, ponumber string) error
 	Process(orderid string) error
 }
 
 type ProductRepository interface {
 	supply.ProductRepository
+	FindAll() ([]supply.Product, error)
 }
 
 type OrderRepository interface {
@@ -22,11 +27,17 @@ type Service struct {
 	order   OrderRepository
 }
 
-func NewPurchasingService(product ProductRepository, order OrderRepository) *Service {
+func NewPurchasingService(product ProductRepository, order OrderRepository) (*Service, error) {
+	products, err := product.FindAll()
+	if err != nil {
+		return &Service{}, err
+	}
+	fmt.Println(products)
+
 	return &Service{
 		product: product,
 		order:   order,
-	}
+	}, nil
 }
 
 func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
@@ -56,6 +67,35 @@ func (s *Service) Process(orderid string) error {
 	order.Process()
 
 	err = s.order.Save(order)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) ProductSearch(query string) []supply.Product {
+	return []supply.Product{}
+}
+
+func (s *Service) UpdateProduct(id, category, name, uom string) error {
+	product, err := s.product.Find(id)
+	if err != nil {
+		return err
+	}
+
+	product.ModifyProduct(category, name, uom)
+
+	err = s.product.Save(product)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) AddProduct(id, category, name, uom string) error {
+	product := supply.NewProduct(id, category, name, uom)
+
+	err := s.product.Save(product)
 	if err != nil {
 		return err
 	}

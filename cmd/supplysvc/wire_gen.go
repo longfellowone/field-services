@@ -11,13 +11,19 @@ import (
 	"supply/pkg/grpc"
 	mongo2 "supply/pkg/mongo"
 	"supply/pkg/ordering"
+	"supply/pkg/purchasing"
 )
 
 // Injectors from wire.go:
 
-func InitializeOrderingServices(db *mongo.Database) *grpc.Server {
+func InitializeOrderingServices(db *mongo.Database) (*grpc.Server, error) {
 	orderRepository := mongo2.NewOrderRepository(db)
 	service := ordering.NewOrderingService(orderRepository)
-	grpcServer := server.New(service)
-	return grpcServer
+	productRepository := mongo2.NewProductRepository(db)
+	purchasingService, err := purchasing.NewPurchasingService(productRepository, orderRepository)
+	if err != nil {
+		return nil, err
+	}
+	grpcServer := server.New(service, purchasingService)
+	return grpcServer, nil
 }
