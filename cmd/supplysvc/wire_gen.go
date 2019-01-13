@@ -12,6 +12,7 @@ import (
 	mongo2 "supply/pkg/mongo"
 	"supply/pkg/ordering"
 	"supply/pkg/purchasing"
+	"supply/pkg/search"
 )
 
 // Injectors from wire.go:
@@ -24,6 +25,10 @@ func InitializeOrderingServices(db *mongo.Database) (*grpc.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcServer := server.New(service, purchasingService)
+	searchService, err := search.NewSearchService(productRepository)
+	if err != nil {
+		return nil, err
+	}
+	grpcServer := server.New(service, purchasingService, searchService)
 	return grpcServer, nil
 }

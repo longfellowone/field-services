@@ -37,7 +37,7 @@ func NewProductRepository(db *mongo.Database) *ProductRepository {
 }
 
 func (r *ProductRepository) Save(p *supply.Product) error {
-	Product, err := bson.Marshal(&p)
+	product, err := bson.Marshal(&p)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (r *ProductRepository) Save(p *supply.Product) error {
 	filter := bson.D{{Key: "productid", Value: p.ProductID}}
 	opts := options.Replace().SetUpsert(true)
 
-	_, err = r.coll.ReplaceOne(context.TODO(), filter, Product, opts)
+	_, err = r.coll.ReplaceOne(context.TODO(), filter, product, opts)
 	if err != nil {
 		return err
 	}
@@ -66,8 +66,9 @@ func (r *ProductRepository) Find(id string) (*supply.Product, error) {
 
 func (r *ProductRepository) FindAll() ([]supply.Product, error) {
 	var products []supply.Product
+	filter := bson.D{{}}
 
-	cur, err := r.coll.Find(context.TODO(), nil)
+	cur, err := r.coll.Find(context.TODO(), filter)
 	if err != nil {
 		return nil, err
 	}

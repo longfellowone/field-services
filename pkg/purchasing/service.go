@@ -1,21 +1,18 @@
 package purchasing
 
 import (
-	"fmt"
 	"supply/pkg"
 )
 
 type PurchasingService interface {
-	ProductSearch(query string) []supply.Product
-	UpdateProduct(id, category, name, uom string) error
-	AddProduct(id, category, name, uom string) error
 	UpdateItemPO(orderid, productid, ponumber string) error
 	Process(orderid string) error
+	UpdateProduct(id, category, name, uom string) error
+	AddProduct(id, category, name, uom string) error
 }
 
 type ProductRepository interface {
 	supply.ProductRepository
-	FindAll() ([]supply.Product, error)
 }
 
 type OrderRepository interface {
@@ -28,12 +25,6 @@ type Service struct {
 }
 
 func NewPurchasingService(product ProductRepository, order OrderRepository) (*Service, error) {
-	products, err := product.FindAll()
-	if err != nil {
-		return &Service{}, err
-	}
-	fmt.Println(products)
-
 	return &Service{
 		product: product,
 		order:   order,
@@ -71,10 +62,6 @@ func (s *Service) Process(orderid string) error {
 		return err
 	}
 	return nil
-}
-
-func (s *Service) ProductSearch(query string) []supply.Product {
-	return []supply.Product{}
 }
 
 func (s *Service) UpdateProduct(id, category, name, uom string) error {
