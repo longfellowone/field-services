@@ -6,7 +6,7 @@ import (
 )
 
 type SearchService interface {
-	ProductSearch(query string) []Result
+	ProductSearch(name string) []Result
 }
 
 type ProductRepository interface {
@@ -14,7 +14,7 @@ type ProductRepository interface {
 }
 
 type Service struct {
-	products products
+	products []supply.Product
 }
 
 func NewSearchService(product ProductRepository) (*Service, error) {
@@ -23,17 +23,17 @@ func NewSearchService(product ProductRepository) (*Service, error) {
 	return &Service{products: products}, nil
 }
 
-func (s *Service) ProductSearch(query string) []Result {
-	fr := fuzzy.FindFrom(query, s.products)
+func (s *Service) ProductSearch(name string) []Result {
+	fr := fuzzy.FindFrom(name, s)
 
 	if fr.Len() > 10 {
 		fr = fr[:10]
 	}
 
 	var results []Result
-	for i, r := range fr {
+	for _, r := range fr {
 		result := Result{
-			Product:        s.products[i],
+			Product:        s.products[r.Index],
 			MatchedIndexes: r.MatchedIndexes,
 		}
 		results = append(results, result)
@@ -41,17 +41,17 @@ func (s *Service) ProductSearch(query string) []Result {
 	return results
 }
 
+// ProductSearch result
 type Result struct {
 	Product        supply.Product
 	MatchedIndexes []int
 }
 
-type products []supply.Product
-
-func (p products) String(i int) string {
-	return p[i].Name
+// Required methods for fuzzy search
+func (s *Service) String(i int) string {
+	return s.products[i].Name
 }
 
-func (p products) Len() int {
-	return len(p)
+func (s *Service) Len() int {
+	return len(s.products)
 }
