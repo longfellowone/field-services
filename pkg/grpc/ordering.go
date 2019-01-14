@@ -10,6 +10,8 @@ type OrderingServer struct {
 	svc ordering.OrderingService
 }
 
+// status.Errorf(codes.OK, "error: %s")
+
 func (s *OrderingServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	err := s.svc.CreateOrder(in.OrderUuid, in.ProjectUuid)
 	if err != nil {

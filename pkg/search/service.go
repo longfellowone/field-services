@@ -18,8 +18,10 @@ type Service struct {
 }
 
 func NewSearchService(product ProductRepository) (*Service, error) {
-	products, _ := product.FindAll()
-
+	products, err := product.FindAll()
+	if err != nil {
+		return &Service{}, err
+	}
 	return &Service{products: products}, nil
 }
 
@@ -41,7 +43,7 @@ func (s *Service) ProductSearch(name string) []Result {
 	return results
 }
 
-// ProductSearch result
+// Result of ProductSearch
 type Result struct {
 	Product        supply.Product
 	MatchedIndexes []int
