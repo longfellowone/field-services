@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
-	pb "supply/pkg/grpc/proto"
-	"supply/pkg/ordering"
+	pb "supply/api/grpc/proto"
+	"supply/api/ordering"
 )
 
 type OrderingServer struct {

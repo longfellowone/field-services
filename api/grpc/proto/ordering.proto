@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ordering;
+package server;
 
 service ordering {
     rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {}
@@ -9,7 +9,6 @@ service ordering {
     rpc RemoveOrderItem (RemoveOrderItemRequest) returns (RemoveOrderItemResponse) {}
     rpc ReceiveOrderItem (ReceiveOrderItemRequest) returns (ReceiveOrderItemResponse) {}
     rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
-    //rpc 000 (Request) returns (Response) {}
 }
 
 message Empty {}

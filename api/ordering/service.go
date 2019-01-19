@@ -1,7 +1,7 @@
 package ordering
 
 import (
-	"supply/pkg"
+	"supply/api"
 	"time"
 )
 

@@ -1,7 +1,7 @@
 package purchasing
 
 import (
-	"supply/pkg"
+	"supply/api"
 )
 
 type PurchasingService interface {

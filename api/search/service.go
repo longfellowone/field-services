@@ -2,7 +2,7 @@ package search
 
 import (
 	"github.com/sahilm/fuzzy"
-	"supply/pkg"
+	"supply/api"
 )
 
 type SearchService interface {
@@ -45,7 +45,7 @@ func (s *Service) ProductSearch(name string) []Result {
 
 // Result of ProductSearch
 type Result struct {
-	Product        supply.Product
+	supply.Product
 	MatchedIndexes []int
 }
 

@@ -2,10 +2,10 @@ package server
 
 import (
 	"google.golang.org/grpc"
-	pb "supply/pkg/grpc/proto"
-	"supply/pkg/ordering"
-	"supply/pkg/purchasing"
-	"supply/pkg/search"
+	pb "supply/api/grpc/proto"
+	"supply/api/ordering"
+	"supply/api/purchasing"
+	"supply/api/search"
 )
 
 func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc search.SearchService) *grpc.Server {

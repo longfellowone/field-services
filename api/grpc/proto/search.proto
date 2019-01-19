@@ -1,19 +1,28 @@
 syntax = "proto3";
 
-package purchasing;
+package server;
 
-service ordering {
-    rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
-    //rpc 000 (Request) returns (Response) {}
+service search {
+    rpc ProductSearch (ProductSearchRequest) returns (ProductSearchResponse) {}
 }
 
-//
-message ProcessOrderRequest {
-    string order_uuid = 1;
+// ProductSearch
+message ProductSearchRequest {
+    string name = 1;
 }
-message ProcessOrderResponse {
+message ProductSearchResponse {
+    repeated Result results = 5;
 }
-
+message Result {
+    string product_uuid = 1;
+    string category = 2;
+    string name = 3;
+    string uom = 4;
+    repeated Index indexes = 5;
+}
+message Index {
+    int32 index = 1;
+}
 
 /* eslint-disable */
 

@@ -8,16 +8,16 @@ package main
 import (
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"google.golang.org/grpc"
-	"supply/pkg/grpc"
-	mongo2 "supply/pkg/mongo"
-	"supply/pkg/ordering"
-	"supply/pkg/purchasing"
-	"supply/pkg/search"
+	"supply/api/grpc"
+	mongo2 "supply/api/mongo"
+	"supply/api/ordering"
+	"supply/api/purchasing"
+	"supply/api/search"
 )
 
 // Injectors from wire.go:
 
-func InitializeOrderingServices(db *mongo.Database) (*grpc.Server, error) {
+func InitializeSupplyServices(db *mongo.Database) (*grpc.Server, error) {
 	orderRepository := mongo2.NewOrderRepository(db)
 	service := ordering.NewOrderingService(orderRepository)
 	productRepository := mongo2.NewProductRepository(db)

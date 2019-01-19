@@ -3,8 +3,8 @@ package mongo
 import (
 	"context"
 	"log"
-	"supply/pkg"
-	"supply/pkg/ordering"
+	"supply/api"
+	"supply/api/ordering"
 	"time"
 
 	"github.com/mongodb/mongo-go-driver/bson"

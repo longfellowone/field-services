@@ -6,14 +6,14 @@ import (
 	"github.com/google/wire"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"google.golang.org/grpc"
-	"supply/pkg/grpc"
-	mongodb "supply/pkg/mongo"
-	"supply/pkg/ordering"
-	"supply/pkg/purchasing"
-	"supply/pkg/search"
+	"supply/api/grpc"
+	mongodb "supply/api/mongo"
+	"supply/api/ordering"
+	"supply/api/purchasing"
+	"supply/api/search"
 )
 
-func InitializeOrderingServices(db *mongo.Database) (*grpc.Server, error) {
+func InitializeSupplyServices(db *mongo.Database) (*grpc.Server, error) {
 	wire.Build(
 		// Repositories
 		mongodb.NewOrderRepository,

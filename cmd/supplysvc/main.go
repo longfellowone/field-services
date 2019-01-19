@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"supply/pkg/mongo"
+	"supply/api/mongo"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	s, err := InitializeOrderingServices(db)
+	s, err := InitializeSupplyServices(db)
 	if err != nil {
 		log.Fatalf("failed to initialize supply services: %v", err)
 	}

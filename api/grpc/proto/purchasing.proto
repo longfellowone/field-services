@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package server;
+
+service purchasing {
+    //rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
+    //rpc 000 (Request) returns (Response) {}
+}
+
+
+//message ProcessOrderRequest {
+//    string order_uuid = 1;
+//}
+//message ProcessOrderResponse {
+//}
+
+
+/* eslint-disable */
+
+/** Generate GO proto
+protoc --go_out=plugins=grpc:. *.proto
+ */
+
+/** Generate JS proto
+ protoc -I=. ./proto/todo.proto \
+  --js_out=import_style=commonjs:./src/Todo \
+  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Todo
+ */
+
+//  import _"github.com/jnewmano/grpc-json-proxy/codec"
+//  go run github.com/jnewmano/grpc-json-proxy grpc-json-proxy
+//  http://www.objgen.com/json?demo=true
