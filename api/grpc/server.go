@@ -13,7 +13,7 @@ func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc 
 
 	pb.RegisterOrderingServer(s, &OrderingServer{svc: osvc})
 	//pb.RegisterOrderingServer(s, &PurchasingServer{svc: psvc})
-	//pb.RegisterOrderingServer(s, &SearchServer{svc: psvc})
+	pb.RegisterSearchServer(s, &SearchServer{svc: ssvc})
 
 	return s
 }

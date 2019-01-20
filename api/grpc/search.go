@@ -2,16 +2,24 @@ package server
 
 import (
 	"context"
+	"errors"
 	pb "supply/api/grpc/proto"
 	"supply/api/search"
+)
+
+var (
+	ErrNoResults = errors.New("no results")
 )
 
 type SearchServer struct {
 	svc search.SearchService
 }
 
-func (s *SearchServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) *pb.ProductSearchResponse {
+func (s *SearchServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
 	products := s.svc.ProductSearch(in.Name)
+	if len(products) == 0 {
+		return &pb.ProductSearchResponse{}, ErrNoResults
+	}
 
 	var results []*pb.Result
 	for _, p := range products {
@@ -34,5 +42,5 @@ func (s *SearchServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRe
 		results = append(results, result)
 	}
 
-	return &pb.ProductSearchResponse{Results: results}
+	return &pb.ProductSearchResponse{Results: results}, nil
 }
