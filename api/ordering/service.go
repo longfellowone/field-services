@@ -2,7 +2,6 @@ package ordering
 
 import (
 	"supply/api"
-	"time"
 )
 
 type OrderingService interface {
@@ -142,7 +141,9 @@ func (s *Service) FindOrder(orderid string) (supply.Order, error) {
 // Order read models
 
 type ProjectOrder struct {
-	OrderDate time.Time
+	OrderID  string
+	SentDate int64
+	Status   supply.OrderStatus
 }
 
 func (s *Service) FindProjectOrderDates(projectid string) ([]ProjectOrder, error) {

@@ -49,3 +49,6 @@ https://play.golang.org/p/O0Dl1Nj9INz
 
 #### gRPC Fix
 go get github.com/golang/protobuf@8d0c54c1246661d9a51ca0ba455d22116d485eaa
+
+#### GO MOD
+go mod tidy

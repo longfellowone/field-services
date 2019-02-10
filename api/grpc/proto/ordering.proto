@@ -2,21 +2,21 @@ syntax = "proto3";
 
 package server;
 
-service ordering {
+service Ordering {
     rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {}
     rpc SendOrder (SendOrderRequest) returns (SendOrderResponse) {}
     rpc AddOrderItem (AddOrderItemRequest) returns (AddOrderItemResponse) {}
     rpc RemoveOrderItem (RemoveOrderItemRequest) returns (RemoveOrderItemResponse) {}
     rpc ReceiveOrderItem (ReceiveOrderItemRequest) returns (ReceiveOrderItemResponse) {}
     rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
+    rpc FindOrder  (FindOrderRequest) returns (FindOrderResponse);
+    rpc FindProjectOrderDates (FindProjectOrderDatesRequest) returns (FindProjectOrderDatesResponse);
 }
-
-message Empty {}
 
 // CreateOrder
 message CreateOrderRequest {
-    string order_uuid = 1;
-    string project_uuid = 2;
+    string order_id = 1;
+    string project_id = 2;
 }
 message CreateOrderResponse {}
 
@@ -46,7 +46,7 @@ message ModifyRequestedQuantityResponse {}
 
 // SendOrder
 message SendOrderRequest {
-    string order_uuid = 1;
+    string order_id = 1;
 }
 message SendOrderResponse {}
 
@@ -58,6 +58,42 @@ message ReceiveOrderItemRequest {
 }
 message ReceiveOrderItemResponse {}
 
+
+// FindProjectOrderDates
+message FindProjectOrderDatesRequest {
+    string project_id = 1;
+}
+message FindProjectOrderDatesResponse {
+    repeated Order orders = 1;
+}
+
+// An order
+message Order {
+    string order_id = 1;
+    int64 date = 2;
+    string status = 3;
+}
+
+// FindOrder
+message FindOrderRequest {
+    string order_id = 1;
+}
+message FindOrderResponse {
+    int64 date = 1;
+    string status = 2;
+    repeated Item items = 3;
+}
+
+// An order item
+message Item {
+    string product_id = 1;
+    string name = 2;
+    string uom = 3;
+    string quantity_requested = 4;
+    string quantity_received = 5;
+    string item_status = 6;
+}
+
 /* eslint-disable */
 
 /** Generate GO proto
@@ -65,9 +101,9 @@ protoc --go_out=plugins=grpc:. *.proto
  */
 
 /** Generate JS proto
- protoc -I=. ./proto/todo.proto \
-  --js_out=import_style=commonjs:./src/Todo \
-  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Todo
+ protoc -I=. ./proto/ordering.proto \
+  --js_out=import_style=commonjs:./src/Order\
+  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Order
  */
 
 //  import _"github.com/jnewmano/grpc-json-proxy/codec"

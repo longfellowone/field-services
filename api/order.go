@@ -22,7 +22,7 @@ type Order struct {
 	OrderID   string
 	ProjectID string
 	Items     []Item
-	OrderDate time.Time
+	SentDate  int64
 	Status    OrderStatus
 }
 
@@ -32,6 +32,7 @@ func Create(id, pid string) *Order {
 		OrderID:   id,
 		ProjectID: pid,
 		Items:     []Item{},
+		SentDate:  time.Now().Unix(),
 		Status:    New,
 	}
 }
@@ -77,7 +78,7 @@ func (o *Order) Send() error {
 	}
 
 	o.Status = Sent
-	o.OrderDate = time.Now()
+	o.SentDate = time.Now().Unix()
 	return nil
 }
 

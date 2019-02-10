@@ -22,41 +22,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type Empty struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Empty) Reset()         { *m = Empty{} }
-func (m *Empty) String() string { return proto.CompactTextString(m) }
-func (*Empty) ProtoMessage()    {}
-func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{0}
-}
-
-func (m *Empty) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Empty.Unmarshal(m, b)
-}
-func (m *Empty) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Empty.Marshal(b, m, deterministic)
-}
-func (m *Empty) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Empty.Merge(m, src)
-}
-func (m *Empty) XXX_Size() int {
-	return xxx_messageInfo_Empty.Size(m)
-}
-func (m *Empty) XXX_DiscardUnknown() {
-	xxx_messageInfo_Empty.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Empty proto.InternalMessageInfo
-
 // CreateOrder
 type CreateOrderRequest struct {
-	OrderUuid            string   `protobuf:"bytes,1,opt,name=order_uuid,json=orderUuid,proto3" json:"order_uuid,omitempty"`
-	ProjectUuid          string   `protobuf:"bytes,2,opt,name=project_uuid,json=projectUuid,proto3" json:"project_uuid,omitempty"`
+	OrderId              string   `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	ProjectId            string   `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -66,7 +35,7 @@ func (m *CreateOrderRequest) Reset()         { *m = CreateOrderRequest{} }
 func (m *CreateOrderRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateOrderRequest) ProtoMessage()    {}
 func (*CreateOrderRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{1}
+	return fileDescriptor_3965df4c9351bf43, []int{0}
 }
 
 func (m *CreateOrderRequest) XXX_Unmarshal(b []byte) error {
@@ -87,16 +56,16 @@ func (m *CreateOrderRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateOrderRequest proto.InternalMessageInfo
 
-func (m *CreateOrderRequest) GetOrderUuid() string {
+func (m *CreateOrderRequest) GetOrderId() string {
 	if m != nil {
-		return m.OrderUuid
+		return m.OrderId
 	}
 	return ""
 }
 
-func (m *CreateOrderRequest) GetProjectUuid() string {
+func (m *CreateOrderRequest) GetProjectId() string {
 	if m != nil {
-		return m.ProjectUuid
+		return m.ProjectId
 	}
 	return ""
 }
@@ -111,7 +80,7 @@ func (m *CreateOrderResponse) Reset()         { *m = CreateOrderResponse{} }
 func (m *CreateOrderResponse) String() string { return proto.CompactTextString(m) }
 func (*CreateOrderResponse) ProtoMessage()    {}
 func (*CreateOrderResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{2}
+	return fileDescriptor_3965df4c9351bf43, []int{1}
 }
 
 func (m *CreateOrderResponse) XXX_Unmarshal(b []byte) error {
@@ -147,7 +116,7 @@ func (m *AddOrderItemRequest) Reset()         { *m = AddOrderItemRequest{} }
 func (m *AddOrderItemRequest) String() string { return proto.CompactTextString(m) }
 func (*AddOrderItemRequest) ProtoMessage()    {}
 func (*AddOrderItemRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{3}
+	return fileDescriptor_3965df4c9351bf43, []int{2}
 }
 
 func (m *AddOrderItemRequest) XXX_Unmarshal(b []byte) error {
@@ -206,7 +175,7 @@ func (m *AddOrderItemResponse) Reset()         { *m = AddOrderItemResponse{} }
 func (m *AddOrderItemResponse) String() string { return proto.CompactTextString(m) }
 func (*AddOrderItemResponse) ProtoMessage()    {}
 func (*AddOrderItemResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{4}
+	return fileDescriptor_3965df4c9351bf43, []int{3}
 }
 
 func (m *AddOrderItemResponse) XXX_Unmarshal(b []byte) error {
@@ -240,7 +209,7 @@ func (m *RemoveOrderItemRequest) Reset()         { *m = RemoveOrderItemRequest{}
 func (m *RemoveOrderItemRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveOrderItemRequest) ProtoMessage()    {}
 func (*RemoveOrderItemRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{5}
+	return fileDescriptor_3965df4c9351bf43, []int{4}
 }
 
 func (m *RemoveOrderItemRequest) XXX_Unmarshal(b []byte) error {
@@ -285,7 +254,7 @@ func (m *RemoveOrderItemResponse) Reset()         { *m = RemoveOrderItemResponse
 func (m *RemoveOrderItemResponse) String() string { return proto.CompactTextString(m) }
 func (*RemoveOrderItemResponse) ProtoMessage()    {}
 func (*RemoveOrderItemResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{6}
+	return fileDescriptor_3965df4c9351bf43, []int{5}
 }
 
 func (m *RemoveOrderItemResponse) XXX_Unmarshal(b []byte) error {
@@ -320,7 +289,7 @@ func (m *ModifyRequestedQuantityRequest) Reset()         { *m = ModifyRequestedQ
 func (m *ModifyRequestedQuantityRequest) String() string { return proto.CompactTextString(m) }
 func (*ModifyRequestedQuantityRequest) ProtoMessage()    {}
 func (*ModifyRequestedQuantityRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{7}
+	return fileDescriptor_3965df4c9351bf43, []int{6}
 }
 
 func (m *ModifyRequestedQuantityRequest) XXX_Unmarshal(b []byte) error {
@@ -372,7 +341,7 @@ func (m *ModifyRequestedQuantityResponse) Reset()         { *m = ModifyRequested
 func (m *ModifyRequestedQuantityResponse) String() string { return proto.CompactTextString(m) }
 func (*ModifyRequestedQuantityResponse) ProtoMessage()    {}
 func (*ModifyRequestedQuantityResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{8}
+	return fileDescriptor_3965df4c9351bf43, []int{7}
 }
 
 func (m *ModifyRequestedQuantityResponse) XXX_Unmarshal(b []byte) error {
@@ -395,7 +364,7 @@ var xxx_messageInfo_ModifyRequestedQuantityResponse proto.InternalMessageInfo
 
 // SendOrder
 type SendOrderRequest struct {
-	OrderUuid            string   `protobuf:"bytes,1,opt,name=order_uuid,json=orderUuid,proto3" json:"order_uuid,omitempty"`
+	OrderId              string   `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -405,7 +374,7 @@ func (m *SendOrderRequest) Reset()         { *m = SendOrderRequest{} }
 func (m *SendOrderRequest) String() string { return proto.CompactTextString(m) }
 func (*SendOrderRequest) ProtoMessage()    {}
 func (*SendOrderRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{9}
+	return fileDescriptor_3965df4c9351bf43, []int{8}
 }
 
 func (m *SendOrderRequest) XXX_Unmarshal(b []byte) error {
@@ -426,9 +395,9 @@ func (m *SendOrderRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SendOrderRequest proto.InternalMessageInfo
 
-func (m *SendOrderRequest) GetOrderUuid() string {
+func (m *SendOrderRequest) GetOrderId() string {
 	if m != nil {
-		return m.OrderUuid
+		return m.OrderId
 	}
 	return ""
 }
@@ -443,7 +412,7 @@ func (m *SendOrderResponse) Reset()         { *m = SendOrderResponse{} }
 func (m *SendOrderResponse) String() string { return proto.CompactTextString(m) }
 func (*SendOrderResponse) ProtoMessage()    {}
 func (*SendOrderResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{10}
+	return fileDescriptor_3965df4c9351bf43, []int{9}
 }
 
 func (m *SendOrderResponse) XXX_Unmarshal(b []byte) error {
@@ -478,7 +447,7 @@ func (m *ReceiveOrderItemRequest) Reset()         { *m = ReceiveOrderItemRequest
 func (m *ReceiveOrderItemRequest) String() string { return proto.CompactTextString(m) }
 func (*ReceiveOrderItemRequest) ProtoMessage()    {}
 func (*ReceiveOrderItemRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{11}
+	return fileDescriptor_3965df4c9351bf43, []int{10}
 }
 
 func (m *ReceiveOrderItemRequest) XXX_Unmarshal(b []byte) error {
@@ -530,7 +499,7 @@ func (m *ReceiveOrderItemResponse) Reset()         { *m = ReceiveOrderItemRespon
 func (m *ReceiveOrderItemResponse) String() string { return proto.CompactTextString(m) }
 func (*ReceiveOrderItemResponse) ProtoMessage()    {}
 func (*ReceiveOrderItemResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3965df4c9351bf43, []int{12}
+	return fileDescriptor_3965df4c9351bf43, []int{11}
 }
 
 func (m *ReceiveOrderItemResponse) XXX_Unmarshal(b []byte) error {
@@ -551,8 +520,317 @@ func (m *ReceiveOrderItemResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ReceiveOrderItemResponse proto.InternalMessageInfo
 
+// FindProjectOrderDates
+type FindProjectOrderDatesRequest struct {
+	ProjectId            string   `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *FindProjectOrderDatesRequest) Reset()         { *m = FindProjectOrderDatesRequest{} }
+func (m *FindProjectOrderDatesRequest) String() string { return proto.CompactTextString(m) }
+func (*FindProjectOrderDatesRequest) ProtoMessage()    {}
+func (*FindProjectOrderDatesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3965df4c9351bf43, []int{12}
+}
+
+func (m *FindProjectOrderDatesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FindProjectOrderDatesRequest.Unmarshal(m, b)
+}
+func (m *FindProjectOrderDatesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FindProjectOrderDatesRequest.Marshal(b, m, deterministic)
+}
+func (m *FindProjectOrderDatesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FindProjectOrderDatesRequest.Merge(m, src)
+}
+func (m *FindProjectOrderDatesRequest) XXX_Size() int {
+	return xxx_messageInfo_FindProjectOrderDatesRequest.Size(m)
+}
+func (m *FindProjectOrderDatesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_FindProjectOrderDatesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FindProjectOrderDatesRequest proto.InternalMessageInfo
+
+func (m *FindProjectOrderDatesRequest) GetProjectId() string {
+	if m != nil {
+		return m.ProjectId
+	}
+	return ""
+}
+
+type FindProjectOrderDatesResponse struct {
+	Orders               []*Order `protobuf:"bytes,1,rep,name=orders,proto3" json:"orders,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *FindProjectOrderDatesResponse) Reset()         { *m = FindProjectOrderDatesResponse{} }
+func (m *FindProjectOrderDatesResponse) String() string { return proto.CompactTextString(m) }
+func (*FindProjectOrderDatesResponse) ProtoMessage()    {}
+func (*FindProjectOrderDatesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3965df4c9351bf43, []int{13}
+}
+
+func (m *FindProjectOrderDatesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FindProjectOrderDatesResponse.Unmarshal(m, b)
+}
+func (m *FindProjectOrderDatesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FindProjectOrderDatesResponse.Marshal(b, m, deterministic)
+}
+func (m *FindProjectOrderDatesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FindProjectOrderDatesResponse.Merge(m, src)
+}
+func (m *FindProjectOrderDatesResponse) XXX_Size() int {
+	return xxx_messageInfo_FindProjectOrderDatesResponse.Size(m)
+}
+func (m *FindProjectOrderDatesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_FindProjectOrderDatesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FindProjectOrderDatesResponse proto.InternalMessageInfo
+
+func (m *FindProjectOrderDatesResponse) GetOrders() []*Order {
+	if m != nil {
+		return m.Orders
+	}
+	return nil
+}
+
+// An order
+type Order struct {
+	OrderId              string   `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	Date                 int64    `protobuf:"varint,2,opt,name=date,proto3" json:"date,omitempty"`
+	Status               string   `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Order) Reset()         { *m = Order{} }
+func (m *Order) String() string { return proto.CompactTextString(m) }
+func (*Order) ProtoMessage()    {}
+func (*Order) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3965df4c9351bf43, []int{14}
+}
+
+func (m *Order) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Order.Unmarshal(m, b)
+}
+func (m *Order) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Order.Marshal(b, m, deterministic)
+}
+func (m *Order) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Order.Merge(m, src)
+}
+func (m *Order) XXX_Size() int {
+	return xxx_messageInfo_Order.Size(m)
+}
+func (m *Order) XXX_DiscardUnknown() {
+	xxx_messageInfo_Order.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Order proto.InternalMessageInfo
+
+func (m *Order) GetOrderId() string {
+	if m != nil {
+		return m.OrderId
+	}
+	return ""
+}
+
+func (m *Order) GetDate() int64 {
+	if m != nil {
+		return m.Date
+	}
+	return 0
+}
+
+func (m *Order) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+// FindOrder
+type FindOrderRequest struct {
+	OrderId              string   `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *FindOrderRequest) Reset()         { *m = FindOrderRequest{} }
+func (m *FindOrderRequest) String() string { return proto.CompactTextString(m) }
+func (*FindOrderRequest) ProtoMessage()    {}
+func (*FindOrderRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3965df4c9351bf43, []int{15}
+}
+
+func (m *FindOrderRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FindOrderRequest.Unmarshal(m, b)
+}
+func (m *FindOrderRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FindOrderRequest.Marshal(b, m, deterministic)
+}
+func (m *FindOrderRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FindOrderRequest.Merge(m, src)
+}
+func (m *FindOrderRequest) XXX_Size() int {
+	return xxx_messageInfo_FindOrderRequest.Size(m)
+}
+func (m *FindOrderRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_FindOrderRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FindOrderRequest proto.InternalMessageInfo
+
+func (m *FindOrderRequest) GetOrderId() string {
+	if m != nil {
+		return m.OrderId
+	}
+	return ""
+}
+
+type FindOrderResponse struct {
+	Date                 int64    `protobuf:"varint,1,opt,name=date,proto3" json:"date,omitempty"`
+	Status               string   `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Items                []*Item  `protobuf:"bytes,3,rep,name=items,proto3" json:"items,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *FindOrderResponse) Reset()         { *m = FindOrderResponse{} }
+func (m *FindOrderResponse) String() string { return proto.CompactTextString(m) }
+func (*FindOrderResponse) ProtoMessage()    {}
+func (*FindOrderResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3965df4c9351bf43, []int{16}
+}
+
+func (m *FindOrderResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FindOrderResponse.Unmarshal(m, b)
+}
+func (m *FindOrderResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FindOrderResponse.Marshal(b, m, deterministic)
+}
+func (m *FindOrderResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FindOrderResponse.Merge(m, src)
+}
+func (m *FindOrderResponse) XXX_Size() int {
+	return xxx_messageInfo_FindOrderResponse.Size(m)
+}
+func (m *FindOrderResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_FindOrderResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FindOrderResponse proto.InternalMessageInfo
+
+func (m *FindOrderResponse) GetDate() int64 {
+	if m != nil {
+		return m.Date
+	}
+	return 0
+}
+
+func (m *FindOrderResponse) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *FindOrderResponse) GetItems() []*Item {
+	if m != nil {
+		return m.Items
+	}
+	return nil
+}
+
+// An order item
+type Item struct {
+	ProductId            string   `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Uom                  string   `protobuf:"bytes,3,opt,name=uom,proto3" json:"uom,omitempty"`
+	QuantityRequested    string   `protobuf:"bytes,4,opt,name=quantity_requested,json=quantityRequested,proto3" json:"quantity_requested,omitempty"`
+	QuantityReceived     string   `protobuf:"bytes,5,opt,name=quantity_received,json=quantityReceived,proto3" json:"quantity_received,omitempty"`
+	ItemStatus           string   `protobuf:"bytes,6,opt,name=item_status,json=itemStatus,proto3" json:"item_status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Item) Reset()         { *m = Item{} }
+func (m *Item) String() string { return proto.CompactTextString(m) }
+func (*Item) ProtoMessage()    {}
+func (*Item) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3965df4c9351bf43, []int{17}
+}
+
+func (m *Item) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Item.Unmarshal(m, b)
+}
+func (m *Item) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Item.Marshal(b, m, deterministic)
+}
+func (m *Item) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Item.Merge(m, src)
+}
+func (m *Item) XXX_Size() int {
+	return xxx_messageInfo_Item.Size(m)
+}
+func (m *Item) XXX_DiscardUnknown() {
+	xxx_messageInfo_Item.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Item proto.InternalMessageInfo
+
+func (m *Item) GetProductId() string {
+	if m != nil {
+		return m.ProductId
+	}
+	return ""
+}
+
+func (m *Item) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Item) GetUom() string {
+	if m != nil {
+		return m.Uom
+	}
+	return ""
+}
+
+func (m *Item) GetQuantityRequested() string {
+	if m != nil {
+		return m.QuantityRequested
+	}
+	return ""
+}
+
+func (m *Item) GetQuantityReceived() string {
+	if m != nil {
+		return m.QuantityReceived
+	}
+	return ""
+}
+
+func (m *Item) GetItemStatus() string {
+	if m != nil {
+		return m.ItemStatus
+	}
+	return ""
+}
+
 func init() {
-	proto.RegisterType((*Empty)(nil), "server.Empty")
 	proto.RegisterType((*CreateOrderRequest)(nil), "server.CreateOrderRequest")
 	proto.RegisterType((*CreateOrderResponse)(nil), "server.CreateOrderResponse")
 	proto.RegisterType((*AddOrderItemRequest)(nil), "server.AddOrderItemRequest")
@@ -565,39 +843,57 @@ func init() {
 	proto.RegisterType((*SendOrderResponse)(nil), "server.SendOrderResponse")
 	proto.RegisterType((*ReceiveOrderItemRequest)(nil), "server.ReceiveOrderItemRequest")
 	proto.RegisterType((*ReceiveOrderItemResponse)(nil), "server.ReceiveOrderItemResponse")
+	proto.RegisterType((*FindProjectOrderDatesRequest)(nil), "server.FindProjectOrderDatesRequest")
+	proto.RegisterType((*FindProjectOrderDatesResponse)(nil), "server.FindProjectOrderDatesResponse")
+	proto.RegisterType((*Order)(nil), "server.Order")
+	proto.RegisterType((*FindOrderRequest)(nil), "server.FindOrderRequest")
+	proto.RegisterType((*FindOrderResponse)(nil), "server.FindOrderResponse")
+	proto.RegisterType((*Item)(nil), "server.Item")
 }
 
 func init() { proto.RegisterFile("ordering.proto", fileDescriptor_3965df4c9351bf43) }
 
 var fileDescriptor_3965df4c9351bf43 = []byte{
-	// 422 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x5d, 0xaf, 0xd2, 0x40,
-	0x10, 0xf5, 0x7a, 0xf1, 0x42, 0x07, 0x54, 0x5c, 0x14, 0xca, 0xaa, 0x7c, 0xec, 0x83, 0xfa, 0x44,
-	0xa2, 0xfe, 0x02, 0x35, 0x26, 0x12, 0x63, 0x8c, 0xf5, 0xeb, 0x91, 0x20, 0x3b, 0x92, 0x1a, 0xdb,
-	0x2d, 0xdb, 0x5d, 0x12, 0x5e, 0xfd, 0xe5, 0xa6, 0xdb, 0xed, 0xa6, 0x40, 0x8b, 0x31, 0x97, 0xb7,
-	0xdd, 0x99, 0x33, 0xe7, 0xcc, 0x4c, 0xcf, 0x16, 0xee, 0x08, 0xc9, 0x51, 0x86, 0xf1, 0x7a, 0x96,
-	0x48, 0xa1, 0x04, 0xb9, 0x4a, 0x51, 0x6e, 0x51, 0xb2, 0x26, 0xdc, 0x7a, 0x1b, 0x25, 0x6a, 0xc7,
-	0xbe, 0x01, 0x79, 0x23, 0x71, 0xa9, 0xf0, 0x63, 0x06, 0x0c, 0x70, 0xa3, 0x31, 0x55, 0xe4, 0x31,
-	0x80, 0x29, 0x5c, 0x68, 0x1d, 0x72, 0xff, 0x62, 0x72, 0xf1, 0xcc, 0x0b, 0x3c, 0x13, 0xf9, 0xaa,
-	0x43, 0x4e, 0xa6, 0xd0, 0x49, 0xa4, 0xf8, 0x85, 0x2b, 0x95, 0x03, 0x6e, 0x1a, 0x40, 0xdb, 0xc6,
-	0x32, 0x08, 0x7b, 0x00, 0xbd, 0x3d, 0xde, 0x34, 0x11, 0x71, 0x8a, 0x4c, 0x43, 0xef, 0x15, 0xe7,
-	0x26, 0x36, 0x57, 0x18, 0x15, 0x7a, 0x43, 0x68, 0xe5, 0x7a, 0x4e, 0xad, 0x69, 0xee, 0x73, 0x9e,
-	0xb5, 0x92, 0x48, 0xc1, 0xf5, 0x4a, 0x2d, 0x9c, 0x92, 0x67, 0x23, 0x73, 0x4e, 0x08, 0x34, 0xe2,
-	0x65, 0x84, 0xfe, 0xa5, 0x49, 0x98, 0x33, 0xe9, 0xc2, 0xa5, 0x16, 0x91, 0xdf, 0x30, 0xa1, 0xec,
-	0xc8, 0xfa, 0x70, 0x7f, 0x5f, 0xd6, 0xb6, 0x13, 0x40, 0x3f, 0xc0, 0x48, 0x6c, 0xf1, 0x7c, 0x1d,
-	0xb1, 0x21, 0x0c, 0x8e, 0x38, 0xad, 0xdc, 0x16, 0x46, 0x1f, 0x04, 0x0f, 0x7f, 0xee, 0xac, 0x0a,
-	0xf2, 0x4f, 0x7a, 0x19, 0xab, 0x50, 0xed, 0xae, 0xbf, 0x08, 0x0a, 0xad, 0x8d, 0x25, 0x33, 0xcb,
-	0xb8, 0x1d, 0xb8, 0x3b, 0x9b, 0xc2, 0xb8, 0x56, 0xd7, 0xb6, 0xf6, 0x1c, 0xba, 0x9f, 0x31, 0xe6,
-	0xff, 0xe1, 0x02, 0xd6, 0x83, 0x7b, 0xa5, 0x12, 0xcb, 0x23, 0xb2, 0xe9, 0x57, 0x18, 0x9e, 0x73,
-	0xa5, 0x27, 0x67, 0xa3, 0xe0, 0x1f, 0x0b, 0xe6, 0xcd, 0xbc, 0xf8, 0xd3, 0xb0, 0x92, 0x61, 0xbc,
-	0x26, 0xef, 0xa0, 0x5d, 0x72, 0x24, 0xa1, 0xb3, 0xfc, 0x29, 0xcc, 0x8e, 0xed, 0x4f, 0x1f, 0x56,
-	0xe6, 0xec, 0x84, 0x37, 0xc8, 0x6b, 0xf0, 0xdc, 0xe0, 0xc4, 0x2f, 0xb0, 0x87, 0xeb, 0xa3, 0xc3,
-	0x8a, 0x8c, 0xe3, 0x78, 0x0f, 0x9d, 0xb2, 0x23, 0x89, 0x93, 0xac, 0x78, 0x1e, 0xf4, 0x51, 0x75,
-	0xd2, 0x91, 0x7d, 0x81, 0xbb, 0x07, 0x96, 0x23, 0xa3, 0xa2, 0xa4, 0xda, 0xdf, 0x74, 0x5c, 0x9b,
-	0x77, 0xac, 0xdf, 0xa1, 0x7b, 0xb8, 0x59, 0x52, 0x2a, 0xab, 0xfc, 0xc8, 0x74, 0x52, 0x0f, 0x70,
-	0xc4, 0xbf, 0x61, 0x50, 0x63, 0x47, 0xf2, 0xa4, 0x28, 0x3f, 0xfd, 0x4e, 0xe8, 0xd3, 0x7f, 0xe2,
-	0x0a, 0xb5, 0x1f, 0x57, 0xe6, 0xcf, 0xf7, 0xf2, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xad, 0xe4,
-	0x95, 0x17, 0x0b, 0x05, 0x00, 0x00,
+	// 610 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xdb, 0x6e, 0xd3, 0x40,
+	0x10, 0xc5, 0xcd, 0x85, 0x64, 0xd2, 0x42, 0x32, 0xa1, 0xa9, 0x63, 0xda, 0x26, 0x58, 0x14, 0x2a,
+	0xa1, 0xe6, 0xa1, 0x3c, 0x23, 0x71, 0x53, 0x45, 0x84, 0x68, 0xc1, 0x45, 0xe2, 0x31, 0x32, 0xd9,
+	0x01, 0x19, 0x11, 0x3b, 0xb1, 0xd7, 0x91, 0xfa, 0x4b, 0x7c, 0x09, 0x9f, 0x85, 0x76, 0xbd, 0x76,
+	0x1c, 0x5f, 0xd2, 0x48, 0xf4, 0xcd, 0x3b, 0x33, 0x3b, 0x67, 0x66, 0x67, 0xce, 0x31, 0x3c, 0xf0,
+	0x7c, 0x46, 0xbe, 0xe3, 0xfe, 0x1c, 0xcd, 0x7d, 0x8f, 0x7b, 0x58, 0x0f, 0xc8, 0x5f, 0x92, 0x6f,
+	0x5e, 0x02, 0xbe, 0xf3, 0xc9, 0xe6, 0x74, 0x25, 0xfc, 0x16, 0x2d, 0x42, 0x0a, 0x38, 0xf6, 0xa1,
+	0x21, 0xe3, 0x27, 0x0e, 0xd3, 0xb5, 0xa1, 0x76, 0xda, 0xb4, 0xee, 0xcb, 0xf3, 0x98, 0xe1, 0x11,
+	0xc0, 0xdc, 0xf7, 0x7e, 0xd1, 0x94, 0x0b, 0xe7, 0x8e, 0x74, 0x36, 0x95, 0x65, 0xcc, 0xcc, 0x7d,
+	0xe8, 0xae, 0xe5, 0x0b, 0xe6, 0x9e, 0x1b, 0x90, 0x19, 0x42, 0xf7, 0x0d, 0x63, 0xd2, 0x36, 0xe6,
+	0x34, 0xdb, 0x1a, 0x87, 0x85, 0x59, 0x1c, 0x61, 0x19, 0x33, 0x44, 0xa8, 0xba, 0xf6, 0x8c, 0xf4,
+	0x8a, 0x74, 0xc8, 0x6f, 0x6c, 0x43, 0x25, 0xf4, 0x66, 0x7a, 0x55, 0x9a, 0xc4, 0xa7, 0xd9, 0x83,
+	0x47, 0xeb, 0xb0, 0xaa, 0x1c, 0x0b, 0x7a, 0x16, 0xcd, 0xbc, 0x25, 0xdd, 0x5d, 0x45, 0x66, 0x1f,
+	0x0e, 0x72, 0x39, 0x15, 0xdc, 0x12, 0x8e, 0x3f, 0x79, 0xcc, 0xf9, 0x71, 0xa3, 0x50, 0x88, 0x7d,
+	0x09, 0x6d, 0x97, 0x3b, 0xfc, 0xe6, 0xff, 0x1f, 0xc2, 0x80, 0xc6, 0x42, 0x25, 0x93, 0x8f, 0xb1,
+	0x67, 0x25, 0x67, 0xf3, 0x09, 0x0c, 0x4a, 0x71, 0x55, 0x69, 0x67, 0xd0, 0xbe, 0x26, 0x97, 0x6d,
+	0x39, 0x7d, 0xb3, 0x0b, 0x9d, 0x54, 0xb8, 0xca, 0xe1, 0x89, 0xce, 0xa7, 0xe4, 0xdc, 0xe5, 0x73,
+	0x6e, 0xec, 0xcb, 0x00, 0x3d, 0x0f, 0xa8, 0x8a, 0x79, 0x05, 0x87, 0x17, 0x8e, 0xcb, 0x3e, 0x47,
+	0x1b, 0x29, 0xfd, 0xef, 0x6d, 0x4e, 0x41, 0x5c, 0xd1, 0xfa, 0xfe, 0x6a, 0xd9, 0xfd, 0xbd, 0x80,
+	0xa3, 0x92, 0xeb, 0x51, 0x7e, 0x3c, 0x81, 0xba, 0xec, 0x20, 0xd0, 0xb5, 0x61, 0xe5, 0xb4, 0x75,
+	0xbe, 0x37, 0x8a, 0x98, 0x34, 0x8a, 0xde, 0x44, 0x39, 0xcd, 0x4b, 0xa8, 0x49, 0xc3, 0xa6, 0x17,
+	0x40, 0xa8, 0x32, 0x9b, 0x93, 0xec, 0xbd, 0x62, 0xc9, 0x6f, 0xec, 0x41, 0x3d, 0xe0, 0x36, 0x0f,
+	0x03, 0xb5, 0xd9, 0xea, 0x24, 0xe6, 0x24, 0xea, 0xda, 0x76, 0x4e, 0x53, 0xe8, 0xa4, 0xc2, 0x55,
+	0xe9, 0x31, 0x9e, 0x56, 0x88, 0xb7, 0x93, 0xc6, 0x43, 0x13, 0x6a, 0x0e, 0xa7, 0x99, 0x28, 0x43,
+	0x74, 0xb9, 0x1b, 0x77, 0x29, 0xdf, 0x3a, 0x72, 0x99, 0x7f, 0x35, 0xa8, 0x8a, 0x73, 0x66, 0x94,
+	0x5a, 0x19, 0x57, 0x77, 0xf2, 0x5c, 0xad, 0x24, 0x5c, 0xc5, 0x33, 0xc0, 0x78, 0xc0, 0x13, 0x3f,
+	0xde, 0x57, 0x45, 0xe6, 0xce, 0x62, 0x9d, 0x2f, 0xc4, 0xf0, 0x05, 0x74, 0x52, 0xe1, 0x72, 0x19,
+	0x98, 0x5e, 0x93, 0xd1, 0xed, 0x55, 0x74, 0x64, 0xc7, 0x01, 0xb4, 0x44, 0xc9, 0x13, 0xd5, 0x6a,
+	0x5d, 0x86, 0x81, 0x30, 0x5d, 0x4b, 0xcb, 0xf9, 0x9f, 0x1a, 0x34, 0xae, 0x94, 0x42, 0xe2, 0x07,
+	0x68, 0xa5, 0x34, 0x0c, 0x8d, 0xb8, 0xf7, 0xbc, 0x50, 0x1a, 0x8f, 0x0b, 0x7d, 0x6a, 0x15, 0xef,
+	0xe1, 0x5b, 0x68, 0x26, 0x74, 0x41, 0x3d, 0x8e, 0xcd, 0x12, 0xce, 0xe8, 0x17, 0x78, 0x92, 0x1c,
+	0x1f, 0x61, 0x37, 0xad, 0x61, 0x98, 0x40, 0x16, 0x08, 0xaa, 0x71, 0x58, 0xec, 0x4c, 0x92, 0x7d,
+	0x85, 0x87, 0x19, 0x91, 0xc2, 0xe3, 0xf8, 0x4a, 0xb1, 0x22, 0x1a, 0x83, 0x52, 0x7f, 0x92, 0xf5,
+	0x1b, 0xb4, 0xb3, 0x7c, 0xc4, 0xd4, 0xb5, 0x42, 0x69, 0x30, 0x86, 0xe5, 0x01, 0x49, 0xe2, 0xdf,
+	0x70, 0x50, 0x22, 0x60, 0xf8, 0x2c, 0xbe, 0xbe, 0x59, 0x59, 0x8d, 0xe7, 0xb7, 0xc6, 0x25, 0x68,
+	0xaf, 0xa1, 0x99, 0x90, 0x66, 0x35, 0xad, 0x2c, 0xed, 0x56, 0xd3, 0xca, 0x33, 0x8c, 0xc1, 0x7e,
+	0xa1, 0x7a, 0xe0, 0xd3, 0xf4, 0x9d, 0x32, 0x6d, 0x32, 0x4e, 0x6e, 0x89, 0x8a, 0x50, 0xbe, 0xd7,
+	0xe5, 0x2f, 0xfc, 0xe5, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa2, 0x59, 0x5e, 0x50, 0xd4, 0x07,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -618,6 +914,8 @@ type OrderingClient interface {
 	RemoveOrderItem(ctx context.Context, in *RemoveOrderItemRequest, opts ...grpc.CallOption) (*RemoveOrderItemResponse, error)
 	ReceiveOrderItem(ctx context.Context, in *ReceiveOrderItemRequest, opts ...grpc.CallOption) (*ReceiveOrderItemResponse, error)
 	ModifyRequestedQuantity(ctx context.Context, in *ModifyRequestedQuantityRequest, opts ...grpc.CallOption) (*ModifyRequestedQuantityResponse, error)
+	FindOrder(ctx context.Context, in *FindOrderRequest, opts ...grpc.CallOption) (*FindOrderResponse, error)
+	FindProjectOrderDates(ctx context.Context, in *FindProjectOrderDatesRequest, opts ...grpc.CallOption) (*FindProjectOrderDatesResponse, error)
 }
 
 type orderingClient struct {
@@ -630,7 +928,7 @@ func NewOrderingClient(cc *grpc.ClientConn) OrderingClient {
 
 func (c *orderingClient) CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error) {
 	out := new(CreateOrderResponse)
-	err := c.cc.Invoke(ctx, "/server.ordering/CreateOrder", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/server.Ordering/CreateOrder", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -639,7 +937,7 @@ func (c *orderingClient) CreateOrder(ctx context.Context, in *CreateOrderRequest
 
 func (c *orderingClient) SendOrder(ctx context.Context, in *SendOrderRequest, opts ...grpc.CallOption) (*SendOrderResponse, error) {
 	out := new(SendOrderResponse)
-	err := c.cc.Invoke(ctx, "/server.ordering/SendOrder", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/server.Ordering/SendOrder", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -648,7 +946,7 @@ func (c *orderingClient) SendOrder(ctx context.Context, in *SendOrderRequest, op
 
 func (c *orderingClient) AddOrderItem(ctx context.Context, in *AddOrderItemRequest, opts ...grpc.CallOption) (*AddOrderItemResponse, error) {
 	out := new(AddOrderItemResponse)
-	err := c.cc.Invoke(ctx, "/server.ordering/AddOrderItem", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/server.Ordering/AddOrderItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -657,7 +955,7 @@ func (c *orderingClient) AddOrderItem(ctx context.Context, in *AddOrderItemReque
 
 func (c *orderingClient) RemoveOrderItem(ctx context.Context, in *RemoveOrderItemRequest, opts ...grpc.CallOption) (*RemoveOrderItemResponse, error) {
 	out := new(RemoveOrderItemResponse)
-	err := c.cc.Invoke(ctx, "/server.ordering/RemoveOrderItem", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/server.Ordering/RemoveOrderItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -666,7 +964,7 @@ func (c *orderingClient) RemoveOrderItem(ctx context.Context, in *RemoveOrderIte
 
 func (c *orderingClient) ReceiveOrderItem(ctx context.Context, in *ReceiveOrderItemRequest, opts ...grpc.CallOption) (*ReceiveOrderItemResponse, error) {
 	out := new(ReceiveOrderItemResponse)
-	err := c.cc.Invoke(ctx, "/server.ordering/ReceiveOrderItem", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/server.Ordering/ReceiveOrderItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -675,7 +973,25 @@ func (c *orderingClient) ReceiveOrderItem(ctx context.Context, in *ReceiveOrderI
 
 func (c *orderingClient) ModifyRequestedQuantity(ctx context.Context, in *ModifyRequestedQuantityRequest, opts ...grpc.CallOption) (*ModifyRequestedQuantityResponse, error) {
 	out := new(ModifyRequestedQuantityResponse)
-	err := c.cc.Invoke(ctx, "/server.ordering/ModifyRequestedQuantity", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/server.Ordering/ModifyRequestedQuantity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderingClient) FindOrder(ctx context.Context, in *FindOrderRequest, opts ...grpc.CallOption) (*FindOrderResponse, error) {
+	out := new(FindOrderResponse)
+	err := c.cc.Invoke(ctx, "/server.Ordering/FindOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderingClient) FindProjectOrderDates(ctx context.Context, in *FindProjectOrderDatesRequest, opts ...grpc.CallOption) (*FindProjectOrderDatesResponse, error) {
+	out := new(FindProjectOrderDatesResponse)
+	err := c.cc.Invoke(ctx, "/server.Ordering/FindProjectOrderDates", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -690,6 +1006,8 @@ type OrderingServer interface {
 	RemoveOrderItem(context.Context, *RemoveOrderItemRequest) (*RemoveOrderItemResponse, error)
 	ReceiveOrderItem(context.Context, *ReceiveOrderItemRequest) (*ReceiveOrderItemResponse, error)
 	ModifyRequestedQuantity(context.Context, *ModifyRequestedQuantityRequest) (*ModifyRequestedQuantityResponse, error)
+	FindOrder(context.Context, *FindOrderRequest) (*FindOrderResponse, error)
+	FindProjectOrderDates(context.Context, *FindProjectOrderDatesRequest) (*FindProjectOrderDatesResponse, error)
 }
 
 func RegisterOrderingServer(s *grpc.Server, srv OrderingServer) {
@@ -706,7 +1024,7 @@ func _Ordering_CreateOrder_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/server.ordering/CreateOrder",
+		FullMethod: "/server.Ordering/CreateOrder",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderingServer).CreateOrder(ctx, req.(*CreateOrderRequest))
@@ -724,7 +1042,7 @@ func _Ordering_SendOrder_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/server.ordering/SendOrder",
+		FullMethod: "/server.Ordering/SendOrder",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderingServer).SendOrder(ctx, req.(*SendOrderRequest))
@@ -742,7 +1060,7 @@ func _Ordering_AddOrderItem_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/server.ordering/AddOrderItem",
+		FullMethod: "/server.Ordering/AddOrderItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderingServer).AddOrderItem(ctx, req.(*AddOrderItemRequest))
@@ -760,7 +1078,7 @@ func _Ordering_RemoveOrderItem_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/server.ordering/RemoveOrderItem",
+		FullMethod: "/server.Ordering/RemoveOrderItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderingServer).RemoveOrderItem(ctx, req.(*RemoveOrderItemRequest))
@@ -778,7 +1096,7 @@ func _Ordering_ReceiveOrderItem_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/server.ordering/ReceiveOrderItem",
+		FullMethod: "/server.Ordering/ReceiveOrderItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderingServer).ReceiveOrderItem(ctx, req.(*ReceiveOrderItemRequest))
@@ -796,7 +1114,7 @@ func _Ordering_ModifyRequestedQuantity_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/server.ordering/ModifyRequestedQuantity",
+		FullMethod: "/server.Ordering/ModifyRequestedQuantity",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderingServer).ModifyRequestedQuantity(ctx, req.(*ModifyRequestedQuantityRequest))
@@ -804,8 +1122,44 @@ func _Ordering_ModifyRequestedQuantity_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Ordering_FindOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderingServer).FindOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/server.Ordering/FindOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderingServer).FindOrder(ctx, req.(*FindOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Ordering_FindProjectOrderDates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindProjectOrderDatesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderingServer).FindProjectOrderDates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/server.Ordering/FindProjectOrderDates",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderingServer).FindProjectOrderDates(ctx, req.(*FindProjectOrderDatesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Ordering_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "server.ordering",
+	ServiceName: "server.Ordering",
 	HandlerType: (*OrderingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -831,6 +1185,14 @@ var _Ordering_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ModifyRequestedQuantity",
 			Handler:    _Ordering_ModifyRequestedQuantity_Handler,
+		},
+		{
+			MethodName: "FindOrder",
+			Handler:    _Ordering_FindOrder_Handler,
+		},
+		{
+			MethodName: "FindProjectOrderDates",
+			Handler:    _Ordering_FindProjectOrderDates_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

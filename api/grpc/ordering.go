@@ -13,7 +13,7 @@ type OrderingServer struct {
 // status.Errorf(codes.OK, "error: %s")
 
 func (s *OrderingServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	err := s.svc.CreateOrder(in.OrderUuid, in.ProjectUuid)
+	err := s.svc.CreateOrder(in.OrderId, in.ProjectId)
 	if err != nil {
 		return &pb.CreateOrderResponse{}, err
 	}
@@ -45,7 +45,7 @@ func (s *OrderingServer) ModifyRequestedQuantity(ctx context.Context, in *pb.Mod
 }
 
 func (s *OrderingServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
-	err := s.svc.SendOrder(in.OrderUuid)
+	err := s.svc.SendOrder(in.OrderId)
 	if err != nil {
 		return &pb.SendOrderResponse{}, err
 	}
@@ -58,4 +58,31 @@ func (s *OrderingServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrd
 		return &pb.ReceiveOrderItemResponse{}, err
 	}
 	return &pb.ReceiveOrderItemResponse{}, nil
+}
+
+func (s *OrderingServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
+	_, err := s.svc.FindOrder(in.OrderId)
+	if err != nil {
+		return &pb.FindOrderResponse{}, err
+	}
+	return &pb.FindOrderResponse{}, nil
+}
+
+func (s *OrderingServer) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOrderDatesRequest) (*pb.FindProjectOrderDatesResponse, error) {
+	oo, err := s.svc.FindProjectOrderDates(in.ProjectId)
+	if err != nil {
+		return &pb.FindProjectOrderDatesResponse{}, err
+	}
+
+	var orders []*pb.Order
+	for _, o := range oo {
+		order := &pb.Order{
+			OrderId: o.OrderID,
+			Date:    o.SentDate,
+			Status:  string(o.Status),
+		}
+		orders = append(orders, order)
+	}
+
+	return &pb.FindProjectOrderDatesResponse{Orders: orders}, nil
 }
