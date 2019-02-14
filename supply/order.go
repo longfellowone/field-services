@@ -19,7 +19,7 @@ type OrderRepository interface {
 }
 
 type Order struct {
-	OrderID   string
+	ID        string
 	ProjectID string
 	Items     []Item
 	SentDate  int64
@@ -29,7 +29,7 @@ type Order struct {
 // Returns a new *Order
 func Create(id, pid string) *Order {
 	return &Order{
-		OrderID:   id,
+		ID:        id,
 		ProjectID: pid,
 		Items:     []Item{},
 		SentDate:  time.Now().Unix(),

@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"errors"
-	pb "supply/api/grpc/proto"
-	"supply/api/search"
+	pb "supply/supply/grpc/proto"
+	"supply/supply/search"
 )
 
 var (

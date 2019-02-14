@@ -6,11 +6,11 @@ import (
 	"github.com/google/wire"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"google.golang.org/grpc"
-	"supply/api/grpc"
-	mongodb "supply/api/mongo"
-	"supply/api/ordering"
-	"supply/api/purchasing"
-	"supply/api/search"
+	"supply/supply/grpc"
+	mongodb "supply/supply/mongo"
+	"supply/supply/ordering"
+	"supply/supply/purchasing"
+	"supply/supply/search"
 )
 
 func InitializeSupplyServices(db *mongo.Database) (*grpc.Server, error) {

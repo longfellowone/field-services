@@ -2,8 +2,9 @@ package supply_test
 
 import (
 	"reflect"
-	"supply/api"
+	"supply/supply"
 	"testing"
+	"time"
 )
 
 func TestCreate(t *testing.T) {
@@ -22,9 +23,10 @@ func TestCreate(t *testing.T) {
 			pid: "pid1",
 		},
 		want: &supply.Order{
-			OrderID:   "oid1",
+			ID:        "oid1",
 			ProjectID: "pid1",
 			Items:     []supply.Item{},
+			SentDate:  time.Now().Unix(),
 			Status:    supply.New,
 		},
 	}}

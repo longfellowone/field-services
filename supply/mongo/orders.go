@@ -3,8 +3,8 @@ package mongo
 import (
 	"context"
 	"log"
-	"supply/api"
-	"supply/api/ordering"
+	"supply/supply"
+	"supply/supply/ordering"
 	"time"
 
 	"github.com/mongodb/mongo-go-driver/bson"
@@ -23,7 +23,7 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
 
 	orderIndex := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "orderid", Value: bsonx.Int32(1)}},
+		Keys:    bsonx.Doc{{Key: "id", Value: bsonx.Int32(1)}},
 		Options: options.Index().SetUnique(true),
 	}
 	projectIndex := mongo.IndexModel{
@@ -47,7 +47,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 		return err
 	}
 
-	filter := bson.D{{Key: "orderid", Value: o.OrderID}}
+	filter := bson.D{{Key: "id", Value: o.ID}}
 	opts := options.Replace().SetUpsert(true)
 
 	_, err = r.coll.ReplaceOne(context.TODO(), filter, order, opts)
@@ -60,7 +60,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	var order supply.Order
 
-	filter := bson.D{{Key: "orderid", Value: id}}
+	filter := bson.D{{Key: "id", Value: id}}
 
 	err := r.coll.FindOne(context.TODO(), filter).Decode(&order)
 	if err != nil {

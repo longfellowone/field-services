@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
-	pb "supply/api/grpc/proto"
-	"supply/api/ordering"
+	pb "supply/supply/grpc/proto"
+	"supply/supply/ordering"
 )
 
 type OrderingServer struct {
@@ -13,7 +13,7 @@ type OrderingServer struct {
 // status.Errorf(codes.OK, "error: %s")
 
 func (s *OrderingServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	err := s.svc.CreateOrder(in.OrderId, in.ProjectId)
+	err := s.svc.CreateOrder(in.Id, in.ProjectId)
 	if err != nil {
 		return &pb.CreateOrderResponse{}, err
 	}
@@ -21,7 +21,7 @@ func (s *OrderingServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequ
 }
 
 func (s *OrderingServer) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
-	err := s.svc.AddOrderItem(in.OrderId, in.ProductId, in.Name, in.Uom)
+	err := s.svc.AddOrderItem(in.Id, in.ProductId, in.Name, in.Uom)
 	if err != nil {
 		return &pb.AddOrderItemResponse{}, err
 	}
@@ -29,7 +29,7 @@ func (s *OrderingServer) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRe
 }
 
 func (s *OrderingServer) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequest) (*pb.RemoveOrderItemResponse, error) {
-	err := s.svc.RemoveOrderItem(in.OrderId, in.ProductId)
+	err := s.svc.RemoveOrderItem(in.Id, in.ProductId)
 	if err != nil {
 		return &pb.RemoveOrderItemResponse{}, err
 	}
@@ -37,7 +37,7 @@ func (s *OrderingServer) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrder
 }
 
 func (s *OrderingServer) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
-	err := s.svc.ModifyRequestedQuantity(in.OrderId, in.ProductId, uint(in.Quantity))
+	err := s.svc.ModifyRequestedQuantity(in.Id, in.ProductId, uint(in.Quantity))
 	if err != nil {
 		return &pb.ModifyRequestedQuantityResponse{}, err
 	}
@@ -45,7 +45,7 @@ func (s *OrderingServer) ModifyRequestedQuantity(ctx context.Context, in *pb.Mod
 }
 
 func (s *OrderingServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
-	err := s.svc.SendOrder(in.OrderId)
+	err := s.svc.SendOrder(in.Id)
 	if err != nil {
 		return &pb.SendOrderResponse{}, err
 	}
@@ -53,7 +53,7 @@ func (s *OrderingServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest)
 }
 
 func (s *OrderingServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
-	err := s.svc.ReceiveOrderItem(in.OrderId, in.ProductId, uint(in.Quantity))
+	err := s.svc.ReceiveOrderItem(in.Id, in.ProductId, uint(in.Quantity))
 	if err != nil {
 		return &pb.ReceiveOrderItemResponse{}, err
 	}
@@ -61,11 +61,29 @@ func (s *OrderingServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrd
 }
 
 func (s *OrderingServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
-	_, err := s.svc.FindOrder(in.OrderId)
+	order, err := s.svc.FindOrder(in.Id)
 	if err != nil {
 		return &pb.FindOrderResponse{}, err
 	}
-	return &pb.FindOrderResponse{}, nil
+
+	var items []*pb.Item
+	for _, i := range order.Items {
+		item := &pb.Item{
+			ProductId:         i.ProductID,
+			Name:              i.Name,
+			Uom:               i.UOM,
+			QuantityRequested: uint32(i.QuantityRequested),
+			QuantityReceived:  uint32(i.QuantityReceived),
+			ItemStatus:        i.ItemStatus.String(),
+		}
+		items = append(items, item)
+	}
+
+	return &pb.FindOrderResponse{
+		Date:   order.SentDate,
+		Status: order.Status.String(),
+		Items:  items,
+	}, nil
 }
 
 func (s *OrderingServer) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOrderDatesRequest) (*pb.FindProjectOrderDatesResponse, error) {
@@ -77,12 +95,14 @@ func (s *OrderingServer) FindProjectOrderDates(ctx context.Context, in *pb.FindP
 	var orders []*pb.Order
 	for _, o := range oo {
 		order := &pb.Order{
-			OrderId: o.OrderID,
-			Date:    o.SentDate,
-			Status:  string(o.Status),
+			Id:     o.ID,
+			Date:   o.SentDate,
+			Status: o.Status.String(),
 		}
 		orders = append(orders, order)
 	}
+
+	//time.Sleep(2 * time.Second)
 
 	return &pb.FindProjectOrderDatesResponse{Orders: orders}, nil
 }

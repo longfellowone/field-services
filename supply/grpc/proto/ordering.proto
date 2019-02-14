@@ -15,14 +15,14 @@ service Ordering {
 
 // CreateOrder
 message CreateOrderRequest {
-    string order_id = 1;
+    string id = 1;
     string project_id = 2;
 }
 message CreateOrderResponse {}
 
 // AddOrderItem
 message AddOrderItemRequest {
-    string order_id = 1;
+    string id = 1;
     string product_id = 2;
     string name = 3;
     string uom = 4;
@@ -31,14 +31,14 @@ message AddOrderItemResponse {}
 
 // RemoveOrderItem
 message RemoveOrderItemRequest {
-    string order_id = 1;
+    string id = 1;
     string product_id = 2;
 }
 message RemoveOrderItemResponse {}
 
 // ModifyRequestedQuantity
 message ModifyRequestedQuantityRequest {
-    string order_id = 1;
+    string id = 1;
     string product_id = 2;
     uint32 quantity = 3;
 }
@@ -46,13 +46,13 @@ message ModifyRequestedQuantityResponse {}
 
 // SendOrder
 message SendOrderRequest {
-    string order_id = 1;
+    string id = 1;
 }
 message SendOrderResponse {}
 
 // ReceiveOrderItem
 message ReceiveOrderItemRequest {
-    string order_id = 1;
+    string id = 1;
     string product_id = 2;
     uint32 quantity = 3;
 }
@@ -69,14 +69,14 @@ message FindProjectOrderDatesResponse {
 
 // An order
 message Order {
-    string order_id = 1;
+    string id = 1;
     int64 date = 2;
     string status = 3;
 }
 
 // FindOrder
 message FindOrderRequest {
-    string order_id = 1;
+    string id = 1;
 }
 message FindOrderResponse {
     int64 date = 1;
@@ -89,8 +89,8 @@ message Item {
     string product_id = 1;
     string name = 2;
     string uom = 3;
-    string quantity_requested = 4;
-    string quantity_received = 5;
+    uint32 quantity_requested = 4;
+    uint32 quantity_received = 5;
     string item_status = 6;
 }
 

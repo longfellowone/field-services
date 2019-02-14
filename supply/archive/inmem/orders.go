@@ -2,7 +2,7 @@ package inmem
 
 //
 //import (
-//	"supply/api"
+//	"supply/supply"
 //	"sync"
 //)
 //

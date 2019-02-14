@@ -2,7 +2,7 @@ package search
 
 import (
 	"github.com/sahilm/fuzzy"
-	"supply/api"
+	"supply/supply"
 )
 
 type SearchService interface {

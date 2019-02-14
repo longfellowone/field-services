@@ -1,7 +1,7 @@
 package ordering
 
 import (
-	"supply/api"
+	"supply/supply"
 )
 
 type OrderingService interface {
@@ -141,7 +141,7 @@ func (s *Service) FindOrder(orderid string) (supply.Order, error) {
 // Order read models
 
 type ProjectOrder struct {
-	OrderID  string
+	ID       string
 	SentDate int64
 	Status   supply.OrderStatus
 }

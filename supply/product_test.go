@@ -2,7 +2,7 @@ package supply_test
 
 import (
 	"reflect"
-	"supply/api"
+	"supply/supply"
 	"testing"
 )
 
