@@ -2,6 +2,7 @@ package search
 
 import (
 	"github.com/sahilm/fuzzy"
+	"strings"
 	"supply/supply"
 )
 
@@ -26,10 +27,13 @@ func NewSearchService(product ProductRepository) (*Service, error) {
 }
 
 func (s *Service) ProductSearch(name string) []Result {
-	fr := fuzzy.FindFrom(name, s)
+	replacer := strings.NewReplacer("“", "\"", "”", "\"")
+	output := replacer.Replace(name)
 
-	if fr.Len() > 10 {
-		fr = fr[:10]
+	fr := fuzzy.FindFrom(output, s)
+
+	if fr.Len() > 8 {
+		fr = fr[:8]
 	}
 
 	var results []Result

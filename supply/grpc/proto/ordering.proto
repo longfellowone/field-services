@@ -101,7 +101,7 @@ protoc --go_out=plugins=grpc:. *.proto
  */
 
 /** Generate JS proto
- protoc -I=. ./proto/ordering.proto \
+ protoc -I=. ./proto/search.proto \
   --js_out=import_style=commonjs:./src/Order\
   --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Order
  */
@@ -109,3 +109,7 @@ protoc --go_out=plugins=grpc:. *.proto
 //  import _"github.com/jnewmano/grpc-json-proxy/codec"
 //  go run github.com/jnewmano/grpc-json-proxy grpc-json-proxy
 //  http://www.objgen.com/json?demo=true
+
+ protoc -I=. ./search.proto \
+--js_out=import_style=commonjs:./
+--grpc-web_out=import_style=commonjs,mode=grpcwebtext:./

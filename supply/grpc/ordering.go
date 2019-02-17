@@ -4,6 +4,7 @@ import (
 	"context"
 	pb "supply/supply/grpc/proto"
 	"supply/supply/ordering"
+	"time"
 )
 
 type OrderingServer struct {
@@ -102,7 +103,7 @@ func (s *OrderingServer) FindProjectOrderDates(ctx context.Context, in *pb.FindP
 		orders = append(orders, order)
 	}
 
-	//time.Sleep(2 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	return &pb.FindProjectOrderDatesResponse{Orders: orders}, nil
 }

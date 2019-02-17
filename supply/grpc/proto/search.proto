@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package server;
 
-service search {
+service Search {
     rpc ProductSearch (ProductSearchRequest) returns (ProductSearchResponse) {}
 }
 

@@ -16,6 +16,10 @@ type SearchServer struct {
 }
 
 func (s *SearchServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
+	if in.Name == "" {
+		return &pb.ProductSearchResponse{}, nil
+	}
+
 	products := s.svc.ProductSearch(in.Name)
 	if len(products) == 0 {
 		return &pb.ProductSearchResponse{}, ErrNoResults
