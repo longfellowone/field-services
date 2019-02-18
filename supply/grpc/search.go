@@ -4,23 +4,18 @@ import (
 	"context"
 	"errors"
 	pb "supply/supply/grpc/proto"
-	"supply/supply/search"
 )
 
 var (
 	ErrNoResults = errors.New("no results")
 )
 
-type SearchServer struct {
-	svc search.SearchService
-}
-
-func (s *SearchServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
+func (s *SupplyServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
 	if in.Name == "" {
 		return &pb.ProductSearchResponse{}, nil
 	}
 
-	products := s.svc.ProductSearch(in.Name)
+	products := s.ssvc.ProductSearch(in.Name)
 	if len(products) == 0 {
 		return &pb.ProductSearchResponse{}, ErrNoResults
 	}

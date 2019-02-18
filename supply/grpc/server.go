@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+type SupplyServer struct {
+	osvc ordering.OrderingService
+	ssvc search.SearchService
+}
+
 func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc search.SearchService) *grpc.Server {
 	s := grpc.NewServer()
 
@@ -27,9 +32,10 @@ func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc 
 
 	osvc.AddOrderItem("oid1", "pid1", "product1", "ea")
 
-	pb.RegisterOrderingServer(s, &OrderingServer{svc: osvc})
-	//pb.RegisterOrderingServer(s, &PurchasingServer{svc: psvc})
-	pb.RegisterSearchServer(s, &SearchServer{svc: ssvc})
+	pb.RegisterSupplyServer(s, &SupplyServer{
+		osvc: osvc,
+		ssvc: ssvc,
+	})
 
 	return s
 }

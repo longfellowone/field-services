@@ -2,7 +2,8 @@ syntax = "proto3";
 
 package server;
 
-service Ordering {
+service Supply {
+    // Ordering
     rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {}
     rpc SendOrder (SendOrderRequest) returns (SendOrderResponse) {}
     rpc AddOrderItem (AddOrderItemRequest) returns (AddOrderItemResponse) {}
@@ -11,6 +12,8 @@ service Ordering {
     rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
     rpc FindOrder  (FindOrderRequest) returns (FindOrderResponse);
     rpc FindProjectOrderDates (FindProjectOrderDatesRequest) returns (FindProjectOrderDatesResponse);
+    // ProductSearch
+    rpc ProductSearch (ProductSearchRequest) returns (ProductSearchResponse) {}
 }
 
 // CreateOrder
@@ -94,6 +97,31 @@ message Item {
     string item_status = 6;
 }
 
+// ProductSearch
+message ProductSearchRequest {
+    string name = 1;
+}
+message ProductSearchResponse {
+    repeated Result results = 5;
+}
+message Result {
+    string product_uuid = 1;
+    string category = 2;
+    string name = 3;
+    string uom = 4;
+    repeated Index indexes = 5;
+}
+message Index {
+    int32 index = 1;
+}
+
+// Perchasing
+service Purchasing {
+    //rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
+    //rpc 000 (Request) returns (Response) {}
+}
+
+
 /* eslint-disable */
 
 /** Generate GO proto
@@ -109,7 +137,3 @@ protoc --go_out=plugins=grpc:. *.proto
 //  import _"github.com/jnewmano/grpc-json-proxy/codec"
 //  go run github.com/jnewmano/grpc-json-proxy grpc-json-proxy
 //  http://www.objgen.com/json?demo=true
-
- protoc -I=. ./search.proto \
---js_out=import_style=commonjs:./
---grpc-web_out=import_style=commonjs,mode=grpcwebtext:./

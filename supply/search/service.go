@@ -32,8 +32,8 @@ func (s *Service) ProductSearch(name string) []Result {
 
 	fr := fuzzy.FindFrom(output, s)
 
-	if fr.Len() > 8 {
-		fr = fr[:8]
+	if fr.Len() > 10 {
+		fr = fr[:10]
 	}
 
 	var results []Result
