@@ -2,13 +2,12 @@ package server
 
 import (
 	"context"
-	"errors"
 	pb "supply/supply/grpc/proto"
 )
 
-var (
-	ErrNoResults = errors.New("no results")
-)
+//var (
+//	ErrNoResults = errors.New("no results")
+//)
 
 func (s *SupplyServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
 	if in.Name == "" {
@@ -17,7 +16,7 @@ func (s *SupplyServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRe
 
 	products := s.ssvc.ProductSearch(in.Name)
 	if len(products) == 0 {
-		return &pb.ProductSearchResponse{}, ErrNoResults
+		return &pb.ProductSearchResponse{}, nil
 	}
 
 	var results []*pb.Result

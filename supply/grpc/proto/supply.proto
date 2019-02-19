@@ -121,7 +121,6 @@ service Purchasing {
     //rpc 000 (Request) returns (Response) {}
 }
 
-
 /* eslint-disable */
 
 /** Generate GO proto
@@ -129,7 +128,7 @@ protoc --go_out=plugins=grpc:. *.proto
  */
 
 /** Generate JS proto
- protoc -I=. ./proto/search.proto \
+ protoc -I=. ./proto/supply.proto \
   --js_out=import_style=commonjs:./src/Order\
   --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/Order
  */

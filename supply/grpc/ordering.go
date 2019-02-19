@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	pb "supply/supply/grpc/proto"
-	"time"
 )
 
 // status.Errorf(codes.OK, "error: %s")
@@ -97,9 +96,6 @@ func (s *SupplyServer) FindProjectOrderDates(ctx context.Context, in *pb.FindPro
 		}
 		orders = append(orders, order)
 	}
-
-	// Temp
-	time.Sleep(1 * time.Second)
 
 	return &pb.FindProjectOrderDatesResponse{Orders: orders}, nil
 }
