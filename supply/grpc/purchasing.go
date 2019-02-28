@@ -1,7 +1,7 @@
 package server
 
 import (
-	"supply/supply/purchasing"
+	"field/supply/purchasing"
 )
 
 type PurchasingServer struct {

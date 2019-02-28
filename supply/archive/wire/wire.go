@@ -1,9 +1,8 @@
 package wire
 
 import (
+	"field/supply"
 	"github.com/google/wire"
-	"supply/supply"
-	"supply/supply/ordering"
 )
 
 func initializeSupplyServiceInMemory() *ordering.Service {

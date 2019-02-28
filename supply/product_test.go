@@ -1,8 +1,8 @@
 package supply_test
 
 import (
+	"field/supply"
 	"reflect"
-	"supply/supply"
 	"testing"
 )
 

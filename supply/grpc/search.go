@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	pb "supply/supply/grpc/proto"
+	pb "field/supply/grpc/proto"
 )
 
 //var (
@@ -13,6 +13,8 @@ func (s *SupplyServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRe
 	if in.Name == "" {
 		return &pb.ProductSearchResponse{}, nil
 	}
+
+	//time.Sleep(2000 * time.Millisecond)
 
 	products := s.ssvc.ProductSearch(in.Name)
 	if len(products) == 0 {

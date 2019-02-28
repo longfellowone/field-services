@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	pb "supply/supply/grpc/proto"
+	pb "field/supply/grpc/proto"
 )
 
 // status.Errorf(codes.OK, "error: %s")
@@ -60,6 +60,8 @@ func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (
 	if err != nil {
 		return &pb.FindOrderResponse{}, err
 	}
+
+	//time.Sleep(2 * time.Second)
 
 	var items []*pb.Item
 	for _, i := range order.Items {

@@ -1,7 +1,7 @@
 package ordering
 
 import (
-	"supply/supply"
+	"field/supply"
 )
 
 type OrderingService interface {

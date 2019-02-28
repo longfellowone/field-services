@@ -1,9 +1,9 @@
 package search
 
 import (
+	"field/supply"
 	"github.com/sahilm/fuzzy"
 	"strings"
-	"supply/supply"
 )
 
 type SearchService interface {
