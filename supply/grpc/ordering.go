@@ -66,7 +66,7 @@ func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (
 	var items []*pb.Item
 	for _, i := range order.Items {
 		item := &pb.Item{
-			ProductId:         i.ItemID,
+			ProductId:         i.ProductID,
 			Name:              i.Name,
 			Uom:               i.UOM,
 			QuantityRequested: uint32(i.QuantityRequested),

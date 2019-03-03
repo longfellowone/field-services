@@ -3,7 +3,7 @@ package supply
 import "fmt"
 
 type Item struct {
-	ItemID            string
+	ProductID         string
 	Name              string
 	UOM               string
 	QuantityRequested uint
@@ -16,7 +16,7 @@ type Item struct {
 // Returns a new *Item
 func newItem(id, name, uom string) *Item {
 	return &Item{
-		ItemID:     id,
+		ProductID:  id,
 		Name:       name,
 		UOM:        uom,
 		ItemStatus: Waiting,

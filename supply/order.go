@@ -121,7 +121,7 @@ func (o *Order) ReceiveItem(id string, quantity uint) error {
 // Finds index of an item
 func (o *Order) findItem(id string) (int, error) {
 	for i := range o.Items {
-		if o.Items[i].ItemID == id {
+		if o.Items[i].ProductID == id {
 			return i, nil
 		}
 	}
