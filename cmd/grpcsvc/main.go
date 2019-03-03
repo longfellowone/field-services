@@ -23,6 +23,7 @@ func main() {
 		log.Fatalf("failed to initialize supply services: %v", err)
 	}
 
+	fmt.Println("Remember to import products.json into MongoDB on first run!")
 	fmt.Println("Listening...")
 
 	if err := s.Serve(lis); err != nil {

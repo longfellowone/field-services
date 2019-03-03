@@ -66,7 +66,7 @@ func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (
 	var items []*pb.Item
 	for _, i := range order.Items {
 		item := &pb.Item{
-			ProductId:         i.ProductID,
+			ProductId:         i.ItemID,
 			Name:              i.Name,
 			Uom:               i.UOM,
 			QuantityRequested: uint32(i.QuantityRequested),
@@ -92,7 +92,7 @@ func (s *SupplyServer) FindProjectOrderDates(ctx context.Context, in *pb.FindPro
 	var orders []*pb.Order
 	for _, o := range oo {
 		order := &pb.Order{
-			Id:     o.ID,
+			Id:     o.OrderID,
 			Date:   o.SentDate,
 			Status: o.Status.String(),
 		}

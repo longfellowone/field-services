@@ -19,7 +19,7 @@ type OrderRepository interface {
 }
 
 type Order struct {
-	ID        string
+	OrderID   string
 	ProjectID string
 	Items     []Item
 	SentDate  int64
@@ -29,7 +29,7 @@ type Order struct {
 // Returns a new *Order
 func Create(id, pid string) *Order {
 	return &Order{
-		ID:        id,
+		OrderID:   id,
 		ProjectID: pid,
 		Items:     []Item{},
 		SentDate:  time.Now().Unix(),
@@ -121,7 +121,7 @@ func (o *Order) ReceiveItem(id string, quantity uint) error {
 // Finds index of an item
 func (o *Order) findItem(id string) (int, error) {
 	for i := range o.Items {
-		if o.Items[i].ProductID == id {
+		if o.Items[i].ItemID == id {
 			return i, nil
 		}
 	}

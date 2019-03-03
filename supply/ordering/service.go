@@ -141,7 +141,7 @@ func (s *Service) FindOrder(orderid string) (supply.Order, error) {
 // Order read models
 
 type ProjectOrder struct {
-	ID       string
+	OrderID  string
 	SentDate int64
 	Status   supply.OrderStatus
 }

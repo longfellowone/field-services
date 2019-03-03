@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+// Add disconnect function and call in main
+// https://github.com/GoogleCloudPlatform/golang-samples/blob/master/getting-started/bookshelf/db_mongo.go
+
+// https://github.com/GoogleCloudPlatform/golang-samples/blob/master/getting-started/bookshelf/db_mysql.go
+
 func Connect(username, passwrd, dbname string) (*mongo.Database, error) {
 	conn := fmt.Sprintf("mongodb://%s:%s@localhost:27017", username, passwrd)
 

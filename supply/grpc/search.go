@@ -13,7 +13,6 @@ func (s *SupplyServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRe
 	if in.Name == "" {
 		return &pb.ProductSearchResponse{}, nil
 	}
-
 	//time.Sleep(2000 * time.Millisecond)
 
 	products := s.ssvc.ProductSearch(in.Name)
