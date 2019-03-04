@@ -4,21 +4,14 @@ import (
 	"field/supply/graphql"
 	"field/supply/mongo"
 	"field/supply/search"
+	"github.com/99designs/gqlgen/handler"
+	"github.com/go-chi/chi"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
-	"os"
-
-	"github.com/99designs/gqlgen/handler"
 )
 
-const defaultPort = "8080"
-
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
-
 	db, err := mongo.Connect("default", "password", "supply")
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
@@ -30,11 +23,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	router := chi.NewRouter()
+
+	router.Use(cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8080", "http://localhost:3000"},
+		AllowCredentials: true,
+	}).Handler)
+
 	gqlHandler := graphql.New(searchService)
 
-	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", gqlHandler)
+	router.Handle("/", handler.Playground("Starwars", "/query"))
+	router.Handle("/graphql", gqlHandler)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("Listening...")
+	err = http.ListenAndServe(":8080", router)
+	if err != nil {
+		panic(err)
+	}
 }

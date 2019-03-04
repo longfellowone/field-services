@@ -1,7 +1,8 @@
 module field
 
 require (
-	github.com/99designs/gqlgen v0.4.5-0.20190218060022-51266b8f7ab0
+	github.com/99designs/gqlgen v0.8.0
+	github.com/go-chi/chi v3.3.2+incompatible
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.2.1-0.20181127190454-8d0c54c12466
 	github.com/golang/snappy v0.0.1 // indirect
@@ -9,6 +10,7 @@ require (
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/mongodb/mongo-go-driver v0.3.0
+	github.com/rs/cors v1.6.0
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/vektah/gqlparser v1.1.1
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
