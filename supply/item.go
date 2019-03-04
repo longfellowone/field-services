@@ -6,9 +6,9 @@ type Item struct {
 	ProductID         string
 	Name              string
 	UOM               string
-	QuantityRequested uint
-	QuantityReceived  uint
-	QuantityRemaining uint
+	QuantityRequested int
+	QuantityReceived  int
+	QuantityRemaining int
 	ItemStatus        ItemStatus
 	PONumber          string
 }
@@ -25,12 +25,12 @@ func newItem(id, name, uom string) *Item {
 }
 
 // Updates the quantity requested of an item
-func (i *Item) updateRequested(quantity uint) {
+func (i *Item) updateRequested(quantity int) {
 	i.QuantityRequested = quantity
 }
 
 // Updates quantity received, remaining and item status
-func (i *Item) receive(quantity uint) {
+func (i *Item) receive(quantity int) {
 	i.QuantityReceived = quantity
 
 	switch {

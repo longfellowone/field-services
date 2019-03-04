@@ -20,23 +20,31 @@ type Product {
     uom: String!
 }
 
-#type Order {
-#    orderID: ID!
-#    projectID: String!
-#    items: [Item!]!
-#    sentDate: Int!
-##    status: String!
-#}
-#
-#type Item {
-#    itemID: ID!
-#    name: String!
-#    uom: String!
-#    quantityRequested: Int!
-#    quantityReceived: Int!
-#    quantityRemaining: Int!
-##    status: String!
-#    po: String!
+type Order {
+    orderID: ID!
+    projectID: String!
+    items: [Item!]!
+    sentDate: Int!
+#    status: String!
+}
+
+type Item {
+    productID: ID!
+    name: String!
+    uom: String!
+    quantityRequested: Int!
+    quantityReceived: Int!
+    quantityRemaining: Int!
+#    ItemStatus: ItemStatus!
+    poNumber: String!
+}
+
+#enum ItemStatus {
+#    Waiting
+#    Filled
+#    BackOrdered
+#    OrderExceeded
+#    NotOrdered
 #}
 
 ###########################################################

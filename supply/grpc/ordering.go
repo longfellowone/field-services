@@ -32,7 +32,7 @@ func (s *SupplyServer) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderIt
 }
 
 func (s *SupplyServer) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
-	err := s.osvc.ModifyRequestedQuantity(in.Id, in.ProductId, uint(in.Quantity))
+	err := s.osvc.ModifyRequestedQuantity(in.Id, in.ProductId, int(in.Quantity))
 	if err != nil {
 		return &pb.ModifyRequestedQuantityResponse{}, err
 	}
@@ -48,7 +48,7 @@ func (s *SupplyServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (
 }
 
 func (s *SupplyServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
-	err := s.osvc.ReceiveOrderItem(in.Id, in.ProductId, uint(in.Quantity))
+	err := s.osvc.ReceiveOrderItem(in.Id, in.ProductId, int(in.Quantity))
 	if err != nil {
 		return &pb.ReceiveOrderItemResponse{}, err
 	}

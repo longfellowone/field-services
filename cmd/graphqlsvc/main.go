@@ -30,10 +30,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := graphql.New(searchService)
+	gqlHandler := graphql.New(searchService)
 
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", server)
+	http.Handle("/query", gqlHandler)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

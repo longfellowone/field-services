@@ -58,7 +58,7 @@ func (o *Order) RemoveItem(id string) error {
 }
 
 // Updates the quantity requested of a single order item
-func (o *Order) UpdateQuantityRequested(id string, quantity uint) error {
+func (o *Order) UpdateQuantityRequested(id string, quantity int) error {
 	i, err := o.findItem(id)
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func (o *Order) UpdatePO(id, po string) error {
 }
 
 // Updates the quantity received of an item
-func (o *Order) ReceiveItem(id string, quantity uint) error {
+func (o *Order) ReceiveItem(id string, quantity int) error {
 	i, err := o.findItem(id)
 	if err != nil {
 		return err

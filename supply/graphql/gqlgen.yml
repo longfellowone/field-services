@@ -18,8 +18,13 @@ resolver:
   type: Resolver
 
 models:
+  Item:
+    model: field/supply.Item
+#  ItemStatus:
+#    model: field/supply/search.ItemStatus
   Product:
     model: field/supply.Product
   Result:
     model: field/supply/search.Result
+
 

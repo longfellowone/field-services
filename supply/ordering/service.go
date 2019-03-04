@@ -8,9 +8,9 @@ type OrderingService interface {
 	CreateOrder(orderid, projectid string) error
 	AddOrderItem(orderid, productid, name, uom string) error
 	RemoveOrderItem(orderid, productid string) error
-	ModifyRequestedQuantity(orderid, productid string, quantity uint) error
+	ModifyRequestedQuantity(orderid, productid string, quantity int) error
 	SendOrder(orderid string) error
-	ReceiveOrderItem(orderid, productid string, quantity uint) error
+	ReceiveOrderItem(orderid, productid string, quantity int) error
 	FindOrder(orderid string) (supply.Order, error)
 	FindProjectOrderDates(projectid string) ([]ProjectOrder, error)
 }
@@ -76,7 +76,7 @@ func (s *Service) RemoveOrderItem(orderid, productid string) error {
 	return nil
 }
 
-func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity uint) error {
+func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity int) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (s *Service) SendOrder(orderid string) error {
 	return nil
 }
 
-func (s *Service) ReceiveOrderItem(orderid, productid string, quantity uint) error {
+func (s *Service) ReceiveOrderItem(orderid, productid string, quantity int) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
