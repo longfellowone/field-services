@@ -1,15 +1,15 @@
 version: '3.7'
 
 services:
-  envoy:
-    image: envoyproxy/envoy:latest
-    restart: always
-    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
-    ports:
-      - '8080:8080'
-    volumes:
-      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
-    network_mode: 'host'
+#  envoy:
+#    image: envoyproxy/envoy:latest
+#    restart: always
+#    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
+#    ports:
+#      - '8080:8080'
+#    volumes:
+#      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
+#    network_mode: 'host'
 
   mongo:
     image: mongo

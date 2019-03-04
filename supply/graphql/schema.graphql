@@ -4,13 +4,13 @@ type Query {
     products(name: String!): [Result!]!
 }
 
-type Mutation {
-
-}
+#type Mutation {
+#
+#}
 
 type Result {
     product: Product!
-    indexes: [Int!]!
+    matchedIndexes: [Int!]!
 }
 
 type Product {
