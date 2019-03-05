@@ -24,7 +24,7 @@ func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc 
 	osvc.CreateOrder("oid4", "pid2")
 	osvc.CreateOrder("oid5", "pid2")
 
-	orders, _ := osvc.FindProjectOrderDates("pid1")
+	orders := osvc.FindProjectOrderDates("pid1")
 
 	for _, o := range orders {
 		fmt.Println(o.OrderID, time.Unix(o.SentDate, 0))

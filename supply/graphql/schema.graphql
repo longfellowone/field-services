@@ -1,12 +1,44 @@
-### go get github.com/99designs/gqlgen@next
-
-type Query {
-    products(name: String!): [Result!]!
+type Mutation {
+    createOrder(input: CreateOrder!): Boolean!
+    sendOrder(input: SendOrder!): Boolean!
+    addOrderItem(input: AddOrderItem!): Boolean!
+    removeOrderItem(input: RemoveOrderItem!): Boolean!
+    receiveOrderItem(input: ModifyQuantity!): Boolean!
+    modifyRequestedQuantity(input: ModifyQuantity!): Boolean!
 }
 
-#type Mutation {
-#
-#}
+input CreateOrder {
+    orderID: ID!
+    projectID: String!
+}
+
+input SendOrder {
+    orderID: ID!
+}
+
+input AddOrderItem {
+    orderID: ID!
+    productID: String!
+    name: String!
+    uom: String!
+}
+
+input RemoveOrderItem {
+    orderID: ID!
+    productID: String!
+}
+
+input ModifyQuantity {
+    orderID: ID!
+    productID: String!
+    quantity: Int!
+}
+
+type Query {
+    order(orderID: ID!): Order!
+    projectOrders(projectID: ID!): [ProjectOrder!]!
+    products(name: String!): [Result!]!
+}
 
 type Result {
     product: Product!
@@ -20,12 +52,18 @@ type Product {
     uom: String!
 }
 
+type ProjectOrder {
+    orderID: ID!
+    sentDate: Int!
+    #    status: String!
+}
+
 type Order {
     orderID: ID!
     projectID: String!
     items: [Item!]!
     sentDate: Int!
-#    status: String!
+    #    status: String!
 }
 
 type Item {
@@ -35,7 +73,7 @@ type Item {
     quantityRequested: Int!
     quantityReceived: Int!
     quantityRemaining: Int!
-#    ItemStatus: ItemStatus!
+    #    ItemStatus: ItemStatus!
     poNumber: String!
 }
 
@@ -45,121 +83,4 @@ type Item {
 #    BackOrdered
 #    OrderExceeded
 #    NotOrdered
-#}
-
-###########################################################
-#type User {
-#    id: ID!
-#    name: String!
-#    email: String!
-#}
-#
-#type Video {
-#    id: ID!
-#    name: String!
-#    description: String!
-#    user: User!
-#    url: String!
-#    createdAt: Timestamp!
-#    screenshots: [Screenshot]
-#    related(limit: Int = 25, offset: Int = 0): [Video!]!
-#}
-#
-#type Screenshot {
-#    id: ID!
-#    videoId: ID!
-#    url: String!
-#}
-#
-#input NewVideo {
-#    name: String!
-#    description: String!
-#    userId: ID!
-#    url: String!
-#}
-#
-#type Mutation {
-#    createVideo(input: NewVideo!): Video!
-#}
-#
-#type Query {
-#    Videos(limit: Int = 25, offset: Int = 0): [Video!]!
-#}
-#
-#scalar Timestamp
-#
-#type Todo {
-#    id: ID!
-#    text: String!
-#    done: Boolean!
-#    user: User!
-#}
-#
-#type User {
-#    id: ID!
-#    name: String!
-#}
-#
-#type Query {
-#    todos: [Todo!]!
-#}
-#
-#input NewTodo {
-#    text: String!
-#    userId: String!
-#}
-#
-#type Mutation {
-#    createTodo(input: NewTodo!): Todo!
-#}
-#
-#schema {
-#    query: Query
-#    mutation: Mutation
-#}
-#
-#type Query {
-#    user(id: ID!): User!
-#}
-#
-#type Mutation {
-#    createUser(input: NewUser!): User!
-#    updateUser(input: UpdateUser!): User!
-#    updateNotification(input: UpdateNotification): User!
-#}
-#
-#type User {
-#    id: ID!
-#    first: String!
-#    last: String!
-#    email: String!
-#    notifications: [Notification!]!
-#}
-#
-#type Notification {
-#    id: ID!
-#    seen: Boolean!
-#    text: String!
-#    title: String!
-#}
-#
-#input NewUser {
-#    email: String!
-#}
-#
-#input UpdateUser {
-#    id: ID!
-#    first: String
-#    last: String
-#    email: String
-#}
-#
-#input UpdateNotification {
-#    id: ID!
-#    userID: ID!
-#    seen: Boolean!
-#}
-#
-#type Subscription {
-#    notificationAdded(id: ID!): User!
 #}

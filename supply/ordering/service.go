@@ -2,6 +2,7 @@ package ordering
 
 import (
 	"field/supply"
+	"log"
 )
 
 type OrderingService interface {
@@ -11,8 +12,8 @@ type OrderingService interface {
 	ModifyRequestedQuantity(orderid, productid string, quantity int) error
 	SendOrder(orderid string) error
 	ReceiveOrderItem(orderid, productid string, quantity int) error
-	FindOrder(orderid string) (supply.Order, error)
-	FindProjectOrderDates(projectid string) ([]ProjectOrder, error)
+	FindOrder(orderid string) *supply.Order
+	FindProjectOrderDates(projectid string) []ProjectOrder
 }
 
 type OrderRepository interface {
@@ -130,12 +131,13 @@ func (s *Service) ReceiveOrderItem(orderid, productid string, quantity int) erro
 	return nil
 }
 
-func (s *Service) FindOrder(orderid string) (supply.Order, error) {
+func (s *Service) FindOrder(orderid string) *supply.Order {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		return supply.Order{}, err
+		log.Println(err)
+		return &supply.Order{}
 	}
-	return *order, nil
+	return order
 }
 
 // Order read models
@@ -146,10 +148,11 @@ type ProjectOrder struct {
 	Status   supply.OrderStatus
 }
 
-func (s *Service) FindProjectOrderDates(projectid string) ([]ProjectOrder, error) {
-	order, err := s.order.FindDates(projectid)
+func (s *Service) FindProjectOrderDates(projectid string) []ProjectOrder {
+	orders, err := s.order.FindDates(projectid)
 	if err != nil {
-		return []ProjectOrder{}, err
+		log.Println(err)
+		return []ProjectOrder{}
 	}
-	return order, nil
+	return orders
 }

@@ -56,11 +56,7 @@ func (s *SupplyServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrder
 }
 
 func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
-	order, err := s.osvc.FindOrder(in.Id)
-	if err != nil {
-		return &pb.FindOrderResponse{}, err
-	}
-
+	order := s.osvc.FindOrder(in.Id)
 	//time.Sleep(2 * time.Second)
 
 	var items []*pb.Item
@@ -84,10 +80,7 @@ func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (
 }
 
 func (s *SupplyServer) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOrderDatesRequest) (*pb.FindProjectOrderDatesResponse, error) {
-	oo, err := s.osvc.FindProjectOrderDates(in.ProjectId)
-	if err != nil {
-		return &pb.FindProjectOrderDatesResponse{}, err
-	}
+	oo := s.osvc.FindProjectOrderDates(in.ProjectId)
 
 	var orders []*pb.Order
 	for _, o := range oo {

@@ -2,13 +2,29 @@
 
 package models
 
-import (
-	"field/supply"
-)
+type AddOrderItem struct {
+	OrderID   string `json:"orderID"`
+	ProductID string `json:"productID"`
+	Name      string `json:"name"`
+	Uom       string `json:"uom"`
+}
 
-type Order struct {
-	OrderID   string        `json:"orderID"`
-	ProjectID string        `json:"projectID"`
-	Items     []supply.Item `json:"items"`
-	SentDate  int           `json:"sentDate"`
+type CreateOrder struct {
+	OrderID   string `json:"orderID"`
+	ProjectID string `json:"projectID"`
+}
+
+type ModifyQuantity struct {
+	OrderID   string `json:"orderID"`
+	ProductID string `json:"productID"`
+	Quantity  int    `json:"quantity"`
+}
+
+type RemoveOrderItem struct {
+	OrderID   string `json:"orderID"`
+	ProductID string `json:"productID"`
+}
+
+type SendOrder struct {
+	OrderID string `json:"orderID"`
 }

@@ -24,11 +24,11 @@ type Service struct {
 	order   OrderRepository
 }
 
-func NewPurchasingService(product ProductRepository, order OrderRepository) (*Service, error) {
+func NewPurchasingService(product ProductRepository, order OrderRepository) *Service {
 	return &Service{
 		product: product,
 		order:   order,
-	}, nil
+	}
 }
 
 func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {

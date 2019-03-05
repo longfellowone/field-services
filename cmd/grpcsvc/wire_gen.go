@@ -21,14 +21,8 @@ func InitializeSupplyServices(db *mongo.Database) (*grpc.Server, error) {
 	orderRepository := mongo2.NewOrderRepository(db)
 	service := ordering.NewOrderingService(orderRepository)
 	productRepository := mongo2.NewProductRepository(db)
-	purchasingService, err := purchasing.NewPurchasingService(productRepository, orderRepository)
-	if err != nil {
-		return nil, err
-	}
-	searchService, err := search.NewSearchService(productRepository)
-	if err != nil {
-		return nil, err
-	}
+	purchasingService := purchasing.NewPurchasingService(productRepository, orderRepository)
+	searchService := search.NewSearchService(productRepository)
 	grpcServer := server.New(service, purchasingService, searchService)
 	return grpcServer, nil
 }

@@ -18,6 +18,8 @@ resolver:
   type: Resolver
 
 models:
+  Order:
+    model: field/supply.Order
   Item:
     model: field/supply.Item
 #  ItemStatus:
@@ -26,5 +28,7 @@ models:
     model: field/supply.Product
   Result:
     model: field/supply/search.Result
+  ProjectOrder:
+    model: field/supply/ordering.ProjectOrder
 
 

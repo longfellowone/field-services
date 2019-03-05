@@ -18,12 +18,12 @@ type Service struct {
 	products []supply.Product
 }
 
-func NewSearchService(product ProductRepository) (*Service, error) {
+func NewSearchService(product ProductRepository) *Service {
 	products, err := product.FindAll()
 	if err != nil {
-		return &Service{}, err
+		panic(err)
 	}
-	return &Service{products: products}, nil
+	return &Service{products: products}
 }
 
 func (s *Service) ProductSearch(name string) []Result {
