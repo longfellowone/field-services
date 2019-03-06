@@ -2,8 +2,8 @@ package main
 
 import (
 	"field/supply/graphql"
-	"field/supply/mongo"
 	"field/supply/ordering"
+	"field/supply/postgres"
 	"field/supply/search"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/go-chi/chi"
@@ -13,13 +13,13 @@ import (
 )
 
 func main() {
-	db, err := mongo.Connect("default", "password", "supply")
+	db, err := postgres.Connect("localhost", 5432, "default", "password", "default")
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		panic(err)
 	}
 
-	orderRepository := mongo.NewOrderRepository(db)
-	productRepository := mongo.NewProductRepository(db)
+	orderRepository := postgres.NewOrderRepository(db)
+	productRepository := postgres.NewProductRepository(db)
 
 	orderingService := ordering.NewOrderingService(orderRepository)
 	searchService := search.NewSearchService(productRepository)
@@ -27,14 +27,13 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8080", "http://localhost:3000"},
-		AllowCredentials: true,
+		AllowedOrigins: []string{"*"},
 	}).Handler)
 
-	gqlHandler := graphql.New(searchService, orderingService)
+	gqlHandler := graphql.Initialize(searchService, orderingService)
 
-	r.Handle("/", handler.Playground("", "/graphql"))
 	r.Handle("/graphql", gqlHandler)
+	r.Handle("/", handler.Playground("", "/graphql"))
 
 	log.Printf("Listening...")
 	err = http.ListenAndServe(":8080", r)

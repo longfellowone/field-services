@@ -16,7 +16,7 @@ type Resolver struct {
 	ssvc search.SearchService
 }
 
-func New(ssvc search.SearchService, osvc ordering.OrderingService) http.HandlerFunc {
+func Initialize(ssvc search.SearchService, osvc ordering.OrderingService) http.HandlerFunc {
 	return handler.GraphQL(NewExecutableSchema(Config{Resolvers: &Resolver{
 		osvc: osvc,
 		ssvc: ssvc,

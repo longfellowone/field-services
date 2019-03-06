@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+
+#  graphql:
+#    depends_on:
+#      - db
+#    build:
+#      context: .
+#      dockerfile: docker/graphql/Dockerfile
+#    ports:
+#      - "8080:8080"
+
+  db:
+    image: postgres
+    restart: always
+    env_file: .env
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+#  envoy:
+#    image: envoyproxy/envoy:latest
+#    restart: always
+#    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
+#    ports:
+#      - '8080:8080'
+#    volumes:
+#      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
+#    network_mode: 'host'
+
+#  mongo:
+#    image: mongo
+#    restart: always
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: default
+#      MONGO_INITDB_ROOT_PASSWORD: password
+#    ports:
+#      - 27017:27017
+#
+#  mongo-express:
+#    image: mongo-express
+#    restart: always
+#    ports:
+#      - 8081:8081
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: default
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+
+#  nats:
+#    image: nats-streaming:latest
+#    restart: always
+#    command: -cid test-cluster -m 8222 --store SQL --sql_driver postgres --sql_source postgresql://default:password@db:5432/nss_db?sslmode=disable -SD # -DV
+#    entrypoint: /nats-streaming-server
+#    ports:
+#      - "4222:4222"
+#      - "8222:8222"
+#    depends_on:
+#      - db
+#
