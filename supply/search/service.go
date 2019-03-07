@@ -6,27 +6,27 @@ import (
 	"strings"
 )
 
-type SearchService interface {
+type Service interface {
 	ProductSearch(name string) []Result
 }
 
-type ProductRepository interface {
+type productRepository interface {
 	FindAll() ([]supply.Product, error)
 }
 
-type Service struct {
+type Svc struct {
 	products []supply.Product
 }
 
-func NewSearchService(product ProductRepository) *Service {
+func NewSearchService(product productRepository) *Svc {
 	products, err := product.FindAll()
 	if err != nil {
 		panic(err)
 	}
-	return &Service{products: products}
+	return &Svc{products: products}
 }
 
-func (s *Service) ProductSearch(name string) []Result {
+func (s *Svc) ProductSearch(name string) []Result {
 	replacer := strings.NewReplacer("“", "\"", "”", "\"")
 	output := replacer.Replace(name)
 
@@ -54,10 +54,10 @@ type Result struct {
 }
 
 // Required methods for fuzzy search
-func (s *Service) String(i int) string {
+func (s *Svc) String(i int) string {
 	return s.products[i].Name
 }
 
-func (s *Service) Len() int {
+func (s *Svc) Len() int {
 	return len(s.products)
 }

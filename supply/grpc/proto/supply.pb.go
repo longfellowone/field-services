@@ -1211,7 +1211,7 @@ func (c *supplyClient) ProductSearch(ctx context.Context, in *ProductSearchReque
 	return out, nil
 }
 
-// SupplyServer is the server API for Supply service.
+// Server is the server API for Supply service.
 type SupplyServer interface {
 	// Ordering
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)

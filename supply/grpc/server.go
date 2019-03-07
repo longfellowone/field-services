@@ -10,19 +10,19 @@ import (
 	"time"
 )
 
-type SupplyServer struct {
-	osvc ordering.OrderingService
-	ssvc search.SearchService
+type Server struct {
+	osvc ordering.Service
+	ssvc search.Service
 }
 
-func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc search.SearchService) *grpc.Server {
+func New(osvc ordering.Service, psvc purchasing.Service, ssvc search.Service) *grpc.Server {
 	s := grpc.NewServer()
 
-	osvc.CreateOrder("oid1", "pid1")
-	osvc.CreateOrder("oid2", "pid1")
-	osvc.CreateOrder("oid3", "pid1")
-	osvc.CreateOrder("oid4", "pid2")
-	osvc.CreateOrder("oid5", "pid2")
+	_ = osvc.CreateOrder("oid1", "pid1")
+	_ = osvc.CreateOrder("oid2", "pid1")
+	_ = osvc.CreateOrder("oid3", "pid1")
+	_ = osvc.CreateOrder("oid4", "pid2")
+	_ = osvc.CreateOrder("oid5", "pid2")
 
 	orders := osvc.FindProjectOrderDates("pid1")
 
@@ -30,9 +30,9 @@ func New(osvc ordering.OrderingService, psvc purchasing.PurchasingService, ssvc 
 		fmt.Println(o.OrderID, time.Unix(o.SentDate, 0))
 	}
 
-	osvc.AddOrderItem("oid1", "pid1", "product1", "ea")
+	_ = osvc.AddOrderItem("oid1", "pid1", "product1", "ea")
 
-	pb.RegisterSupplyServer(s, &SupplyServer{
+	pb.RegisterSupplyServer(s, &Server{
 		osvc: osvc,
 		ssvc: ssvc,
 	})

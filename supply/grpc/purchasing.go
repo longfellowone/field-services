@@ -5,7 +5,7 @@ import (
 )
 
 type PurchasingServer struct {
-	svc purchasing.PurchasingService
+	svc purchasing.Service
 }
 
 //func (s *OrderingServer) UpdateItemPO(ctx context.Context, in *pb.UpdateItemPORequest) (*pb.UpdateItemPOResponse, error) {

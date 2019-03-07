@@ -1,3 +1,6 @@
+#### Hot reload
+https://github.com/oxequa/realize/issues/190
+
 #### .SH Files
 chmod u+x ./
 

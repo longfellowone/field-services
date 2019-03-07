@@ -4,7 +4,7 @@ RUN apk add --no-cache git
 
 ENV GO111MODULE=on
 
-WORKDIR /app
+WORKDIR /builder
 
 COPY go.mod .
 COPY go.sum .
@@ -15,7 +15,8 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./cmd/graphqlsvc
 
-FROM scratch
-COPY --from=builder /app/graphqlsvc /app/
+#FROM scratch
+FROM alpine
+COPY --from=builder /builder/graphqlsvc /app/
 EXPOSE 8080
 ENTRYPOINT ["/app/graphqlsvc"]

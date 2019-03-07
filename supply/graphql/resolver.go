@@ -12,11 +12,11 @@ import (
 )
 
 type Resolver struct {
-	osvc ordering.OrderingService
-	ssvc search.SearchService
+	osvc ordering.Service
+	ssvc search.Service
 }
 
-func Initialize(ssvc search.SearchService, osvc ordering.OrderingService) http.HandlerFunc {
+func Initialize(ssvc search.Service, osvc ordering.Service) http.HandlerFunc {
 	return handler.GraphQL(NewExecutableSchema(Config{Resolvers: &Resolver{
 		osvc: osvc,
 		ssvc: ssvc,

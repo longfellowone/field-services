@@ -15,7 +15,7 @@ import (
 func main() {
 	db, err := postgres.Connect("localhost", 5432, "default", "password", "default")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	orderRepository := postgres.NewOrderRepository(db)
@@ -38,6 +38,6 @@ func main() {
 	log.Printf("Listening...")
 	err = http.ListenAndServe(":8080", r)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

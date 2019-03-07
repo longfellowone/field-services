@@ -9,7 +9,7 @@ import (
 //	ErrNoResults = errors.New("no results")
 //)
 
-func (s *SupplyServer) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
+func (s *Server) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest) (*pb.ProductSearchResponse, error) {
 	if in.Name == "" {
 		return &pb.ProductSearchResponse{}, nil
 	}

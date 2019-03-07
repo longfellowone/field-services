@@ -7,7 +7,7 @@ import (
 
 // status.Errorf(codes.OK, "error: %s")
 
-func (s *SupplyServer) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+func (s *Server) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	err := s.osvc.CreateOrder(in.Id, in.ProjectId)
 	if err != nil {
 		return &pb.CreateOrderResponse{}, err
@@ -15,7 +15,7 @@ func (s *SupplyServer) CreateOrder(ctx context.Context, in *pb.CreateOrderReques
 	return &pb.CreateOrderResponse{}, nil
 }
 
-func (s *SupplyServer) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
+func (s *Server) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
 	err := s.osvc.AddOrderItem(in.Id, in.ProductId, in.Name, in.Uom)
 	if err != nil {
 		return &pb.AddOrderItemResponse{}, err
@@ -23,7 +23,7 @@ func (s *SupplyServer) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequ
 	return &pb.AddOrderItemResponse{}, nil
 }
 
-func (s *SupplyServer) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequest) (*pb.RemoveOrderItemResponse, error) {
+func (s *Server) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequest) (*pb.RemoveOrderItemResponse, error) {
 	err := s.osvc.RemoveOrderItem(in.Id, in.ProductId)
 	if err != nil {
 		return &pb.RemoveOrderItemResponse{}, err
@@ -31,7 +31,7 @@ func (s *SupplyServer) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderIt
 	return &pb.RemoveOrderItemResponse{}, nil
 }
 
-func (s *SupplyServer) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
+func (s *Server) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
 	err := s.osvc.ModifyRequestedQuantity(in.Id, in.ProductId, int(in.Quantity))
 	if err != nil {
 		return &pb.ModifyRequestedQuantityResponse{}, err
@@ -39,7 +39,7 @@ func (s *SupplyServer) ModifyRequestedQuantity(ctx context.Context, in *pb.Modif
 	return &pb.ModifyRequestedQuantityResponse{}, nil
 }
 
-func (s *SupplyServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
+func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
 	err := s.osvc.SendOrder(in.Id)
 	if err != nil {
 		return &pb.SendOrderResponse{}, err
@@ -47,7 +47,7 @@ func (s *SupplyServer) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (
 	return &pb.SendOrderResponse{}, nil
 }
 
-func (s *SupplyServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
+func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
 	err := s.osvc.ReceiveOrderItem(in.Id, in.ProductId, int(in.Quantity))
 	if err != nil {
 		return &pb.ReceiveOrderItemResponse{}, err
@@ -55,7 +55,7 @@ func (s *SupplyServer) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrder
 	return &pb.ReceiveOrderItemResponse{}, nil
 }
 
-func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
+func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
 	order := s.osvc.FindOrder(in.Id)
 	//time.Sleep(2 * time.Second)
 
@@ -79,7 +79,7 @@ func (s *SupplyServer) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (
 	}, nil
 }
 
-func (s *SupplyServer) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOrderDatesRequest) (*pb.FindProjectOrderDatesResponse, error) {
+func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOrderDatesRequest) (*pb.FindProjectOrderDatesResponse, error) {
 	oo := s.osvc.FindProjectOrderDates(in.ProjectId)
 
 	var orders []*pb.Order

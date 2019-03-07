@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-type OrderingService interface {
+type Service interface {
 	CreateOrder(orderid, projectid string) error
 	AddOrderItem(orderid, productid, name, uom string) error
 	RemoveOrderItem(orderid, productid string) error
@@ -16,22 +16,20 @@ type OrderingService interface {
 	FindProjectOrderDates(projectid string) []ProjectOrder
 }
 
-type OrderRepository interface {
+type orderRepository interface {
 	supply.OrderRepository
 	FindDates(projectid string) ([]ProjectOrder, error)
 }
 
-type Service struct {
-	order OrderRepository
+type Svc struct {
+	order orderRepository
 }
 
-func NewOrderingService(order OrderRepository) *Service {
-	return &Service{
-		order: order,
-	}
+func NewOrderingService(order orderRepository) *Svc {
+	return &Svc{order: order}
 }
 
-func (s *Service) CreateOrder(orderid, projectid string) error {
+func (s *Svc) CreateOrder(orderid, projectid string) error {
 	order := supply.Create(orderid, projectid)
 
 	err := s.order.Save(order)
@@ -41,7 +39,7 @@ func (s *Service) CreateOrder(orderid, projectid string) error {
 	return nil
 }
 
-func (s *Service) AddOrderItem(orderid, productid, name, uom string) error {
+func (s *Svc) AddOrderItem(orderid, productid, name, uom string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -59,7 +57,7 @@ func (s *Service) AddOrderItem(orderid, productid, name, uom string) error {
 	return nil
 }
 
-func (s *Service) RemoveOrderItem(orderid, productid string) error {
+func (s *Svc) RemoveOrderItem(orderid, productid string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -77,7 +75,7 @@ func (s *Service) RemoveOrderItem(orderid, productid string) error {
 	return nil
 }
 
-func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity int) error {
+func (s *Svc) ModifyRequestedQuantity(orderid, productid string, quantity int) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -95,7 +93,7 @@ func (s *Service) ModifyRequestedQuantity(orderid, productid string, quantity in
 	return nil
 }
 
-func (s *Service) SendOrder(orderid string) error {
+func (s *Svc) SendOrder(orderid string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -113,7 +111,7 @@ func (s *Service) SendOrder(orderid string) error {
 	return nil
 }
 
-func (s *Service) ReceiveOrderItem(orderid, productid string, quantity int) error {
+func (s *Svc) ReceiveOrderItem(orderid, productid string, quantity int) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -131,7 +129,7 @@ func (s *Service) ReceiveOrderItem(orderid, productid string, quantity int) erro
 	return nil
 }
 
-func (s *Service) FindOrder(orderid string) *supply.Order {
+func (s *Svc) FindOrder(orderid string) *supply.Order {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		log.Println(err)
@@ -148,7 +146,7 @@ type ProjectOrder struct {
 	Status   supply.OrderStatus
 }
 
-func (s *Service) FindProjectOrderDates(projectid string) []ProjectOrder {
+func (s *Svc) FindProjectOrderDates(projectid string) []ProjectOrder {
 	orders, err := s.order.FindDates(projectid)
 	if err != nil {
 		log.Println(err)

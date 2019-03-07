@@ -4,34 +4,34 @@ import (
 	"field/supply"
 )
 
-type PurchasingService interface {
+type Service interface {
 	UpdateItemPO(orderid, productid, ponumber string) error
 	Process(orderid string) error
 	UpdateProduct(id, category, name, uom string) error
 	AddProduct(id, category, name, uom string) error
 }
 
-type ProductRepository interface {
+type productRepository interface {
 	supply.ProductRepository
 }
 
-type OrderRepository interface {
+type orderRepository interface {
 	supply.OrderRepository
 }
 
-type Service struct {
-	product ProductRepository
-	order   OrderRepository
+type Svc struct {
+	product productRepository
+	order   orderRepository
 }
 
-func NewPurchasingService(product ProductRepository, order OrderRepository) *Service {
-	return &Service{
+func NewPurchasingService(product productRepository, order orderRepository) *Svc {
+	return &Svc{
 		product: product,
 		order:   order,
 	}
 }
 
-func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
+func (s *Svc) UpdateItemPO(orderid, productid, ponumber string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (s *Service) UpdateItemPO(orderid, productid, ponumber string) error {
 	return nil
 }
 
-func (s *Service) Process(orderid string) error {
+func (s *Svc) Process(orderid string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (s *Service) Process(orderid string) error {
 	return nil
 }
 
-func (s *Service) UpdateProduct(id, category, name, uom string) error {
+func (s *Svc) UpdateProduct(id, category, name, uom string) error {
 	product, err := s.product.Find(id)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (s *Service) UpdateProduct(id, category, name, uom string) error {
 	return nil
 }
 
-func (s *Service) AddProduct(id, category, name, uom string) error {
+func (s *Svc) AddProduct(id, category, name, uom string) error {
 	product := supply.NewProduct(id, category, name, uom)
 
 	err := s.product.Save(product)
