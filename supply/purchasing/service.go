@@ -19,19 +19,19 @@ type orderRepository interface {
 	supply.OrderRepository
 }
 
-type Svc struct {
+type service struct {
 	product productRepository
 	order   orderRepository
 }
 
-func NewPurchasingService(product productRepository, order orderRepository) *Svc {
-	return &Svc{
+func NewPurchasingService(product productRepository, order orderRepository) *service {
+	return &service{
 		product: product,
 		order:   order,
 	}
 }
 
-func (s *Svc) UpdateItemPO(orderid, productid, ponumber string) error {
+func (s *service) UpdateItemPO(orderid, productid, ponumber string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (s *Svc) UpdateItemPO(orderid, productid, ponumber string) error {
 	return nil
 }
 
-func (s *Svc) Process(orderid string) error {
+func (s *service) Process(orderid string) error {
 	order, err := s.order.Find(orderid)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (s *Svc) Process(orderid string) error {
 	return nil
 }
 
-func (s *Svc) UpdateProduct(id, category, name, uom string) error {
+func (s *service) UpdateProduct(id, category, name, uom string) error {
 	product, err := s.product.Find(id)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (s *Svc) UpdateProduct(id, category, name, uom string) error {
 	return nil
 }
 
-func (s *Svc) AddProduct(id, category, name, uom string) error {
+func (s *service) AddProduct(id, category, name, uom string) error {
 	product := supply.NewProduct(id, category, name, uom)
 
 	err := s.product.Save(product)

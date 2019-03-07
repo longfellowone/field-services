@@ -1,5 +1,5 @@
 //+build wireinject
-// BROKEN -> TO FIX, EXPORT REPOSITORY INTERFACES
+// BROKEN -> TO FIX, EXPORT REPOSITORY INTERFACES AND SERVICE TYPES
 
 package main
 
@@ -22,16 +22,16 @@ func InitializeSupplyServices(db *mongo.Database) (*grpc.Server, error) {
 		// Ordering service
 		wire.Bind(new(ordering.orderRepository), &mongodb.OrderRepository{}),
 		ordering.NewOrderingService,
-		wire.Bind(new(ordering.Service), &ordering.Svc{}),
+		wire.Bind(new(ordering.Service), &ordering.service{}),
 		// Purchasing service
 		wire.Bind(new(purchasing.productRepository), &mongodb.ProductRepository{}),
 		wire.Bind(new(purchasing.orderRepository), &mongodb.OrderRepository{}),
 		purchasing.NewPurchasingService,
-		wire.Bind(new(purchasing.Service), &purchasing.Svc{}),
+		wire.Bind(new(purchasing.Service), &purchasing.service{}),
 		// Search service
 		wire.Bind(new(search.productRepository), &mongodb.ProductRepository{}),
 		search.NewSearchService,
-		wire.Bind(new(search.Service), &search.Svc{}),
+		wire.Bind(new(search.Service), &search.service{}),
 		// gRPC server
 		server.New,
 	)

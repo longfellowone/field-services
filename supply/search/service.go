@@ -14,19 +14,19 @@ type productRepository interface {
 	FindAll() ([]supply.Product, error)
 }
 
-type Svc struct {
+type service struct {
 	products []supply.Product
 }
 
-func NewSearchService(product productRepository) *Svc {
+func NewSearchService(product productRepository) *service {
 	products, err := product.FindAll()
 	if err != nil {
 		panic(err)
 	}
-	return &Svc{products: products}
+	return &service{products: products}
 }
 
-func (s *Svc) ProductSearch(name string) []Result {
+func (s *service) ProductSearch(name string) []Result {
 	replacer := strings.NewReplacer("“", "\"", "”", "\"")
 	output := replacer.Replace(name)
 
@@ -54,10 +54,10 @@ type Result struct {
 }
 
 // Required methods for fuzzy search
-func (s *Svc) String(i int) string {
+func (s *service) String(i int) string {
 	return s.products[i].Name
 }
 
-func (s *Svc) Len() int {
+func (s *service) Len() int {
 	return len(s.products)
 }
