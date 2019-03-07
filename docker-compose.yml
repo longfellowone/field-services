@@ -5,7 +5,7 @@ services:
   db:
     image: postgres
     restart: always
-    env_file: .env
+    env_file: docker/.env
     ports:
       - "5432:5432"
 
