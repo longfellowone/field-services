@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"field/supply/graphql"
 	"field/supply/ordering"
 	"field/supply/postgres"
 	"field/supply/search"
-	"fmt"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
@@ -20,17 +18,11 @@ import (
 )
 
 func main() {
-	conn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", "default", "password", "localhost", 5432, "default")
-
-	db, err := sql.Open("postgres", conn)
+	db, err := postgres.Connect("localhost", 5432, "default", "password", "default")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
-	if err = db.Ping(); err != nil {
-		log.Println(err)
-	}
 
 	orderRepository := postgres.NewOrderRepository(db)
 	productRepository := postgres.NewProductRepository(db)
