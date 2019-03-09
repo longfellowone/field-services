@@ -6,10 +6,10 @@ type ProductRepository interface {
 }
 
 type Product struct {
-	ProductID string
-	Category  string
-	Name      string
-	UOM       string
+	ID       string
+	Category string
+	Name     string
+	UOM      string
 }
 
 // Modifies a product name and uom
@@ -22,9 +22,9 @@ func (p *Product) ModifyProduct(category, name, uom string) {
 // Returns a new *Product
 func NewProduct(id, category, name, uom string) *Product {
 	return &Product{
-		ProductID: id,
-		Category:  category,
-		Name:      name,
-		UOM:       uom,
+		ID:       id,
+		Category: category,
+		Name:     name,
+		UOM:      uom,
 	}
 }

@@ -65,7 +65,7 @@ func (r *ProductRepository) FindAll() ([]*supply.Product, error) {
 	var products []*supply.Product
 	for rows.Next() {
 		var p supply.Product
-		err := rows.Scan(&p.ProductID, &p.Category, &p.Name, &p.UOM)
+		err := rows.Scan(&p.ID, &p.Category, &p.Name, &p.UOM)
 		if err != nil {
 			log.Println(err)
 		}

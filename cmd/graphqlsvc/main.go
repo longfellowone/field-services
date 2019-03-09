@@ -20,10 +20,6 @@ import (
 )
 
 func main() {
-	//db, err := postgres.Connect("localhost", 5432, "default", "password", "default")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
 	conn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", "default", "password", "localhost", 5432, "default")
 
 	db, err := sql.Open("postgres", conn)
@@ -60,7 +56,7 @@ func main() {
 
 	go func() {
 		if err = srv.ListenAndServe(); err != nil {
-			log.Println("unable to start server")
+			log.Println(err)
 		}
 	}()
 
@@ -70,6 +66,6 @@ func main() {
 
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("unable to stop server gracefully")
+		log.Fatal(err)
 	}
 }

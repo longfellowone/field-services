@@ -46,7 +46,7 @@ type Result {
 }
 
 type Product {
-    productID: ID!
+    ID: ID!
     category: String!
     name: String!
     uom: String!

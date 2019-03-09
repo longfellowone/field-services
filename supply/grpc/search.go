@@ -32,7 +32,7 @@ func (s *Server) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest)
 		}
 
 		result := &pb.Result{
-			ProductUuid: p.ProductID,
+			ProductUuid: p.ID,
 			Category:    p.Category,
 			Name:        p.Name,
 			Uom:         p.UOM,

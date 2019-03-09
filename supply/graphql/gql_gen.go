@@ -72,10 +72,10 @@ type ComplexityRoot struct {
 	}
 
 	Product struct {
-		ProductID func(childComplexity int) int
-		Category  func(childComplexity int) int
-		Name      func(childComplexity int) int
-		UOM       func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Category func(childComplexity int) int
+		Name     func(childComplexity int) int
+		UOM      func(childComplexity int) int
 	}
 
 	ProjectOrder struct {
@@ -273,12 +273,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.SentDate(childComplexity), true
 
-	case "Product.ProductID":
-		if e.complexity.Product.ProductID == nil {
+	case "Product.ID":
+		if e.complexity.Product.ID == nil {
 			break
 		}
 
-		return e.complexity.Product.ProductID(childComplexity), true
+		return e.complexity.Product.ID(childComplexity), true
 
 	case "Product.Category":
 		if e.complexity.Product.Category == nil {
@@ -490,7 +490,7 @@ type Result {
 }
 
 type Product {
-    productID: ID!
+    ID: ID!
     category: String!
     name: String!
     uom: String!
@@ -1191,7 +1191,7 @@ func (ec *executionContext) _Order_sentDate(ctx context.Context, field graphql.C
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Product_productID(ctx context.Context, field graphql.CollectedField, obj *supply.Product) graphql.Marshaler {
+func (ec *executionContext) _Product_ID(ctx context.Context, field graphql.CollectedField, obj *supply.Product) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1203,7 +1203,7 @@ func (ec *executionContext) _Product_productID(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ProductID, nil
+		return obj.ID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2656,8 +2656,8 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Product")
-		case "productID":
-			out.Values[i] = ec._Product_productID(ctx, field, obj)
+		case "ID":
+			out.Values[i] = ec._Product_ID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}

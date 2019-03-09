@@ -82,10 +82,10 @@ func TestNewProduct(t *testing.T) {
 			uom:      "ea",
 		},
 		want: &supply.Product{
-			ProductID: "pid1",
-			Category:  "Consumables",
-			Name:      "Pencil",
-			UOM:       "ea",
+			ID:       "pid1",
+			Category: "Consumables",
+			Name:     "Pencil",
+			UOM:      "ea",
 		},
 	}}
 	for _, tt := range tests {

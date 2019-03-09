@@ -1,3 +1,6 @@
+####
+Use _____ID to auto generate resolver for lazy fetch
+
 #### Hot reload
 https://github.com/oxequa/realize/issues/190
 
