@@ -11,11 +11,11 @@ type Service interface {
 }
 
 type productRepository interface {
-	FindAll() ([]supply.Product, error)
+	FindAll() ([]*supply.Product, error)
 }
 
 type service struct {
-	products []supply.Product
+	products []*supply.Product
 }
 
 func NewSearchService(product productRepository) *service {
@@ -39,7 +39,7 @@ func (s *service) ProductSearch(name string) []Result {
 	var results []Result
 	for _, r := range fr {
 		result := Result{
-			Product:        s.products[r.Index],
+			Product:        *s.products[r.Index],
 			MatchedIndexes: r.MatchedIndexes,
 		}
 		results = append(results, result)

@@ -12,8 +12,7 @@ import (
 )
 
 type ProductRepository struct {
-	coll  *mongo.Collection
-	cache []supply.Product
+	coll *mongo.Collection
 }
 
 func NewProductRepository(db *mongo.Database) *ProductRepository {

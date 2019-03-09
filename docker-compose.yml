@@ -67,3 +67,4 @@ services:
 # docker inspect CONTAINER_ID
 # docker run --rm -it CONTAINER_ID sh
 # docker exec -it CONTAINER_ID sh
+# docker-compose logs -f -t
