@@ -3,7 +3,6 @@ package postgres
 import (
 	"database/sql"
 	"field/supply"
-	"fmt"
 	"log"
 )
 
@@ -11,7 +10,7 @@ const (
 	findProducts = iota
 )
 
-var sqlStmts = []string{
+var productSqlStmts = []string{
 	"SELECT productid, category, name, uom FROM products", // findProducts
 }
 
@@ -21,28 +20,20 @@ type ProductRepository struct {
 }
 
 func NewProductRepository(db *sql.DB) *ProductRepository {
-	r := &ProductRepository{
-		db:            db,
-		preparedStmts: make([]*sql.Stmt, 0, len(sqlStmts)),
-	}
-
-	if err := r.createPreparedStmts(); err != nil {
-		db.Close()
-		log.Fatal(err)
-	}
+	r := &ProductRepository{db: db, preparedStmts: make([]*sql.Stmt, 0, len(productSqlStmts))}
+	r.createPreparedStmts()
 	return r
 }
 
-func (r *ProductRepository) createPreparedStmts() error {
-	r.preparedStmts = []*sql.Stmt{}
-	for _, stmt := range sqlStmts {
+func (r *ProductRepository) createPreparedStmts() {
+	for _, stmt := range productSqlStmts {
 		ps, err := r.db.Prepare(stmt)
 		if err != nil {
-			return fmt.Errorf("unable to prepare statement %q: %v", stmt, err)
+			r.db.Close()
+			log.Fatalf("unable to prepare statement %q: %v", stmt, err)
 		}
 		r.preparedStmts = append(r.preparedStmts, ps)
 	}
-	return nil
 }
 
 func (r *ProductRepository) Save(p *supply.Product) error {
@@ -51,12 +42,11 @@ func (r *ProductRepository) Save(p *supply.Product) error {
 
 func (r *ProductRepository) Find(id string) (*supply.Product, error) {
 	var product supply.Product
-
 	return &product, nil
 }
 
 func (r *ProductRepository) FindAll() ([]*supply.Product, error) {
-	rows, err := r.db.Query(sqlStmts[findProducts])
+	rows, err := r.preparedStmts[findProducts].Query()
 	if err != nil {
 		log.Println(err)
 	}

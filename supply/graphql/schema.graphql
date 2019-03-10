@@ -41,7 +41,9 @@ type Query {
 }
 
 type Result {
-    product: Product!
+    ID: ID!
+    name: String!
+    uom: String!
     matchedIndexes: [Int!]!
 }
 

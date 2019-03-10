@@ -39,7 +39,9 @@ func (s *service) ProductSearch(name string) []Result {
 	var results []Result
 	for _, r := range fr {
 		result := Result{
-			Product:        *s.products[r.Index],
+			ID:             s.products[r.Index].ID,
+			Name:           s.products[r.Index].Name,
+			UOM:            s.products[r.Index].UOM,
 			MatchedIndexes: r.MatchedIndexes,
 		}
 		results = append(results, result)
@@ -49,7 +51,9 @@ func (s *service) ProductSearch(name string) []Result {
 
 // Result of ProductSearch
 type Result struct {
-	supply.Product
+	ID             string
+	Name           string
+	UOM            string
 	MatchedIndexes []int
 }
 

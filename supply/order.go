@@ -21,7 +21,7 @@ type OrderRepository interface {
 type Order struct {
 	OrderID   string
 	ProjectID string
-	Items     []Item
+	Items     []*Item
 	SentDate  int64
 	Status    OrderStatus
 }
@@ -31,7 +31,7 @@ func Create(id, pid string) *Order {
 	return &Order{
 		OrderID:   id,
 		ProjectID: pid,
-		Items:     []Item{},
+		Items:     []*Item{},
 		SentDate:  time.Now().Unix(),
 		Status:    New,
 	}
@@ -43,7 +43,7 @@ func (o *Order) AddItem(id, name, uom string) error {
 	if err == nil {
 		return ErrItemAlreadyOnList
 	}
-	o.Items = append(o.Items, *newItem(id, name, uom))
+	o.Items = append(o.Items, newItem(id, name, uom))
 	return nil
 }
 

@@ -1,3 +1,32 @@
+-- Adminer 4.7.1 PostgreSQL dump
+
+DROP TABLE IF EXISTS "order_items";
+CREATE TABLE "public"."order_items" (
+    "orderid" character varying(36) NOT NULL,
+    "productid" character varying(36) NOT NULL,
+    "name" character varying(50) NOT NULL,
+    "uom" character varying(3) NOT NULL,
+    "requested" integer NOT NULL,
+    "received" integer NOT NULL,
+    "remaining" integer NOT NULL,
+    "status" integer NOT NULL,
+    "ponumber" character varying(20) NOT NULL,
+    CONSTRAINT "order_items_orders_orderid_fk" FOREIGN KEY (orderid) REFERENCES orders(orderid) NOT DEFERRABLE
+) WITH (oids = false);
+
+CREATE INDEX "order_items_orderid_index" ON "public"."order_items" USING btree ("orderid");
+
+
+DROP TABLE IF EXISTS "orders";
+CREATE TABLE "public"."orders" (
+    "orderid" character varying(36) NOT NULL,
+    "projectid" character varying(36) NOT NULL,
+    "sentdate" integer NOT NULL,
+    "status" integer NOT NULL,
+    CONSTRAINT "orders_pk" PRIMARY KEY ("orderid")
+) WITH (oids = false);
+
+
 DROP TABLE IF EXISTS "products";
 CREATE TABLE "public"."products" (
     "productid" character varying(36) NOT NULL,
@@ -800,3 +829,5 @@ INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('fe8e69fa-fa74-4ce8-a3d9-933afed06a3a',	'Wire',	'500mcm Copper',	'ft'),
 ('2b7902f5-af18-4ff5-853b-71ff565e03bd',	'Consumables',	'Black paint marker',	'ea'),
 ('d6026ac7-ef83-4321-8b66-a71437d5d125',	'Consumables',	'Box black nitrile gloves - XL',	'ea');
+
+-- 2019-03-10 02:52:43.960763+00

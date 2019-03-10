@@ -90,7 +90,9 @@ type ComplexityRoot struct {
 	}
 
 	Result struct {
-		Product        func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		UOM            func(childComplexity int) int
 		MatchedIndexes func(childComplexity int) int
 	}
 }
@@ -351,12 +353,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Products(childComplexity, args["name"].(string)), true
 
-	case "Result.Product":
-		if e.complexity.Result.Product == nil {
+	case "Result.ID":
+		if e.complexity.Result.ID == nil {
 			break
 		}
 
-		return e.complexity.Result.Product(childComplexity), true
+		return e.complexity.Result.ID(childComplexity), true
+
+	case "Result.Name":
+		if e.complexity.Result.Name == nil {
+			break
+		}
+
+		return e.complexity.Result.Name(childComplexity), true
+
+	case "Result.UOM":
+		if e.complexity.Result.UOM == nil {
+			break
+		}
+
+		return e.complexity.Result.UOM(childComplexity), true
 
 	case "Result.MatchedIndexes":
 		if e.complexity.Result.MatchedIndexes == nil {
@@ -485,7 +501,9 @@ type Query {
 }
 
 type Result {
-    product: Product!
+    ID: ID!
+    name: String!
+    uom: String!
     matchedIndexes: [Int!]!
 }
 
@@ -1499,7 +1517,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Result_product(ctx context.Context, field graphql.CollectedField, obj *search.Result) graphql.Marshaler {
+func (ec *executionContext) _Result_ID(ctx context.Context, field graphql.CollectedField, obj *search.Result) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1511,7 +1529,7 @@ func (ec *executionContext) _Result_product(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Product, nil
+		return obj.ID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1519,10 +1537,62 @@ func (ec *executionContext) _Result_product(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(supply.Product)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNProduct2fieldᚋsupplyᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Result_name(ctx context.Context, field graphql.CollectedField, obj *search.Result) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Result",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Result_uom(ctx context.Context, field graphql.CollectedField, obj *search.Result) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Result",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UOM, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Result_matchedIndexes(ctx context.Context, field graphql.CollectedField, obj *search.Result) graphql.Marshaler {
@@ -2802,8 +2872,18 @@ func (ec *executionContext) _Result(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Result")
-		case "product":
-			out.Values[i] = ec._Result_product(ctx, field, obj)
+		case "ID":
+			out.Values[i] = ec._Result_ID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._Result_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "uom":
+			out.Values[i] = ec._Result_uom(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -3194,10 +3274,6 @@ func (ec *executionContext) marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx context.
 		return graphql.Null
 	}
 	return ec._Order(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProduct2fieldᚋsupplyᚐProduct(ctx context.Context, sel ast.SelectionSet, v supply.Product) graphql.Marshaler {
-	return ec._Product(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNProjectOrder2fieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v ordering.ProjectOrder) graphql.Marshaler {
