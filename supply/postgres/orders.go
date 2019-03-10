@@ -99,7 +99,6 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	if err != nil {
 		return &supply.Order{}, err
 	}
-	// defer tx.Rollback()
 
 	err = tx.QueryRow(findOrder, id).Scan(&o.OrderID, &o.ProjectID, &o.SentDate, &o.Status)
 	if err != nil {
@@ -144,8 +143,32 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	return &o, nil
 }
 
+const findOrderDates = `
+	SELECT orderid, sentdate, status
+	FROM orders
+	WHERE projectid = $1`
+
 func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, error) {
-	var orders []ordering.ProjectOrder
+	orders := make([]ordering.ProjectOrder, 0)
+
+	rows, err := r.db.Query(findOrderDates, projectid)
+	if err != nil {
+		return []ordering.ProjectOrder{}, nil
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var o ordering.ProjectOrder
+		err := rows.Scan(&o.OrderID, &o.SentDate, &o.Status)
+		if err != nil {
+			return []ordering.ProjectOrder{}, nil
+		}
+		orders = append(orders, o)
+	}
+	err = rows.Err()
+	if err != nil {
+		return []ordering.ProjectOrder{}, nil
+	}
 
 	return orders, nil
 }
