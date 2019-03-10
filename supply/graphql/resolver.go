@@ -3,7 +3,6 @@ package graphql
 
 import (
 	"context"
-	"errors"
 	"field/supply"
 	"field/supply/graphql/models"
 	"field/supply/ordering"
@@ -81,7 +80,7 @@ type queryResolver struct{ *Resolver }
 func (r *queryResolver) Order(ctx context.Context, orderID string) (*supply.Order, error) {
 	order, err := r.osvc.FindOrder(orderID)
 	if err != nil {
-		return &supply.Order{}, errors.New("order not found")
+		return &supply.Order{}, err
 	}
 	return order, nil
 }

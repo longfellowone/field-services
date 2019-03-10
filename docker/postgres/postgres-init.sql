@@ -11,11 +11,22 @@ CREATE TABLE "public"."order_items" (
     "remaining" integer NOT NULL,
     "status" integer NOT NULL,
     "ponumber" character varying(20) NOT NULL,
+    CONSTRAINT "order_items_orderid_productid_unique" UNIQUE ("orderid", "productid"),
     CONSTRAINT "order_items_orders_orderid_fk" FOREIGN KEY (orderid) REFERENCES orders(orderid) NOT DEFERRABLE
 ) WITH (oids = false);
 
 CREATE INDEX "order_items_orderid_index" ON "public"."order_items" USING btree ("orderid");
 
+INSERT INTO "order_items" ("orderid", "productid", "name", "uom", "requested", "received", "remaining", "status", "ponumber") VALUES
+('3aedd656-0978-4204-b377-635ec971d691',	'2f0ed6fc-605a-4b30-ad65-2d43888c76c5',	'Item1',	'ea',	10,	'0',	'0',	1,	'N/A'),
+('3aedd656-0978-4204-b377-635ec971d691',	'd5c85fc3-abf1-4392-a194-8d52cce82dd5',	'Item2',	'ea',	7,	'0',	'0',	1,	'N/A'),
+('3aedd656-0978-4204-b377-635ec971d691',	'35014b04-6f2e-4862-9b14-4a29f4c3b33e',	'Item3',	'fa',	200,	'0',	'0',	1,	'N/A'),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'9dcfcdad-eb05-4f0a-8c04-4923ee8b5486',	'Item6',	'ft',	1200,	'0',	'0',	1,	'N/A'),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'0b53abbe-366f-4c94-83bb-08598b88f497',	'Item7',	'ea',	50,	'0',	'0',	1,	'N/A'),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'1afc87b1-6a85-4195-a46d-26a41bd0848c',	'Item4',	'ft',	200,	'0',	'0',	1,	'N/A'),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'f0a05425-353a-4192-9de9-522ac052929a',	'Item5',	'ea',	5,	'0',	'0',	1,	'N/A'),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'e25f57dd-372e-478c-bb59-bf76ff464128',	'Item8',	'ea',	44,	'0',	'0',	1,	'N/A'),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'e39e0959-7e6f-4b2a-9f54-28be24c8299e',	'Item9',	'ea',	150,	'0',	'0',	1,	'N/A');
 
 DROP TABLE IF EXISTS "orders";
 CREATE TABLE "public"."orders" (
@@ -26,6 +37,10 @@ CREATE TABLE "public"."orders" (
     CONSTRAINT "orders_pk" PRIMARY KEY ("orderid")
 ) WITH (oids = false);
 
+INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status") VALUES
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186511,	1),
+('3aedd656-0978-4204-b377-635ec971d691',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186573,	1),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'1b53f5f5-74e8-4108-aefb-a206cf66cfab',	1552186855,	1);
 
 DROP TABLE IF EXISTS "products";
 CREATE TABLE "public"."products" (
@@ -830,4 +845,4 @@ INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('2b7902f5-af18-4ff5-853b-71ff565e03bd',	'Consumables',	'Black paint marker',	'ea'),
 ('d6026ac7-ef83-4321-8b66-a71437d5d125',	'Consumables',	'Box black nitrile gloves - XL',	'ea');
 
--- 2019-03-10 02:52:43.960763+00
+-- 2019-03-10 21:48:40.797366+00
