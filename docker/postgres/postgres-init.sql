@@ -23,6 +23,7 @@ INSERT INTO "order_items" ("orderid", "productid", "name", "uom", "requested", "
 ('3aedd656-0978-4204-b377-635ec971d691',	'35014b04-6f2e-4862-9b14-4a29f4c3b33e',	'Item3',	'fa',	200,	'0',	'0',	1,	'N/A'),
 ('7e55aa12-2e6a-4f21-b01a-09503c755180',	'9dcfcdad-eb05-4f0a-8c04-4923ee8b5486',	'Item6',	'ft',	1200,	'0',	'0',	1,	'N/A'),
 ('7e55aa12-2e6a-4f21-b01a-09503c755180',	'0b53abbe-366f-4c94-83bb-08598b88f497',	'Item7',	'ea',	50,	'0',	'0',	1,	'N/A'),
+('88d98a36-3257-4bad-9cfd-ba3ea23b971e',	'bcb222c4-7d96-4442-99fd-da01806fa0af',	'Item10',	'ft',	'0',	'0',	'0',	'0',	'N/A'),
 ('7e55aa12-2e6a-4f21-b01a-09503c755180',	'1afc87b1-6a85-4195-a46d-26a41bd0848c',	'Item4',	'ft',	200,	'0',	'0',	1,	'N/A'),
 ('7e55aa12-2e6a-4f21-b01a-09503c755180',	'f0a05425-353a-4192-9de9-522ac052929a',	'Item5',	'ea',	5,	'0',	'0',	1,	'N/A'),
 ('7e55aa12-2e6a-4f21-b01a-09503c755180',	'e25f57dd-372e-478c-bb59-bf76ff464128',	'Item8',	'ea',	44,	'0',	'0',	1,	'N/A'),
@@ -38,9 +39,10 @@ CREATE TABLE "public"."orders" (
 ) WITH (oids = false);
 
 INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status") VALUES
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186511,	1),
-('3aedd656-0978-4204-b377-635ec971d691',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186573,	1),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'1b53f5f5-74e8-4108-aefb-a206cf66cfab',	1552186855,	1);
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186511,	'0'),
+('3aedd656-0978-4204-b377-635ec971d691',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186573,	'0'),
+('88d98a36-3257-4bad-9cfd-ba3ea23b971e',	'072da62a-1c83-4670-b5b9-e8677653c2c2',	1552256702,	'0'),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186855,	'0');
 
 DROP TABLE IF EXISTS "products";
 CREATE TABLE "public"."products" (
@@ -845,4 +847,4 @@ INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('2b7902f5-af18-4ff5-853b-71ff565e03bd',	'Consumables',	'Black paint marker',	'ea'),
 ('d6026ac7-ef83-4321-8b66-a71437d5d125',	'Consumables',	'Box black nitrile gloves - XL',	'ea');
 
--- 2019-03-10 21:48:40.797366+00
+-- 2019-03-10 22:49:22.317014+00

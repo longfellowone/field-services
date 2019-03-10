@@ -7,14 +7,11 @@ import (
 )
 
 type OrderRepository struct {
-	db            *sql.DB
-	preparedStmts []*sql.Stmt
+	db *sql.DB
 }
 
 func NewOrderRepository(db *sql.DB) *OrderRepository {
-	r := &OrderRepository{db: db, preparedStmts: make([]*sql.Stmt, 0, len(productSqlStmts))}
-
-	return r
+	return &OrderRepository{db: db}
 }
 
 const saveOrder = `
@@ -31,7 +28,7 @@ const saveItems = `
 	INSERT INTO order_items
 		(orderid, productid, name, uom, requested, received, remaining, status, ponumber)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-	ON CONFLICT (orderid, productid)
+	ON CONFLICT ON CONSTRAINT order_items_orderid_productid_unique
 	DO UPDATE SET
 		name=EXCLUDED.name,
 		uom=EXCLUDED.uom,
@@ -57,6 +54,8 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
+
 	for _, item := range o.Items {
 		_, err = stmt.Exec(
 			o.OrderID,
