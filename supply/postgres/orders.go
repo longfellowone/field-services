@@ -47,7 +47,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 }
 
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
-	var o supply.Order
+	o := supply.Order{Items: make([]*supply.Item, 0)}
 	err := r.preparedStmts[findOrder].QueryRow(id).Scan(&o.OrderID, &o.ProjectID, &o.SentDate, &o.Status)
 	if err != nil {
 		log.Println(err)
@@ -59,21 +59,19 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	}
 	defer rows.Close()
 
-	var items []*supply.Item
 	for rows.Next() {
 		var i supply.Item
 		err := rows.Scan(&i.ProductID, &i.Name)
 		if err != nil {
 			log.Println(err)
 		}
-		items = append(items, &i)
+		o.Items = append(o.Items, &i)
 	}
 	err = rows.Err()
 	if err != nil {
 		log.Println(err)
 	}
 
-	o.Items = items
 	return &o, nil
 }
 
