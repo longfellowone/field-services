@@ -12,7 +12,7 @@ type Service interface {
 	ModifyRequestedQuantity(orderid, productid string, quantity int) error
 	SendOrder(orderid string) error
 	ReceiveOrderItem(orderid, productid string, quantity int) error
-	FindOrder(orderid string) *supply.Order
+	FindOrder(orderid string) (*supply.Order, error)
 	FindProjectOrderDates(projectid string) []ProjectOrder
 }
 
@@ -129,13 +129,12 @@ func (s *service) ReceiveOrderItem(orderid, productid string, quantity int) erro
 	return nil
 }
 
-func (s *service) FindOrder(orderid string) *supply.Order {
+func (s *service) FindOrder(orderid string) (*supply.Order, error) {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		log.Println(err)
-		return &supply.Order{}
+		return &supply.Order{}, err
 	}
-	return order
+	return order, nil
 }
 
 // Order read models

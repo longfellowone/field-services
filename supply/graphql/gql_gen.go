@@ -1177,10 +1177,10 @@ func (ec *executionContext) _Order_items(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]supply.Item)
+	res := resTmp.([]*supply.Item)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNItem2ᚕfieldᚋsupplyᚐItem(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚕᚖfieldᚋsupplyᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_sentDate(ctx context.Context, field graphql.CollectedField, obj *supply.Order) graphql.Marshaler {
@@ -3221,7 +3221,7 @@ func (ec *executionContext) marshalNItem2fieldᚋsupplyᚐItem(ctx context.Conte
 	return ec._Item(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNItem2ᚕfieldᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v []supply.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚕᚖfieldᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v []*supply.Item) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3245,7 +3245,7 @@ func (ec *executionContext) marshalNItem2ᚕfieldᚋsupplyᚐItem(ctx context.Co
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItem2fieldᚋsupplyᚐItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNItem2ᚖfieldᚋsupplyᚐItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3256,6 +3256,16 @@ func (ec *executionContext) marshalNItem2ᚕfieldᚋsupplyᚐItem(ctx context.Co
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalNItem2ᚖfieldᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v *supply.Item) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Item(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNModifyQuantity2fieldᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx context.Context, v interface{}) (models.ModifyQuantity, error) {

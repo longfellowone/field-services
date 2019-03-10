@@ -3,6 +3,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"field/supply"
 	"field/supply/graphql/models"
 	"field/supply/ordering"
@@ -78,7 +79,11 @@ func (r *mutationResolver) ModifyRequestedQuantity(ctx context.Context, input mo
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Order(ctx context.Context, orderID string) (*supply.Order, error) {
-	return r.osvc.FindOrder(orderID), nil
+	order, err := r.osvc.FindOrder(orderID)
+	if err != nil {
+		return &supply.Order{}, errors.New("order not found")
+	}
+	return order, nil
 }
 func (r *queryResolver) ProjectOrders(ctx context.Context, projectID string) ([]ordering.ProjectOrder, error) {
 	return r.osvc.FindProjectOrderDates(projectID), nil

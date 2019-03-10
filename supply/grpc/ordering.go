@@ -56,7 +56,10 @@ func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRe
 }
 
 func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
-	order := s.osvc.FindOrder(in.Id)
+	order, err := s.osvc.FindOrder(in.Id)
+	if err != nil {
+		return &pb.FindOrderResponse{}, err
+	}
 	//time.Sleep(2 * time.Second)
 
 	var items []*pb.Item

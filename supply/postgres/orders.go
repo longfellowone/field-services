@@ -25,9 +25,6 @@ type OrderRepository struct {
 func NewOrderRepository(db *sql.DB) *OrderRepository {
 	r := &OrderRepository{db: db, preparedStmts: make([]*sql.Stmt, 0, len(productSqlStmts))}
 	r.createPreparedStmts()
-
-	_, _ = r.Find("7e55aa12-2e6a-4f21-b01a-09503c755180")
-
 	return r
 }
 
@@ -48,14 +45,25 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	o := supply.Order{Items: make([]*supply.Item, 0)}
-	err := r.preparedStmts[findOrder].QueryRow(id).Scan(&o.OrderID, &o.ProjectID, &o.SentDate, &o.Status)
+
+	tx, err := r.db.Begin()
 	if err != nil {
-		log.Println(err)
+		return &supply.Order{}, err
+	}
+	// defer tx.Rollback()
+
+	err = tx.Stmt(r.preparedStmts[findOrder]).QueryRow(id).Scan(&o.OrderID, &o.ProjectID, &o.SentDate, &o.Status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return &supply.Order{}, err
+		} else {
+			return &supply.Order{}, err
+		}
 	}
 
-	rows, err := r.preparedStmts[findOrderItems].Query(id)
+	rows, err := tx.Stmt(r.preparedStmts[findOrderItems]).Query(id)
 	if err != nil {
-		log.Println(err)
+		return &supply.Order{}, err
 	}
 	defer rows.Close()
 
@@ -63,13 +71,18 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 		var i supply.Item
 		err := rows.Scan(&i.ProductID, &i.Name)
 		if err != nil {
-			log.Println(err)
+			return &supply.Order{}, err
 		}
 		o.Items = append(o.Items, &i)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Println(err)
+		return &supply.Order{}, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return &supply.Order{}, err
 	}
 
 	return &o, nil
