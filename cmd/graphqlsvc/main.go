@@ -36,9 +36,11 @@ func main() {
 	r.Use(cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedHeaders: []string{"Authorization", "Content-Type"},
+		//AllowCredentials: true,
 		//Debug:          true,
 	}).Handler)
-	r.Use(auth.Middleware())
+
+	r.Use(auth.JwtMiddleware.Handler)
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 

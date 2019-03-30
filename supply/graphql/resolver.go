@@ -7,6 +7,7 @@ import (
 	"field/supply/graphql/models"
 	"field/supply/ordering"
 	"field/supply/search"
+	"fmt"
 	"github.com/99designs/gqlgen/handler"
 	"net/http"
 )
@@ -85,6 +86,10 @@ func (r *queryResolver) Order(ctx context.Context, orderID string) (*supply.Orde
 	return order, nil
 }
 func (r *queryResolver) ProjectOrders(ctx context.Context, projectID string) ([]ordering.ProjectOrder, error) {
+	user := ctx.Value("user")
+
+	fmt.Println(user)
+
 	return r.osvc.FindProjectOrderDates(projectID), nil
 }
 func (r *queryResolver) Products(ctx context.Context, name string) ([]search.Result, error) {
