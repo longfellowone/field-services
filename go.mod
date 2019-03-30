@@ -11,6 +11,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/mongodb/mongo-go-driver v0.3.0
+	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.6.0
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/vektah/gqlparser v1.1.1

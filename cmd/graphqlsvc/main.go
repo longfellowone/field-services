@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"field/supply/auth"
 	"field/supply/graphql"
 	"field/supply/ordering"
 	"field/supply/postgres"
@@ -34,7 +35,10 @@ func main() {
 
 	r.Use(cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+		//Debug:          true,
 	}).Handler)
+	r.Use(auth.Middleware())
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 

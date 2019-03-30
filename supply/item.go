@@ -1,6 +1,9 @@
 package supply
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Item struct {
 	ProductID         string
@@ -11,6 +14,7 @@ type Item struct {
 	QuantityRemaining int
 	ItemStatus        ItemStatus
 	PONumber          string
+	DateAdded         int64
 }
 
 // Returns a new *Item
@@ -21,6 +25,7 @@ func newItem(id, name, uom string) *Item {
 		UOM:        uom,
 		ItemStatus: Waiting,
 		PONumber:   "N/A",
+		DateAdded:  time.Now().Unix(),
 	}
 }
 

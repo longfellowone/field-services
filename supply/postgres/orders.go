@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"field/supply"
 	"field/supply/ordering"
+	"github.com/pkg/errors"
+	"log"
 )
 
 type OrderRepository struct {
@@ -26,8 +28,8 @@ const saveOrder = `
 
 const saveItems = `
 	INSERT INTO order_items
-		(orderid, productid, name, uom, requested, received, remaining, status, ponumber)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		(orderid, productid, name, uom, requested, received, remaining, status, ponumber, dateadded)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	ON CONFLICT ON CONSTRAINT order_items_orderid_productid_unique
 	DO UPDATE SET
 		name=EXCLUDED.name,
@@ -66,7 +68,8 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 			item.QuantityReceived,
 			item.QuantityRemaining,
 			item.ItemStatus,
-			item.PONumber)
+			item.PONumber,
+			item.DateAdded)
 		if err != nil {
 			return err
 		}
@@ -85,11 +88,12 @@ const findOrder = `
 	WHERE orderid=$1`
 
 const findOrderItems = `
-	SELECT oi.productid, oi.name, oi.uom, oi.requested, oi.received, oi.remaining, oi.status, oi.ponumber
+	SELECT oi.productid, oi.name, oi.uom, oi.requested, oi.received, oi.remaining, oi.status, oi.ponumber, oi.dateadded
 	FROM orders o 
 	INNER JOIN order_items oi 
 	ON o.orderid = oi.orderid 
-	WHERE o.orderid=$1`
+	WHERE o.orderid=$1
+	ORDER BY oi.dateadded DESC`
 
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	o := supply.Order{Items: make([]*supply.Item, 0)}
@@ -102,7 +106,8 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	err = tx.QueryRow(findOrder, id).Scan(&o.OrderID, &o.ProjectID, &o.SentDate, &o.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &supply.Order{}, err
+			log.Println(err)
+			return &supply.Order{}, errors.New("order not found")
 		} else {
 			return &supply.Order{}, err
 		}
@@ -124,7 +129,8 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 			&i.QuantityReceived,
 			&i.QuantityRemaining,
 			&i.ItemStatus,
-			&i.PONumber)
+			&i.PONumber,
+			&i.DateAdded)
 		if err != nil {
 			return &supply.Order{}, err
 		}
