@@ -2,12 +2,13 @@ package search
 
 import (
 	"field/supply"
+	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
 	"strings"
 )
 
 type Service interface {
-	ProductSearch(name string) []Result
+	ProductSearch(name string) ([]Result, error)
 }
 
 type productRepository interface {
@@ -26,11 +27,14 @@ func NewSearchService(product productRepository) *service {
 	return &service{products: products}
 }
 
-func (s *service) ProductSearch(name string) []Result {
+func (s *service) ProductSearch(name string) ([]Result, error) {
 	replacer := strings.NewReplacer("“", "\"", "”", "\"")
 	output := replacer.Replace(name)
 
 	fr := fuzzy.FindFrom(output, s)
+	if fr.Len() == 0 {
+		return []Result{}, errors.New("No results")
+	}
 
 	if fr.Len() > 10 {
 		fr = fr[:10]
@@ -46,7 +50,7 @@ func (s *service) ProductSearch(name string) []Result {
 		}
 		results = append(results, result)
 	}
-	return results
+	return results, nil
 }
 
 // Result of ProductSearch

@@ -20,12 +20,26 @@ resolver:
 models:
   Order:
     model: field/supply.Order
+    fields:
+      id:
+        resolver: false # force a resolver to be generated
+      projectID:
+        resolver: false # force a resolver to be generated
+      orderID:
+        resolver: false # force a resolver to be generated
   Item:
     model: field/supply.Item
-#  ItemStatus:
-#    model: field/supply/search.ItemStatus
+  #  ItemStatus:
+  #    model: field/supply/search.ItemStatus
   Product:
     model: field/supply.Product
+  Project:
+    model: field/supply.Project
+    fields:
+      ProjectID:
+        resolver: false # force a resolver to be generated
+      OrderID:
+        resolver: false # force a resolver to be generated
   Result:
     model: field/supply/search.Result
   ProjectOrder:

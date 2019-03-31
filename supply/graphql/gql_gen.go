@@ -38,6 +38,8 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Order() OrderResolver
+	Project() ProjectResolver
 	Query() QueryResolver
 }
 
@@ -62,6 +64,8 @@ type ComplexityRoot struct {
 		RemoveOrderItem         func(childComplexity int, input models.RemoveOrderItem) int
 		ReceiveOrderItem        func(childComplexity int, input models.ModifyQuantity) int
 		ModifyRequestedQuantity func(childComplexity int, input models.ModifyQuantity) int
+		CreateProject           func(childComplexity int, input models.CreateProject) int
+		CloseProject            func(childComplexity int, input models.CloseProject) int
 	}
 
 	Order struct {
@@ -78,6 +82,11 @@ type ComplexityRoot struct {
 		UOM      func(childComplexity int) int
 	}
 
+	Project struct {
+		ProjectID func(childComplexity int) int
+		Name      func(childComplexity int) int
+	}
+
 	ProjectOrder struct {
 		OrderID  func(childComplexity int) int
 		SentDate func(childComplexity int) int
@@ -87,6 +96,7 @@ type ComplexityRoot struct {
 		Order         func(childComplexity int, orderID string) int
 		ProjectOrders func(childComplexity int, projectID string) int
 		Products      func(childComplexity int, name string) int
+		Projects      func(childComplexity int, foremanID string) int
 	}
 
 	Result struct {
@@ -98,17 +108,26 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateOrder(ctx context.Context, input models.CreateOrder) (bool, error)
-	SendOrder(ctx context.Context, input models.SendOrder) (bool, error)
-	AddOrderItem(ctx context.Context, input models.AddOrderItem) (bool, error)
-	RemoveOrderItem(ctx context.Context, input models.RemoveOrderItem) (bool, error)
-	ReceiveOrderItem(ctx context.Context, input models.ModifyQuantity) (bool, error)
-	ModifyRequestedQuantity(ctx context.Context, input models.ModifyQuantity) (bool, error)
+	CreateOrder(ctx context.Context, input models.CreateOrder) (*supply.Order, error)
+	SendOrder(ctx context.Context, input models.SendOrder) (*supply.Order, error)
+	AddOrderItem(ctx context.Context, input models.AddOrderItem) (*supply.Order, error)
+	RemoveOrderItem(ctx context.Context, input models.RemoveOrderItem) (*supply.Order, error)
+	ReceiveOrderItem(ctx context.Context, input models.ModifyQuantity) (*supply.Order, error)
+	ModifyRequestedQuantity(ctx context.Context, input models.ModifyQuantity) (*supply.Order, error)
+	CreateProject(ctx context.Context, input models.CreateProject) (*supply.Project, error)
+	CloseProject(ctx context.Context, input models.CloseProject) (*supply.Project, error)
+}
+type OrderResolver interface {
+	ProjectID(ctx context.Context, obj *supply.Order) (string, error)
+}
+type ProjectResolver interface {
+	ProjectID(ctx context.Context, obj *supply.Project) (string, error)
 }
 type QueryResolver interface {
 	Order(ctx context.Context, orderID string) (*supply.Order, error)
 	ProjectOrders(ctx context.Context, projectID string) ([]ordering.ProjectOrder, error)
 	Products(ctx context.Context, name string) ([]search.Result, error)
+	Projects(ctx context.Context, foremanID string) ([]supply.Project, error)
 }
 
 type executableSchema struct {
@@ -247,6 +266,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.ModifyRequestedQuantity(childComplexity, args["input"].(models.ModifyQuantity)), true
 
+	case "Mutation.CreateProject":
+		if e.complexity.Mutation.CreateProject == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProject_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateProject(childComplexity, args["input"].(models.CreateProject)), true
+
+	case "Mutation.CloseProject":
+		if e.complexity.Mutation.CloseProject == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_closeProject_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CloseProject(childComplexity, args["input"].(models.CloseProject)), true
+
 	case "Order.OrderID":
 		if e.complexity.Order.OrderID == nil {
 			break
@@ -303,6 +346,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.UOM(childComplexity), true
 
+	case "Project.ProjectID":
+		if e.complexity.Project.ProjectID == nil {
+			break
+		}
+
+		return e.complexity.Project.ProjectID(childComplexity), true
+
+	case "Project.Name":
+		if e.complexity.Project.Name == nil {
+			break
+		}
+
+		return e.complexity.Project.Name(childComplexity), true
+
 	case "ProjectOrder.OrderID":
 		if e.complexity.ProjectOrder.OrderID == nil {
 			break
@@ -352,6 +409,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Products(childComplexity, args["name"].(string)), true
+
+	case "Query.Projects":
+		if e.complexity.Query.Projects == nil {
+			break
+		}
+
+		args, err := ec.field_Query_projects_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Projects(childComplexity, args["foremanID"].(string)), true
 
 	case "Result.ID":
 		if e.complexity.Result.ID == nil {
@@ -459,17 +528,22 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema.graphql", Input: `type Mutation {
-    createOrder(input: CreateOrder!): Boolean!
-    sendOrder(input: SendOrder!): Boolean!
-    addOrderItem(input: AddOrderItem!): Boolean!
-    removeOrderItem(input: RemoveOrderItem!): Boolean!
-    receiveOrderItem(input: ModifyQuantity!): Boolean!
-    modifyRequestedQuantity(input: ModifyQuantity!): Boolean!
+    # Orders
+    createOrder(input: CreateOrder!): Order!
+    sendOrder(input: SendOrder!): Order!
+    addOrderItem(input: AddOrderItem!): Order!
+    removeOrderItem(input: RemoveOrderItem!): Order!
+    receiveOrderItem(input: ModifyQuantity!): Order!
+    modifyRequestedQuantity(input: ModifyQuantity!): Order!
+    # Projects
+    createProject(input: CreateProject!): Project!
+    closeProject(input: CloseProject!): Project!
 }
 
 input CreateOrder {
     orderID: ID!
     projectID: String!
+    name: String!
 }
 
 input SendOrder {
@@ -494,10 +568,22 @@ input ModifyQuantity {
     quantity: Int!
 }
 
+input CreateProject {
+    projectID: ID!
+    name: String!
+}
+
+input CloseProject {
+    projectID: ID!
+}
+
 type Query {
+    # Orders
     order(orderID: ID!): Order!
     projectOrders(projectID: ID!): [ProjectOrder!]!
     products(name: String!): [Result!]!
+    # Projects
+    projects(foremanID: ID!): [Project!]!
 }
 
 type Result {
@@ -539,6 +625,11 @@ type Item {
     poNumber: String!
 }
 
+type Project {
+    projectID: ID!
+    name: String!
+}
+
 #enum ItemStatus {
 #    Waiting
 #    Filled
@@ -567,12 +658,40 @@ func (ec *executionContext) field_Mutation_addOrderItem_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_closeProject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.CloseProject
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNCloseProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCloseProject(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createOrder_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 models.CreateOrder
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNCreateOrder2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createProject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.CreateProject
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNCreateProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateProject(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -690,6 +809,20 @@ func (ec *executionContext) field_Query_projectOrders_args(ctx context.Context, 
 		}
 	}
 	args["projectID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_projects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["foremanID"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["foremanID"] = arg0
 	return args, nil
 }
 
@@ -934,10 +1067,10 @@ func (ec *executionContext) _Mutation_createOrder(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_sendOrder(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -967,10 +1100,10 @@ func (ec *executionContext) _Mutation_sendOrder(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addOrderItem(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1000,10 +1133,10 @@ func (ec *executionContext) _Mutation_addOrderItem(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeOrderItem(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1033,10 +1166,10 @@ func (ec *executionContext) _Mutation_removeOrderItem(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_receiveOrderItem(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1066,10 +1199,10 @@ func (ec *executionContext) _Mutation_receiveOrderItem(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_modifyRequestedQuantity(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1099,10 +1232,76 @@ func (ec *executionContext) _Mutation_modifyRequestedQuantity(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createProject_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateProject(rctx, args["input"].(models.CreateProject))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*supply.Project)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_closeProject(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_closeProject_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CloseProject(rctx, args["input"].(models.CloseProject))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*supply.Project)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_orderID(ctx context.Context, field graphql.CollectedField, obj *supply.Order) graphql.Marshaler {
@@ -1143,7 +1342,7 @@ func (ec *executionContext) _Order_projectID(ctx context.Context, field graphql.
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ProjectID, nil
+		return ec.resolvers.Order().ProjectID(rctx, obj)
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1313,6 +1512,58 @@ func (ec *executionContext) _Product_uom(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Project_projectID(ctx context.Context, field graphql.CollectedField, obj *supply.Project) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Project",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().ProjectID(rctx, obj)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_name(ctx context.Context, field graphql.CollectedField, obj *supply.Project) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Project",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ProjectOrder_orderID(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrder) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -1462,6 +1713,39 @@ func (ec *executionContext) _Query_products(ctx context.Context, field graphql.C
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNResult2ᚕfieldᚋsupplyᚋsearchᚐResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_projects_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Projects(rctx, args["foremanID"].(string))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]supply.Project)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNProject2ᚕfieldᚋsupplyᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2456,6 +2740,24 @@ func (ec *executionContext) unmarshalInputAddOrderItem(ctx context.Context, v in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCloseProject(ctx context.Context, v interface{}) (models.CloseProject, error) {
+	var it models.CloseProject
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "projectID":
+			var err error
+			it.ProjectID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateOrder(ctx context.Context, v interface{}) (models.CreateOrder, error) {
 	var it models.CreateOrder
 	var asMap = v.(map[string]interface{})
@@ -2471,6 +2773,36 @@ func (ec *executionContext) unmarshalInputCreateOrder(ctx context.Context, v int
 		case "projectID":
 			var err error
 			it.ProjectID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateProject(ctx context.Context, v interface{}) (models.CreateProject, error) {
+	var it models.CreateProject
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "projectID":
+			var err error
+			it.ProjectID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2662,6 +2994,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "createProject":
+			out.Values[i] = ec._Mutation_createProject(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "closeProject":
+			out.Values[i] = ec._Mutation_closeProject(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2690,10 +3032,19 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 				invalid = true
 			}
 		case "projectID":
-			out.Values[i] = ec._Order_projectID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Order_projectID(ctx, field, obj)
+				if res == graphql.Null {
+					invalid = true
+				}
+				return res
+			})
 		case "items":
 			out.Values[i] = ec._Order_items(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2743,6 +3094,47 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "uom":
 			out.Values[i] = ec._Product_uom(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectImplementors = []string{"Project"}
+
+func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *supply.Project) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, projectImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	invalid := false
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Project")
+		case "projectID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_projectID(ctx, field, obj)
+				if res == graphql.Null {
+					invalid = true
+				}
+				return res
+			})
+		case "name":
+			out.Values[i] = ec._Project_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2841,6 +3233,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_products(ctx, field)
+				if res == graphql.Null {
+					invalid = true
+				}
+				return res
+			})
+		case "projects":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_projects(ctx, field)
 				if res == graphql.Null {
 					invalid = true
 				}
@@ -3160,8 +3566,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return graphql.MarshalBoolean(v)
 }
 
+func (ec *executionContext) unmarshalNCloseProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCloseProject(ctx context.Context, v interface{}) (models.CloseProject, error) {
+	return ec.unmarshalInputCloseProject(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNCreateOrder2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateOrder(ctx context.Context, v interface{}) (models.CreateOrder, error) {
 	return ec.unmarshalInputCreateOrder(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCreateProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateProject(ctx context.Context, v interface{}) (models.CreateProject, error) {
+	return ec.unmarshalInputCreateProject(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
@@ -3284,6 +3698,57 @@ func (ec *executionContext) marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx context.
 		return graphql.Null
 	}
 	return ec._Order(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProject2fieldᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v supply.Project) graphql.Marshaler {
+	return ec._Project(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProject2ᚕfieldᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v []supply.Project) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProject2fieldᚋsupplyᚐProject(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v *supply.Project) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Project(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProjectOrder2fieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v ordering.ProjectOrder) graphql.Marshaler {

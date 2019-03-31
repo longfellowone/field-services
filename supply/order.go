@@ -19,21 +19,26 @@ type OrderRepository interface {
 }
 
 type Order struct {
-	OrderID   string
-	ProjectID string
-	Items     []*Item
-	SentDate  int64
-	Status    OrderStatus
+	OrderID string
+	Project
+	Items    []*Item
+	SentDate int64
+	Status   OrderStatus
+	Comments string
 }
 
 // Returns a new *Order
-func Create(id, pid string) *Order {
+func Create(id, pid, name, foreman, email string) *Order {
 	return &Order{
-		OrderID:   id,
-		ProjectID: pid,
-		Items:     []*Item{},
-		SentDate:  time.Now().Unix(),
-		Status:    New,
+		OrderID: id,
+		Project: Project{
+			ID:           pid,
+			Name:         name,
+			ForemanEmail: email,
+		},
+		Items:    []*Item{},
+		SentDate: time.Now().Unix(),
+		Status:   New,
 	}
 }
 

@@ -9,9 +9,19 @@ type AddOrderItem struct {
 	Uom       string `json:"uom"`
 }
 
+type CloseProject struct {
+	ProjectID string `json:"projectID"`
+}
+
 type CreateOrder struct {
 	OrderID   string `json:"orderID"`
 	ProjectID string `json:"projectID"`
+	Name      string `json:"name"`
+}
+
+type CreateProject struct {
+	ProjectID string `json:"projectID"`
+	Name      string `json:"name"`
 }
 
 type ModifyQuantity struct {

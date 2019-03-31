@@ -1,45 +1,146 @@
 -- Adminer 4.7.1 PostgreSQL dump
 
+\connect "default";
+
 DROP TABLE IF EXISTS "order_items";
 CREATE TABLE "public"."order_items" (
-    "orderid" character varying(36) NOT NULL,
-    "productid" character varying(36) NOT NULL,
-    "name" character varying(50) NOT NULL,
-    "uom" character varying(3) NOT NULL,
-    "requested" integer NOT NULL,
-    "received" integer NOT NULL,
-    "remaining" integer NOT NULL,
-    "status" integer NOT NULL,
-    "ponumber" character varying(20) NOT NULL,
-    "dateadded" integer NOT NULL,
-    CONSTRAINT "order_items_orderid_productid_unique" UNIQUE ("orderid", "productid"),
-    CONSTRAINT "order_items_orders_orderid_fk" FOREIGN KEY (orderid) REFERENCES orders(orderid) NOT DEFERRABLE
+                                        "orderid" character varying(36) NOT NULL,
+                                        "productid" character varying(36) NOT NULL,
+                                        "name" character varying(50) NOT NULL,
+                                        "uom" character varying(3) NOT NULL,
+                                        "requested" integer NOT NULL,
+                                        "received" integer NOT NULL,
+                                        "remaining" integer NOT NULL,
+                                        "status" integer NOT NULL,
+                                        "ponumber" character varying(20) NOT NULL,
+                                        "dateadded" integer NOT NULL,
+                                        CONSTRAINT "order_items_orderid_productid_unique" UNIQUE ("orderid", "productid"),
+                                        CONSTRAINT "order_items_orders_orderid_fk" FOREIGN KEY (orderid) REFERENCES orders(orderid) NOT DEFERRABLE
 ) WITH (oids = false);
 
 CREATE INDEX "order_items_orderid_index" ON "public"."order_items" USING btree ("orderid");
 
+INSERT INTO "order_items" ("orderid", "productid", "name", "uom", "requested", "received", "remaining", "status", "ponumber", "dateadded") VALUES
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'17a2479b-2ab5-4caa-a392-bb5247b73c16',	'EMT 4"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553737839),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'43792b07-bbfd-4058-a8b5-d07c655a3b3a',	'LV OCC Switch',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744776),
+('3aedd656-0978-4204-b377-635ec971d691',	'0180a045-f829-4f48-a949-57742c9d617b',	'FLEX 2-1/2"',	'ft',	200,	'0',	'0',	'0',	'N/A',	1553739607),
+('3aedd656-0978-4204-b377-635ec971d691',	'4976bc7d-e0b1-49cf-aa86-24337df86476',	'1/2" Nut',	'ea',	100,	'0',	'0',	'0',	'N/A',	1553739589),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'056b4f57-7a4d-4f0b-86c7-6249459b20f4',	'DB2 3" Sweep',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744719),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'37e2d700-99d4-406f-8e5d-e2bb57a59088',	'AA Battery',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744717),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'bcc37e31-8f19-4fcd-a624-2a46eef89d81',	'4" PVC TA + Locknuts',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744562),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'80c59dfa-1208-41b3-88a3-29bc23fceb95',	'EMT 2-1/2"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744557),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'aeb6cb7e-896d-4193-a4a1-54a4d9bc68bd',	'Deep Octagon box',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744553),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'fc513eb7-861d-4be9-b6b4-4ac5e03cffbe',	'14/3 SOOW',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744548),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'523f11e4-6d7c-4911-977a-e58f33717390',	'AA Batteries',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744543),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'17a2479b-2ab5-4caa-a392-bb5247b73c16',	'EMT 4"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744539),
+('3aedd656-0978-4204-b377-635ec971d691',	'8516a0cb-993f-4e23-9aab-0bc321a15d67',	'LV OCC Wall switch',	'ea',	1,	'0',	'0',	'0',	'N/A',	1553737905),
+('3aedd656-0978-4204-b377-635ec971d691',	'95ff6cdb-b3ca-4dbd-bcee-9e9a05bdbe87',	'Wet hand wipes',	'ea',	1,	'0',	'0',	'0',	'N/A',	1553737893),
+('3aedd656-0978-4204-b377-635ec971d691',	'd144b1de-8c9d-43ad-a126-3af4789a133b',	'Twine',	'ft',	5000,	'0',	'0',	'0',	'N/A',	1553737888),
+('3aedd656-0978-4204-b377-635ec971d691',	'9f3e6688-e31d-47d9-b4b7-b5bfaf31a136',	'Torq SS721Z in-wall timer',	'ea',	2,	'0',	'0',	'0',	'N/A',	1553737882),
+('3aedd656-0978-4204-b377-635ec971d691',	'48e450a8-aa10-4f0b-ac56-07c09d349ff2',	'1/2" SDS bit',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916690),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'b61397ff-d788-47d4-ba0e-a461590a0db8',	'3/4" KT90',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553737705),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'49d64281-7c3f-4a11-8802-5a05b97df96f',	'12/3 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553737699),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'9a3d63e9-a1bc-46cc-9581-1c73a3c0981b',	'1" EMT connector w/ Insulated throat',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744143),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'03f99233-6095-4c5b-a032-006c87e0fcca',	'Strongtie RSV37112 - Rod/Steel',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553739667),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7330109c-bb47-45b4-bee0-ffa7614195af',	'1" KT90',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553739628),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'471c8974-928b-4b61-abcf-d4a3aff31491',	'3/4" EMT connector w/ Insulated throat',	'ea',	699,	'0',	'0',	'0',	'N/A',	1553737932),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'585a0df1-e37c-4094-9f55-81f61b0d5178',	'3/8" Threaded rod',	'ft',	69,	'0',	'0',	'0',	'N/A',	1553737925),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'10d39950-9e46-4aee-bebc-df510698c01f',	'Sunscreen',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553917370),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'b76dffbc-5f8e-4b52-b9eb-a198bfd92ac7',	'4" Chase nipple + 1 Locknut',	'ea',	69,	'0',	'0',	'0',	'N/A',	1553737921),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7ae67fe7-1bbe-4142-963a-c4c49af22f98',	'1/2" EMT connector w/ Insulated throat',	'ea',	169,	'0',	'0',	'0',	'N/A',	1553737256),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'a798b777-03c7-44a5-babe-806c921de07e',	'1/2" P Clamp',	'ea',	2500,	'0',	'0',	'0',	'N/A',	1553736882),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'2e19613f-ea93-4cd8-b574-ffefe51cc15a',	'EMT 2"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553737843),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'751dc94a-9ac5-4f06-b8f9-711a096ffd9b',	'1/2 Wedge anchor 5-1/2"',	'ea',	3000,	'0',	'0',	'0',	'N/A',	1553736878),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'506ed5b6-2242-4cd6-a984-96d316b9f6db',	'1/2" LB',	'ea',	2000,	'0',	'0',	'0',	'N/A',	1553736793),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'69d3fe1d-c365-4e3c-8036-01eea67562b6',	'Headlight',	'ea',	90,	'0',	'0',	'0',	'N/A',	1553736061),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'b5c52d9a-8cd4-48de-bedc-8ea91fdf0da0',	'Carpenter pencil',	'ea',	30,	'0',	'0',	'0',	'N/A',	1553736032),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'2e19613f-ea93-4cd8-b574-ffefe51cc15a',	'EMT 2"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553916426),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'e1012371-09c3-4b37-a5e0-e06afea1425c',	'3/4" LB',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916393),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'58e3d4f6-7e39-4067-b848-b001aeb4619b',	'#8 Copper',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553745017),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'83ae7276-0945-469a-a9cc-59e25da1b06c',	'T&B SSF-CM535',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553745015),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7f06b820-5da6-415a-a8e4-f6ab62676223',	'1/8" Rope',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553745012),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7addc32d-97c7-442c-9154-476fc510b2e6',	'Roll tie wire',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553745009),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'bac52703-b5ed-42da-bef9-07a730471af4',	'10/4 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553745004),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'd144b1de-8c9d-43ad-a126-3af4789a133b',	'Twine',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744870),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'6a8066a7-9e28-411a-a77f-67348a863e24',	'1-1/4" PVC TA + Locknuts',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744840),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'4976bc7d-e0b1-49cf-aa86-24337df86476',	'1/2" Nut',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553980059),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'a74d73fa-f4b7-45bd-bc9a-23f4661f5049',	'15a bolt on breaker',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553740428),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'650c2cf0-1fba-4c5d-ac82-61723fff2fbf',	'#8 x 2-1/2" screw',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553740368),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'db4f3478-e412-4558-bd89-f60e507f1d84',	'EMT 1/2"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744837),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'66c5f29f-d084-4b39-8e3c-e7c7855673f1',	'Milwaukee 49-56-9285',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744833),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'0b5e345d-6524-4eb2-a420-87a108f4faad',	'8 port wago',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744830),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'88ce3176-12d0-4628-bfb4-cbb11b73b5d3',	'1/2" EMT coupling',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553740291),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'506ed5b6-2242-4cd6-a984-96d316b9f6db',	'1/2" LB',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553980062),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'06447fc6-ca7c-4366-ba78-d48d514ac1d4',	'Masons string reel',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744754),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'ede8495a-90cf-4369-bd2d-e252a8409ae5',	'2" PVC TA + Locknuts',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744750),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'a08c8061-519c-479f-9b38-a971b4a9ffa2',	'Male cord end',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744743),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'4406e1d7-0102-4670-b933-15ab60275d9a',	'AAA Batteries',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744737),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'efdcea77-5af5-4072-a1ed-fd2168dcf921',	'12/4 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744730),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'15842504-8292-4dbe-8931-22e52232151e',	'Milwaukee Inkzall',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744726),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'4c00de8f-0ada-4b1b-b043-1385a0815f16',	'6/2 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744723),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'fc9e4727-dd80-4224-a31a-cf92bd4c7793',	'4'' T8 3500K',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553738022),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'8cf51e78-8220-4308-823c-ed3ae39da600',	'FA Smoke',	'ea',	369,	'0',	'0',	'0',	'N/A',	1553738007),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'b3d3f045-470f-47b4-913d-6c10b805fdec',	'Thermostat for baseboard heater',	'ea',	699,	'0',	'0',	'0',	'N/A',	1553738004),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'fbf2670c-58ca-4aef-a196-75a8172328f4',	'Caddy CJ6',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553738000),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'eb3d1400-6baf-44e8-91c2-79da0e3b902b',	'Decora rocker switch with 0-10v dimming',	'ea',	969969,	'0',	'0',	'0',	'N/A',	1553737265),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'17a32c5a-1093-452c-8726-65ab88036f8d',	'Twin connectors',	'ea',	25,	'0',	'0',	'0',	'N/A',	1553736020),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'a68007bd-c429-487f-91f3-3aeb67fde317',	'FLEX 4"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553744020),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'33e8dcc0-8e61-4e0a-8c28-d0e8feecff63',	'3G Deep masonry box',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916496),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'f4d1bf3e-3cf9-4404-8a2a-6a480088db91',	'500'' Florescent Green masons line',	'ea',	56,	'0',	'0',	'0',	'N/A',	1553916493),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'd99c9554-3bab-4b3e-a42b-f5ca21b5b37f',	'Green fluorescent marking paint',	'ea',	108,	'0',	'0',	'0',	'N/A',	1553916487),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'4bac5f0c-3892-42b8-9b1e-29d8f68ba230',	'Blue wire connectors',	'ea',	32,	'0',	'0',	'0',	'N/A',	1553916470),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'a5e61fac-f3d9-4f90-984e-c32218d56b1a',	'FA Strobe',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916464),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7be64998-2636-4ceb-8366-e4fc3a89fb1f',	'FA Duct smoke',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916462),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'caac6272-31e5-4379-bbcb-312f418f600d',	'FA Isolator',	'ea',	3456,	'0',	'0',	'0',	'N/A',	1553916460),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'68b3a426-5ffa-4100-89cd-b7f55455b796',	'1/2" Flat washer',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916457),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'c78e5deb-e34a-4708-81d3-2478bada3fdf',	'3/8" Flat washer',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916454),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'837566fa-c2c7-4f20-abe0-5ff48752fcaa',	'1/2" Fender washer',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916450),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'd68d9542-7979-4ddd-9acf-c006cd59e76a',	'1/4" Fender washer',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916447),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'e11760db-2730-4b17-a65c-c829e6fe0f79',	'3/8" Fender washer',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916444),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'75e0d66d-5dc2-4676-ba9e-478130d4f5f2',	'1/4" Nut',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553916434),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'838b7a96-0cbc-4485-b5f6-f5afc8546c96',	'#0 Antishort',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744906),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'5a5a5f8f-28c1-461c-9ce7-ad2d05569698',	'100 Pack laminator sheets',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744901),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'141df9af-cef5-46e1-97eb-395f69740f60',	'5-50R + Coverplate',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553817423),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'3eb8fa00-6e4e-4810-8df8-1a4ce4f0dab5',	'Octagon wrap box',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553817419),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'43792b07-bbfd-4058-a8b5-d07c655a3b3a',	'LV OCC Switch',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553817415),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'ee0be742-0122-4b03-a0d9-65abd0e691e8',	'1-1/2" PVC 45',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744895),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'eb8c62cd-9bd0-4a1f-b60e-e5e5f310237b',	'18 tpi hacksaw blade',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744886),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'08af36fb-5fde-4731-983d-ddd3f2db71a4',	'2" 6/32 Screw',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744076),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'c686942a-0adb-4757-a7ab-08208d46694f',	'FA EOL',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553817412),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'9f3e6688-e31d-47d9-b4b7-b5bfaf31a136',	'Torq SS721Z in-wall timer',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744066),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'0180a045-f829-4f48-a949-57742c9d617b',	'FLEX 2-1/2"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553817408),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'1bda9559-1518-431d-bbc5-75c14d3169b9',	'Screw on plastic zip tie mounts',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1553744060),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'540a60fd-b74b-46c9-b64b-6f011b146855',	'EMT 3/4"',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1553817397),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'aea15eeb-44ec-4bc7-92d5-c37b8adf2b33',	'4 Pole 347v Lighting contactor',	'ea',	69,	'0',	'0',	'0',	'N/A',	1553736011),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'4976bc7d-e0b1-49cf-aa86-24337df86476',	'1/2" Nut',	'ea',	669,	'0',	'0',	'0',	'N/A',	1553735974);
+
 DROP TABLE IF EXISTS "orders";
 CREATE TABLE "public"."orders" (
-    "orderid" character varying(36) NOT NULL,
-    "projectid" character varying(36) NOT NULL,
-    "sentdate" integer NOT NULL,
-    "status" integer NOT NULL,
-    CONSTRAINT "orders_pk" PRIMARY KEY ("orderid")
+                                   "orderid" character varying(36) NOT NULL,
+                                   "projectid" character varying(36) NOT NULL,
+                                   "sentdate" integer NOT NULL,
+                                   "status" integer NOT NULL,
+                                   "project_name" character varying(80) NOT NULL,
+                                   "foreman_email" character varying(80) NOT NULL,
+                                   "comments" character varying(3000) NOT NULL,
+                                   CONSTRAINT "orders_pk" PRIMARY KEY ("orderid")
 ) WITH (oids = false);
 
-INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status") VALUES
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186511,	'0'),
-('3aedd656-0978-4204-b377-635ec971d691',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186573,	'0'),
-('88d98a36-3257-4bad-9cfd-ba3ea23b971e',	'072da62a-1c83-4670-b5b9-e8677653c2c2',	1552256702,	'0'),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186855,	'0');
+INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status", "project_name", "foreman_email", "comments") VALUES
+('a198f009-173b-4ac3-9d41-df7001090bde',	'3a63592f-22bf-4d8e-af66-c31e77c0f624',	1552186577,	'0',	'Project Name 3',	'email@email.com',	''),
+('3f9615cf-edc3-4528-8f47-052f093bbb14',	'9f84f49a-5428-40c0-8798-7f7d2d6ab1a6',	1552186588,	'0',	'Old Project',	'mattwright3195@gmail.com',	''),
+('88d98a36-3257-4bad-9cfd-ba3ea23b971e',	'072da62a-1c83-4670-b5b9-e8677653c2c2',	1552256702,	'0',	'St. Thomas',	'mattwright3195@gmail.com',	''),
+('7e55aa12-2e6a-4f21-b01a-09503c755180',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186511,	'0',	'Argyle',	'mattwright3195@gmail.com',	''),
+('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186855,	'0',	'Argyle',	'mattwright3195@gmail.com',	''),
+('3aedd656-0978-4204-b377-635ec971d691',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186573,	'0',	'Argyle',	'mattwright3195@gmail.com',	'');
 
 DROP TABLE IF EXISTS "products";
 CREATE TABLE "public"."products" (
-    "productid" character varying(36) NOT NULL,
-    "category" character varying(30) NOT NULL,
-    "name" character varying(50) NOT NULL,
-    "uom" character varying(3) NOT NULL,
-    CONSTRAINT "products_pkey" PRIMARY KEY ("productid")
+                                     "productid" character varying(36) NOT NULL,
+                                     "category" character varying(30) NOT NULL,
+                                     "name" character varying(50) NOT NULL,
+                                     "uom" character varying(3) NOT NULL,
+                                     CONSTRAINT "products_pkey" PRIMARY KEY ("productid")
 ) WITH (oids = false);
 
 INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
@@ -836,4 +937,20 @@ INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('2b7902f5-af18-4ff5-853b-71ff565e03bd',	'Consumables',	'Black paint marker',	'ea'),
 ('d6026ac7-ef83-4321-8b66-a71437d5d125',	'Consumables',	'Box black nitrile gloves - XL',	'ea');
 
--- 2019-03-11 01:21:35.36718+00
+DROP TABLE IF EXISTS "projects";
+CREATE TABLE "public"."projects" (
+                                     "projectid" character varying(36) NOT NULL,
+                                     "name" character varying(80) NOT NULL,
+                                     "foreman" character varying(36) NOT NULL,
+                                     "foreman_email" character varying(80) NOT NULL,
+                                     "active" boolean DEFAULT true,
+                                     CONSTRAINT "projects_pk" PRIMARY KEY ("projectid")
+) WITH (oids = false);
+
+INSERT INTO "projects" ("projectid", "name", "foreman", "foreman_email", "active") VALUES
+('cf510766-faf7-415e-a067-0c5ae5cb2ae8',	'Argyle',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'1'),
+('072da62a-1c83-4670-b5b9-e8677653c2c2',	'St. Thomas',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'1'),
+('3a63592f-22bf-4d8e-af66-c31e77c0f624',	'Project Name 3',	'auth0|000000000000000000000000',	'email@email.com',	'1'),
+('9f84f49a-5428-40c0-8798-7f7d2d6ab1a6',	'Old Project',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0');
+
+-- 2019-03-31 19:11:10.014324+00

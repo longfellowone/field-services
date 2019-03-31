@@ -18,8 +18,8 @@ func NewOrderRepository(db *sql.DB) *OrderRepository {
 
 const saveOrder = `
 	INSERT INTO orders
-		(orderid, projectid, sentdate, status)
-	VALUES ($1, $2, $3, $4)
+		(orderid, projectid, project_name, foreman_email, sentdate, status, comments)
+	VALUES ($1, $2, $3, $4, $5, $6, $7)
 	ON CONFLICT ON CONSTRAINT orders_pk
 	DO UPDATE SET 
 		projectid=EXCLUDED.projectid,
@@ -47,7 +47,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(saveOrder, o.OrderID, o.ProjectID, o.SentDate, o.Status)
+	_, err = tx.Exec(saveOrder, o.OrderID, o.Project.ID, o.Name, o.ForemanEmail, o.SentDate, o.Status, o.Comments)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 }
 
 const findOrder = `
-	SELECT orderid,projectid,sentdate,status 
+	SELECT orderid, projectid, project_name, foreman_email, sentdate, status, comments
 	FROM orders 
 	WHERE orderid=$1`
 
@@ -103,7 +103,15 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 		return &supply.Order{}, err
 	}
 
-	err = tx.QueryRow(findOrder, id).Scan(&o.OrderID, &o.ProjectID, &o.SentDate, &o.Status)
+	err = tx.QueryRow(findOrder, id).Scan(
+		&o.OrderID,
+		&o.Project.ID,
+		&o.Name,
+		&o.ForemanEmail,
+		&o.SentDate,
+		&o.Status,
+		&o.Comments)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Println(err)
@@ -131,6 +139,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 			&i.ItemStatus,
 			&i.PONumber,
 			&i.DateAdded)
+
 		if err != nil {
 			return &supply.Order{}, err
 		}
@@ -151,7 +160,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 const findOrderDates = `
 	SELECT orderid, sentdate, status
 	FROM orders
-	WHERE projectid = $1`
+	WHERE projectid=$1`
 
 func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, error) {
 	orders := make([]ordering.ProjectOrder, 0)

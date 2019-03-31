@@ -1,15 +1,20 @@
 type Mutation {
-    createOrder(input: CreateOrder!): Boolean!
-    sendOrder(input: SendOrder!): Boolean!
-    addOrderItem(input: AddOrderItem!): Boolean!
-    removeOrderItem(input: RemoveOrderItem!): Boolean!
-    receiveOrderItem(input: ModifyQuantity!): Boolean!
-    modifyRequestedQuantity(input: ModifyQuantity!): Boolean!
+    # Orders
+    createOrder(input: CreateOrder!): Order!
+    sendOrder(input: SendOrder!): Order!
+    addOrderItem(input: AddOrderItem!): Order!
+    removeOrderItem(input: RemoveOrderItem!): Order!
+    receiveOrderItem(input: ModifyQuantity!): Order!
+    modifyRequestedQuantity(input: ModifyQuantity!): Order!
+    # Projects
+    createProject(input: CreateProject!): Project!
+    closeProject(input: CloseProject!): Project!
 }
 
 input CreateOrder {
     orderID: ID!
     projectID: String!
+    name: String!
 }
 
 input SendOrder {
@@ -34,10 +39,22 @@ input ModifyQuantity {
     quantity: Int!
 }
 
+input CreateProject {
+    projectID: ID!
+    name: String!
+}
+
+input CloseProject {
+    projectID: ID!
+}
+
 type Query {
+    # Orders
     order(orderID: ID!): Order!
     projectOrders(projectID: ID!): [ProjectOrder!]!
     products(name: String!): [Result!]!
+    # Projects
+    projects(foremanID: ID!): [Project!]!
 }
 
 type Result {
@@ -77,6 +94,11 @@ type Item {
     quantityRemaining: Int!
     #    ItemStatus: ItemStatus!
     poNumber: String!
+}
+
+type Project {
+    projectID: ID!
+    name: String!
 }
 
 #enum ItemStatus {

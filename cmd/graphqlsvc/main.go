@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"field/supply/auth"
 	"field/supply/graphql"
 	"field/supply/ordering"
 	"field/supply/postgres"
@@ -27,8 +26,9 @@ func main() {
 
 	orderRepository := postgres.NewOrderRepository(db)
 	productRepository := postgres.NewProductRepository(db)
+	projectRepository := postgres.NewProjectRepository(db)
 
-	orderingService := ordering.NewOrderingService(orderRepository)
+	orderingService := ordering.NewOrderingService(orderRepository, projectRepository)
 	searchService := search.NewSearchService(productRepository)
 
 	r := chi.NewRouter()
@@ -39,7 +39,7 @@ func main() {
 		AllowCredentials: true,
 	}).Handler)
 
-	r.Use(auth.Middleware())
+	//r.Use(auth.Middleware())
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 
