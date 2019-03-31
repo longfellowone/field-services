@@ -34,10 +34,9 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedHeaders: []string{"Authorization", "Content-Type"},
-		//AllowCredentials: true,
-		//Debug:          true,
+		AllowedOrigins:   []string{"*"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
 	}).Handler)
 
 	r.Use(auth.Middleware())

@@ -4,11 +4,9 @@ package graphql
 import (
 	"context"
 	"field/supply"
-	"field/supply/auth"
 	"field/supply/graphql/models"
 	"field/supply/ordering"
 	"field/supply/search"
-	"fmt"
 	"github.com/99designs/gqlgen/handler"
 	"net/http"
 )
@@ -87,15 +85,16 @@ func (r *queryResolver) Order(ctx context.Context, orderID string) (*supply.Orde
 	return order, nil
 }
 func (r *queryResolver) ProjectOrders(ctx context.Context, projectID string) ([]ordering.ProjectOrder, error) {
-	user := auth.ForContext(ctx)
+	//user := auth.ForContext(ctx)
 
-	fmt.Println(user)
-
-	if user := auth.ForContext(ctx); user == nil {
-		return []ordering.ProjectOrder{}, fmt.Errorf("Access denied")
+	//if user := auth.ForContext(ctx); user == nil || !user.IsPurchaser {
+	//	return []ordering.ProjectOrder{}, fmt.Errorf("Access denied")
+	//}
+	orders, err := r.osvc.FindProjectOrderDates(projectID)
+	if err != nil {
+		return []ordering.ProjectOrder{}, err
 	}
-
-	return r.osvc.FindProjectOrderDates(projectID), nil
+	return orders, nil
 }
 func (r *queryResolver) Products(ctx context.Context, name string) ([]search.Result, error) {
 	return r.ssvc.ProductSearch(name), nil

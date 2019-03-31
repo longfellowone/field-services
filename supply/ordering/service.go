@@ -2,7 +2,6 @@ package ordering
 
 import (
 	"field/supply"
-	"log"
 )
 
 type Service interface {
@@ -13,7 +12,7 @@ type Service interface {
 	SendOrder(orderid string) error
 	ReceiveOrderItem(orderid, productid string, quantity int) error
 	FindOrder(orderid string) (*supply.Order, error)
-	FindProjectOrderDates(projectid string) []ProjectOrder
+	FindProjectOrderDates(projectid string) ([]ProjectOrder, error)
 }
 
 type orderRepository interface {
@@ -145,11 +144,10 @@ type ProjectOrder struct {
 	Status   supply.OrderStatus
 }
 
-func (s *service) FindProjectOrderDates(projectid string) []ProjectOrder {
+func (s *service) FindProjectOrderDates(projectid string) ([]ProjectOrder, error) {
 	orders, err := s.order.FindDates(projectid)
 	if err != nil {
-		log.Println(err)
-		return []ProjectOrder{}
+		return []ProjectOrder{}, err
 	}
-	return orders
+	return orders, nil
 }

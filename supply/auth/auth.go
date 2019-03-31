@@ -55,11 +55,11 @@ var jwtToken = jwtmiddleware.New(jwtmiddleware.Options{
 	},
 })
 
-var userCtxKey = &contextKey{"user"}
-
 type contextKey struct {
 	name string
 }
+
+var userCtxKey = &contextKey{"user"}
 
 func Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -93,36 +93,36 @@ func ForContext(ctx context.Context) *supply.User {
 }
 
 type CustomClaims struct {
-	Scope  string `json:"scope"`
 	UserID string `json:"sub"`
 	Email  string `json:"https://localhost/email"`
+	Scope  string `json:"scope"`
 	jwt.StandardClaims
 }
 
 func populateUserDetails(tokenString string) *supply.User {
 	token, _ := jwt.ParseWithClaims(tokenString, &CustomClaims{}, nil)
 	claims, _ := token.Claims.(*CustomClaims)
+	scopes := strings.Split(claims.Scope, " ")
 
 	user := &supply.User{
 		ID:          claims.UserID,
 		Email:       claims.Email,
-		IsForeman:   checkScope("create:orders", claims),
-		IsPurchaser: checkScope("manage:orders", claims),
+		IsForeman:   checkScope("create:orders", scopes),
+		IsPurchaser: checkScope("manage:orders", scopes),
 	}
 
 	fmt.Println(user)
 	return user
 }
 
-func checkScope(scope string, claims *CustomClaims) bool {
-	hasScope := false
-	result := strings.Split(claims.Scope, " ")
-	for i := range result {
-		if result[i] == scope {
-			hasScope = true
+func checkScope(scope string, scopes []string) bool {
+	ok := false
+	for i := range scopes {
+		if scopes[i] == scope {
+			ok = true
 		}
 	}
-	return hasScope
+	return ok
 }
 
 func getPemCert(token *jwt.Token) (string, error) {
