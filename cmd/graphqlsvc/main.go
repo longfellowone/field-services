@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"field/supply/auth"
 	"field/supply/graphql"
 	"field/supply/ordering"
 	"field/supply/postgres"
@@ -39,7 +40,7 @@ func main() {
 		AllowCredentials: true,
 	}).Handler)
 
-	//r.Use(auth.Middleware())
+	r.Use(auth.Middleware())
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 
