@@ -47,7 +47,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(saveOrder, o.OrderID, o.Project.ID, o.Name, o.ForemanEmail, o.SentDate, o.Status, o.Comments)
+	_, err = tx.Exec(saveOrder, o.ID, o.Project.ID, o.Name, o.ForemanEmail, o.SentDate, o.Status, o.Comments)
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,8 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 
 	for _, item := range o.Items {
 		_, err = stmt.Exec(
-			o.OrderID,
-			item.ProductID,
+			o.ID,
+			item.ID,
 			item.Name,
 			item.UOM,
 			item.QuantityRequested,
@@ -104,7 +104,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	}
 
 	err = tx.QueryRow(findOrder, id).Scan(
-		&o.OrderID,
+		&o.ID,
 		&o.Project.ID,
 		&o.Name,
 		&o.ForemanEmail,
@@ -130,7 +130,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	for rows.Next() {
 		var i supply.Item
 		err := rows.Scan(
-			&i.ProductID,
+			&i.ID,
 			&i.Name,
 			&i.UOM,
 			&i.QuantityRequested,
@@ -173,7 +173,7 @@ func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, 
 
 	for rows.Next() {
 		var o ordering.ProjectOrder
-		err := rows.Scan(&o.OrderID, &o.SentDate, &o.Status)
+		err := rows.Scan(&o.ID, &o.SentDate, &o.Status)
 		if err != nil {
 			return []ordering.ProjectOrder{}, nil
 		}

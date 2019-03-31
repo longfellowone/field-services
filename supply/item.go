@@ -6,7 +6,7 @@ import (
 )
 
 type Item struct {
-	ProductID         string
+	ID                string
 	Name              string
 	UOM               string
 	QuantityRequested int
@@ -20,7 +20,7 @@ type Item struct {
 // Returns a new *Item
 func newItem(id, name, uom string) *Item {
 	return &Item{
-		ProductID:  id,
+		ID:         id,
 		Name:       name,
 		UOM:        uom,
 		ItemStatus: Waiting,

@@ -12,81 +12,82 @@ type Mutation {
 }
 
 input CreateOrder {
-    orderID: ID!
+    id: ID!
     projectID: String!
     name: String!
 }
 
 input SendOrder {
-    orderID: ID!
+    id: ID!
 }
 
 input AddOrderItem {
-    orderID: ID!
+    id: ID!
     productID: String!
     name: String!
     uom: String!
 }
 
 input RemoveOrderItem {
-    orderID: ID!
+    id: ID!
     productID: String!
 }
 
 input ModifyQuantity {
-    orderID: ID!
+    id: ID!
     productID: String!
     quantity: Int!
 }
 
 input CreateProject {
-    projectID: ID!
+    id: ID!
     name: String!
 }
 
 input CloseProject {
-    projectID: ID!
+    id: ID!
 }
 
 type Query {
     # Orders
-    order(orderID: ID!): Order!
-    projectOrders(projectID: ID!): [ProjectOrder!]!
+    order(id: ID!): Order!
+    projectOrders(id: ID!): [ProjectOrder!]!
     products(name: String!): [Result!]!
     # Projects
     projects(foremanID: ID!): [Project!]!
 }
 
 type Result {
-    ID: ID!
+    id: ID!
     name: String!
     uom: String!
     matchedIndexes: [Int!]!
 }
 
 type Product {
-    ID: ID!
+    id: ID!
     category: String!
     name: String!
     uom: String!
 }
 
 type ProjectOrder {
-    orderID: ID!
+    id: ID!
     sentDate: Int!
     #    status: String!
 }
 
 type Order {
-    orderID: ID!
-    projectID: String!
+    id: ID!
+    project: Project!
     items: [Item!]!
     sentDate: Int!
+    comments: String!
     #    status: String!
 }
 
 type Item {
-    productID: ID!
+    id: ID!
     name: String!
     uom: String!
     quantityRequested: Int!
@@ -97,7 +98,7 @@ type Item {
 }
 
 type Project {
-    projectID: ID!
+    id: ID!
     name: String!
 }
 

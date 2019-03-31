@@ -48,7 +48,7 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 		return err
 	}
 
-	filter := bson.D{{Key: "orderid", Value: o.OrderID}}
+	filter := bson.D{{Key: "orderid", Value: o.ID}}
 	opts := options.Replace().SetUpsert(true)
 
 	_, err = r.coll.ReplaceOne(context.TODO(), filter, order, opts)

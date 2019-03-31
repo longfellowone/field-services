@@ -87,9 +87,12 @@ func Middleware() func(http.Handler) http.Handler {
 	}
 }
 
-func ForContext(ctx context.Context) *supply.User {
-	raw, _ := ctx.Value(userCtxKey).(*supply.User)
-	return raw
+func ForContext(ctx context.Context) (*supply.User, error) {
+	raw, ok := ctx.Value(userCtxKey).(*supply.User)
+	if !ok {
+		return &supply.User{}, errors.New("user not found in context")
+	}
+	return raw, nil
 }
 
 type CustomClaims struct {

@@ -23,7 +23,7 @@ func TestCreate(t *testing.T) {
 			pid: "pid1",
 		},
 		want: &supply.Order{
-			OrderID:   "oid1",
+			ID:        "oid1",
 			ProjectID: "pid1",
 			Items:     []*supply.Item{},
 			SentDate:  time.Now().Unix(),
@@ -56,10 +56,10 @@ func TestOrder_AddItem(t *testing.T) {
 		name: "must add item to order",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
-				Name:      "EMT Conduit",
-				UOM:       "ft",
-				PONumber:  "N/A",
+				ID:       "pid1",
+				Name:     "EMT Conduit",
+				UOM:      "ft",
+				PONumber: "N/A",
 			}},
 		},
 		args: args{
@@ -69,15 +69,15 @@ func TestOrder_AddItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
-				Name:      "EMT Conduit",
-				UOM:       "ft",
-				PONumber:  "N/A",
+				ID:       "pid1",
+				Name:     "EMT Conduit",
+				UOM:      "ft",
+				PONumber: "N/A",
 			}, {
-				ProductID: "pid2",
-				Name:      "Connector",
-				UOM:       "ea",
-				PONumber:  "N/A",
+				ID:       "pid2",
+				Name:     "Connector",
+				UOM:      "ea",
+				PONumber: "N/A",
 			}},
 		},
 		wantErr: false,
@@ -85,7 +85,7 @@ func TestOrder_AddItem(t *testing.T) {
 		name: "cannot add same item more than once",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
+				ID: "pid1",
 			}},
 		},
 		args: args{
@@ -93,7 +93,7 @@ func TestOrder_AddItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
+				ID: "pid1",
 			}},
 		},
 		wantErr: true,
@@ -125,7 +125,7 @@ func TestOrder_RemoveItem(t *testing.T) {
 		name: "must remove item from order",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
+				ID: "pid1",
 			}},
 		},
 		args: args{
@@ -164,7 +164,7 @@ func TestOrder_UpdateQuantityRequested(t *testing.T) {
 		name: "must update an items quantity requested",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 100,
 			}},
 		},
@@ -174,7 +174,7 @@ func TestOrder_UpdateQuantityRequested(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 			}},
 		},
@@ -290,8 +290,8 @@ func TestOrder_UpdatePO(t *testing.T) {
 		name: "po number must update",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
-				PONumber:  "N/A",
+				ID:       "pid1",
+				PONumber: "N/A",
 			}},
 		},
 		args: args{
@@ -300,8 +300,8 @@ func TestOrder_UpdatePO(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
-				PONumber:  "HE748563",
+				ID:       "pid1",
+				PONumber: "HE748563",
 			}},
 		},
 		wantErr: false,
@@ -309,8 +309,8 @@ func TestOrder_UpdatePO(t *testing.T) {
 		name: "po must be equal to N/A when empty",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
-				PONumber:  "RX234738",
+				ID:       "pid1",
+				PONumber: "RX234738",
 			}},
 		},
 		args: args{
@@ -319,8 +319,8 @@ func TestOrder_UpdatePO(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID: "pid1",
-				PONumber:  "N/A",
+				ID:       "pid1",
+				PONumber: "N/A",
 			}},
 		},
 		wantErr: false,
@@ -353,7 +353,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		name: "order must be marked complete when all items received",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  0,
 				QuantityRemaining: 0,
@@ -367,7 +367,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  50,
 				QuantityRemaining: 0,
@@ -380,7 +380,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		name: "order must be marked back to processed if received was modified to < requested",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  50,
 				QuantityRemaining: 0,
@@ -394,7 +394,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  49,
 				QuantityRemaining: 1,
@@ -407,7 +407,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		name: "item status must update to filled when requested quantity received",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  0,
 				ItemStatus:        supply.Waiting,
@@ -420,7 +420,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  50,
 				ItemStatus:        supply.Filled,
@@ -432,7 +432,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		name: "item must be marked back ordered when received > 0 && < requested",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  0,
 				QuantityRemaining: 50,
@@ -446,7 +446,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  49,
 				QuantityRemaining: 1,
@@ -459,7 +459,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		name: "item must be marked exceeded when received more than requested",
 		got: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  51,
 				QuantityRemaining: 0,
@@ -473,7 +473,7 @@ func TestOrder_ReceiveItem(t *testing.T) {
 		},
 		want: &supply.Order{
 			Items: []*supply.Item{{
-				ProductID:         "pid1",
+				ID:                "pid1",
 				QuantityRequested: 50,
 				QuantityReceived:  51,
 				QuantityRemaining: 0,

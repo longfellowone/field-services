@@ -180,7 +180,7 @@ func (s *service) FindProjectsByForeman(foremanid string) ([]supply.Project, err
 // Order read models
 
 type ProjectOrder struct {
-	OrderID  string
+	ID       string
 	SentDate int64
 	Status   supply.OrderStatus
 }

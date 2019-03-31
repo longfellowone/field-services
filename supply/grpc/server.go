@@ -27,7 +27,7 @@ func New(osvc ordering.Service, psvc purchasing.Service, ssvc search.Service) *g
 	orders := osvc.FindProjectOrderDates("pid1")
 
 	for _, o := range orders {
-		fmt.Println(o.OrderID, time.Unix(o.SentDate, 0))
+		fmt.Println(o.ID, time.Unix(o.SentDate, 0))
 	}
 
 	_ = osvc.AddOrderItem("oid1", "pid1", "product1", "ea")

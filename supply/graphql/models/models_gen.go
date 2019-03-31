@@ -3,38 +3,38 @@
 package models
 
 type AddOrderItem struct {
-	OrderID   string `json:"orderID"`
+	ID        string `json:"id"`
 	ProductID string `json:"productID"`
 	Name      string `json:"name"`
 	Uom       string `json:"uom"`
 }
 
 type CloseProject struct {
-	ProjectID string `json:"projectID"`
+	ID string `json:"id"`
 }
 
 type CreateOrder struct {
-	OrderID   string `json:"orderID"`
+	ID        string `json:"id"`
 	ProjectID string `json:"projectID"`
 	Name      string `json:"name"`
 }
 
 type CreateProject struct {
-	ProjectID string `json:"projectID"`
-	Name      string `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type ModifyQuantity struct {
-	OrderID   string `json:"orderID"`
+	ID        string `json:"id"`
 	ProductID string `json:"productID"`
 	Quantity  int    `json:"quantity"`
 }
 
 type RemoveOrderItem struct {
-	OrderID   string `json:"orderID"`
+	ID        string `json:"id"`
 	ProductID string `json:"productID"`
 }
 
 type SendOrder struct {
-	OrderID string `json:"orderID"`
+	ID string `json:"id"`
 }

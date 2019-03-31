@@ -12,7 +12,8 @@ import (
 	"net/http"
 )
 
-// THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
+//if user := auth.ForContext(ctx); user == nil || !user.IsPurchaser {
+//	return []ordering.ProjectOrder{}, fmt.Errorf("Access denied")
 
 type Resolver struct {
 	osvc ordering.Service
@@ -29,108 +30,88 @@ func Initialize(ssvc search.Service, osvc ordering.Service) http.HandlerFunc {
 func (r *Resolver) Mutation() MutationResolver {
 	return &mutationResolver{r}
 }
-func (r *Resolver) Order() OrderResolver {
-	return &orderResolver{}
-}
-func (r *Resolver) Project() ProjectResolver {
-	return &projectResolver{}
-}
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
 }
 
-type orderResolver struct{ *Resolver }
-type projectResolver struct{ *Resolver }
-
 type mutationResolver struct{ *Resolver }
 
 func (r *mutationResolver) CreateOrder(ctx context.Context, input models.CreateOrder) (*supply.Order, error) {
-	user := auth.ForContext(ctx)
-	order, err := r.osvc.CreateOrder(input.OrderID, input.ProjectID, input.Name, user.ID, user.Email)
+	user, err := auth.ForContext(ctx)
+	if err != nil {
+		return &supply.Order{}, err
+	}
+	order, err := r.osvc.CreateOrder(input.ID, input.ProjectID, input.Name, user.ID, user.Email)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
 func (r *mutationResolver) SendOrder(ctx context.Context, input models.SendOrder) (*supply.Order, error) {
-	order, err := r.osvc.SendOrder(input.OrderID)
+	order, err := r.osvc.SendOrder(input.ID)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
 func (r *mutationResolver) AddOrderItem(ctx context.Context, input models.AddOrderItem) (*supply.Order, error) {
-	order, err := r.osvc.AddOrderItem(input.OrderID, input.ProductID, input.Name, input.Uom)
+	order, err := r.osvc.AddOrderItem(input.ID, input.ProductID, input.Name, input.Uom)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
 func (r *mutationResolver) RemoveOrderItem(ctx context.Context, input models.RemoveOrderItem) (*supply.Order, error) {
-	order, err := r.osvc.RemoveOrderItem(input.OrderID, input.ProductID)
+	order, err := r.osvc.RemoveOrderItem(input.ID, input.ProductID)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
 func (r *mutationResolver) ReceiveOrderItem(ctx context.Context, input models.ModifyQuantity) (*supply.Order, error) {
-	order, err := r.osvc.ReceiveOrderItem(input.OrderID, input.ProductID, input.Quantity)
+	order, err := r.osvc.ReceiveOrderItem(input.ID, input.ProductID, input.Quantity)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
 func (r *mutationResolver) ModifyRequestedQuantity(ctx context.Context, input models.ModifyQuantity) (*supply.Order, error) {
-	order, err := r.osvc.ModifyRequestedQuantity(input.OrderID, input.ProductID, input.Quantity)
+	order, err := r.osvc.ModifyRequestedQuantity(input.ID, input.ProductID, input.Quantity)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
 func (r *mutationResolver) CreateProject(ctx context.Context, input models.CreateProject) (*supply.Project, error) {
-	user := auth.ForContext(ctx)
-	project, err := r.osvc.CreateProject(input.ProjectID, input.Name, user.ID, user.Email)
+	user, err := auth.ForContext(ctx)
+	if err != nil {
+		return &supply.Project{}, err
+	}
+	project, err := r.osvc.CreateProject(input.ID, input.Name, user.ID, user.Email)
 	if err != nil {
 		return &supply.Project{}, err
 	}
 	return project, nil
 }
 func (r *mutationResolver) CloseProject(ctx context.Context, input models.CloseProject) (*supply.Project, error) {
-	project, err := r.osvc.CloseProject(input.ProjectID)
+	project, err := r.osvc.CloseProject(input.ID)
 	if err != nil {
 		return &supply.Project{}, err
 	}
 	return project, nil
 }
 
-//type orderResolver struct{ *Resolver }
-//
-//func (r *orderResolver) ProjectID(ctx context.Context, obj *supply.Order) (string, error) {
-//	panic("not implemented")
-//}
-//
-//type projectResolver struct{ *Resolver }
-//
-//func (r *projectResolver) ProjectID(ctx context.Context, obj *supply.Project) (string, error) {
-//	panic("not implemented")
-//}
-
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) Order(ctx context.Context, orderID string) (*supply.Order, error) {
-	order, err := r.osvc.FindOrder(orderID)
+func (r *queryResolver) Order(ctx context.Context, id string) (*supply.Order, error) {
+	order, err := r.osvc.FindOrder(id)
 	if err != nil {
 		return &supply.Order{}, err
 	}
 	return order, nil
 }
-func (r *queryResolver) ProjectOrders(ctx context.Context, projectID string) ([]ordering.ProjectOrder, error) {
-	//user := auth.ForContext(ctx)
-
-	//if user := auth.ForContext(ctx); user == nil || !user.IsPurchaser {
-	//	return []ordering.ProjectOrder{}, fmt.Errorf("Access denied")
-	//}
-	orders, err := r.osvc.FindProjectOrderDates(projectID)
+func (r *queryResolver) ProjectOrders(ctx context.Context, id string) ([]ordering.ProjectOrder, error) {
+	orders, err := r.osvc.FindProjectOrderDates(id)
 	if err != nil {
 		return []ordering.ProjectOrder{}, err
 	}
@@ -144,5 +125,9 @@ func (r *queryResolver) Products(ctx context.Context, name string) ([]search.Res
 	return results, nil
 }
 func (r *queryResolver) Projects(ctx context.Context, foremanID string) ([]supply.Project, error) {
-	panic("not implemented")
+	projects, err := r.osvc.FindProjectsByForeman(foremanID)
+	if err != nil {
+		return []supply.Project{}, err
+	}
+	return projects, nil
 }
