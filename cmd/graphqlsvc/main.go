@@ -40,7 +40,7 @@ func main() {
 		//Debug:          true,
 	}).Handler)
 
-	r.Use(auth.JwtMiddleware.Handler)
+	r.Use(auth.Middleware())
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 

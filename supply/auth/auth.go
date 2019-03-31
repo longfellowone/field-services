@@ -3,9 +3,11 @@ package auth
 import (
 	"encoding/json"
 	"errors"
-	"github.com/auth0/go-jwt-middleware"
+	"fmt"
+	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 	"log"
+	"strings"
 
 	"net/http"
 )
@@ -23,7 +25,7 @@ type JSONWebKeys struct {
 	X5c []string `json:"x5c"`
 }
 
-var JwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+var jwtToken = jwtmiddleware.New(jwtmiddleware.Options{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 		aud := "http://192.168.0.104:8080/graphql"
 		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
@@ -46,13 +48,59 @@ var JwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 		return result, nil
 	},
 	SigningMethod: jwt.SigningMethodRS256,
-	//ErrorHandler: func(w http.ResponseWriter, r *http.Request, err string) {
-	//	http.Error(w, err, http.StatusForbidden)
-	//	return
-	//},
-	//CredentialsOptional: true,
+	ErrorHandler: func(w http.ResponseWriter, r *http.Request, err string) {
+		responseJSON(err, w, http.StatusUnauthorized)
+	},
+	CredentialsOptional: true,
 	//Debug:               true,
 })
+
+func Middleware() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			err := jwtToken.CheckJWT(w, r)
+			if err != nil {
+				return
+			}
+
+			token, err := jwtmiddleware.FromAuthHeader(r)
+			if err != nil {
+				return
+			}
+
+			if token == "" {
+				fmt.Println("no token")
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			hasScope := checkScope("read:messages", token)
+			if !hasScope {
+				responseJSON("Insufficient scope.", w, http.StatusForbidden)
+				return
+			}
+
+			fmt.Println("got token: ", token)
+
+			//userId, err := validateAndGetUserID(c)
+			//if err != nil {
+			//	http.Error(w, "Invalid cookie", http.StatusForbidden)
+			//	return
+			//}
+			//
+			//// get the user from the database
+			//user := getUserByID(db, userId)
+			//
+			//// put it in context
+			//ctx := context.WithValue(r.Context(), userCtxKey, user)
+			//
+			//// and call the next with our new context
+			//r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
+		})
+	}
+}
 
 func getPemCert(token *jwt.Token) (string, error) {
 	cert := ""
@@ -82,4 +130,43 @@ func getPemCert(token *jwt.Token) (string, error) {
 	}
 
 	return cert, nil
+}
+
+type CustomClaims struct {
+	Scope string `json:"scope"`
+	jwt.StandardClaims
+}
+
+func checkScope(scope string, tokenString string) bool {
+	token, _ := jwt.ParseWithClaims(tokenString, &CustomClaims{}, nil)
+
+	claims, _ := token.Claims.(*CustomClaims)
+
+	hasScope := false
+	result := strings.Split(claims.Scope, " ")
+	for i := range result {
+		if result[i] == scope {
+			hasScope = true
+		}
+	}
+
+	return hasScope
+}
+
+type Response struct {
+	Message string `json:"message"`
+}
+
+func responseJSON(message string, w http.ResponseWriter, statusCode int) {
+	response := Response{message}
+
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(jsonResponse)
 }
