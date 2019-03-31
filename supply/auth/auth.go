@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	jwtmiddleware "github.com/auth0/go-jwt-middleware"
+	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 	"log"
 	"strings"
@@ -30,13 +30,13 @@ var jwtToken = jwtmiddleware.New(jwtmiddleware.Options{
 		aud := "http://192.168.0.104:8080/graphql"
 		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
 		if !checkAud {
-			return token, errors.New("Invalid audience.")
+			return token, errors.New("Invalid audience")
 		}
 
 		iss := "https://dev-vqglrbz9.auth0.com/"
 		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
 		if !checkIss {
-			return token, errors.New("Invalid issuer.")
+			return token, errors.New("Invalid issuer")
 		}
 
 		cert, err := getPemCert(token)
@@ -51,8 +51,6 @@ var jwtToken = jwtmiddleware.New(jwtmiddleware.Options{
 	ErrorHandler: func(w http.ResponseWriter, r *http.Request, err string) {
 		responseJSON(err, w, http.StatusUnauthorized)
 	},
-	CredentialsOptional: true,
-	//Debug:               true,
 })
 
 func Middleware() func(http.Handler) http.Handler {
@@ -64,24 +62,16 @@ func Middleware() func(http.Handler) http.Handler {
 				return
 			}
 
-			token, err := jwtmiddleware.FromAuthHeader(r)
-			if err != nil {
-				return
-			}
+			authHeaderParts := strings.Split(r.Header.Get("Authorization"), " ")
+			token := authHeaderParts[1]
 
-			if token == "" {
-				fmt.Println("no token")
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			hasScope := checkScope("read:messages", token)
+			hasScope := checkScope("manage:orders", token)
 			if !hasScope {
-				responseJSON("Insufficient scope.", w, http.StatusForbidden)
+				responseJSON("Insufficient scope", w, http.StatusForbidden)
 				return
 			}
 
-			fmt.Println("got token: ", token)
+			checkForID(token)
 
 			//userId, err := validateAndGetUserID(c)
 			//if err != nil {
@@ -133,8 +123,17 @@ func getPemCert(token *jwt.Token) (string, error) {
 }
 
 type CustomClaims struct {
-	Scope string `json:"scope"`
+	Scope  string `json:"scope"`
+	UserID string `json:"sub"`
 	jwt.StandardClaims
+}
+
+func checkForID(tokenString string) {
+	token, _ := jwt.ParseWithClaims(tokenString, &CustomClaims{}, nil)
+
+	claims, _ := token.Claims.(*CustomClaims)
+
+	fmt.Println(claims.UserID)
 }
 
 func checkScope(scope string, tokenString string) bool {
