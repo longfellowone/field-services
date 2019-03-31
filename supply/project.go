@@ -26,7 +26,3 @@ func NewProject(id, name, foreman, email string) *Project {
 func (p *Project) Close() {
 	p.Active = false
 }
-
-//func NewProduct(id, category, name, uom string) *Product {
-//	return
-//}

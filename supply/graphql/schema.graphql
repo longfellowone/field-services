@@ -95,11 +95,13 @@ type Item {
     quantityRemaining: Int!
     #    ItemStatus: ItemStatus!
     poNumber: String!
+    dateAdded: Int!
 }
 
 type Project {
     id: ID!
     name: String!
+    active: Boolean!
 }
 
 #enum ItemStatus {

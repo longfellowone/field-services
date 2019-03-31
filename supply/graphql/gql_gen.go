@@ -53,6 +53,7 @@ type ComplexityRoot struct {
 		QuantityReceived  func(childComplexity int) int
 		QuantityRemaining func(childComplexity int) int
 		PONumber          func(childComplexity int) int
+		DateAdded         func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -82,8 +83,9 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
-		ID   func(childComplexity int) int
-		Name func(childComplexity int) int
+		ID     func(childComplexity int) int
+		Name   func(childComplexity int) int
+		Active func(childComplexity int) int
 	}
 
 	ProjectOrder struct {
@@ -186,6 +188,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.PONumber(childComplexity), true
+
+	case "Item.DateAdded":
+		if e.complexity.Item.DateAdded == nil {
+			break
+		}
+
+		return e.complexity.Item.DateAdded(childComplexity), true
 
 	case "Mutation.CreateOrder":
 		if e.complexity.Mutation.CreateOrder == nil {
@@ -359,6 +368,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Name(childComplexity), true
+
+	case "Project.Active":
+		if e.complexity.Project.Active == nil {
+			break
+		}
+
+		return e.complexity.Project.Active(childComplexity), true
 
 	case "ProjectOrder.ID":
 		if e.complexity.ProjectOrder.ID == nil {
@@ -624,11 +640,13 @@ type Item {
     quantityRemaining: Int!
     #    ItemStatus: ItemStatus!
     poNumber: String!
+    dateAdded: Int!
 }
 
 type Project {
     id: ID!
     name: String!
+    active: Boolean!
 }
 
 #enum ItemStatus {
@@ -1039,6 +1057,32 @@ func (ec *executionContext) _Item_poNumber(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Item_dateAdded(ctx context.Context, field graphql.CollectedField, obj *supply.Item) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Item",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DateAdded, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createOrder(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1589,6 +1633,32 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_active(ctx context.Context, field graphql.CollectedField, obj *supply.Project) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Project",
+		Field:  field,
+		Args:   nil,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProjectOrder_id(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrder) graphql.Marshaler {
@@ -2965,6 +3035,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "dateAdded":
+			out.Values[i] = ec._Item_dateAdded(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3149,6 +3224,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "name":
 			out.Values[i] = ec._Project_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "active":
+			out.Values[i] = ec._Project_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}

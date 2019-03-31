@@ -44,7 +44,7 @@ func (s *service) CreateOrder(orderid, projectid, name, foreman, email string) (
 
 	err := s.order.Save(order)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 	return order, nil
 }
@@ -52,17 +52,17 @@ func (s *service) CreateOrder(orderid, projectid, name, foreman, email string) (
 func (s *service) AddOrderItem(orderid, productid, name, uom string) (*supply.Order, error) {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = order.AddItem(productid, name, uom)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = s.order.Save(order)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 	return order, nil
 }
@@ -70,17 +70,17 @@ func (s *service) AddOrderItem(orderid, productid, name, uom string) (*supply.Or
 func (s *service) RemoveOrderItem(orderid, productid string) (*supply.Order, error) {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = order.RemoveItem(productid)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = s.order.Save(order)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 	return order, nil
 }
@@ -88,17 +88,17 @@ func (s *service) RemoveOrderItem(orderid, productid string) (*supply.Order, err
 func (s *service) ModifyRequestedQuantity(orderid, productid string, quantity int) (*supply.Order, error) {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = order.UpdateQuantityRequested(productid, quantity)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = s.order.Save(order)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 	return order, nil
 }
@@ -106,17 +106,17 @@ func (s *service) ModifyRequestedQuantity(orderid, productid string, quantity in
 func (s *service) SendOrder(orderid string) (*supply.Order, error) {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = order.Send()
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = s.order.Save(order)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 	return order, nil
 }
@@ -124,17 +124,17 @@ func (s *service) SendOrder(orderid string) (*supply.Order, error) {
 func (s *service) ReceiveOrderItem(orderid, productid string, quantity int) (*supply.Order, error) {
 	order, err := s.order.Find(orderid)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = order.ReceiveItem(productid, quantity)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 
 	err = s.order.Save(order)
 	if err != nil {
-		return &supply.Order{}, nil
+		return &supply.Order{}, err
 	}
 	return order, nil
 }
@@ -151,28 +151,28 @@ func (s *service) CreateProject(projectid, name, foreman, email string) (*supply
 	project := supply.NewProject(projectid, name, foreman, email)
 	err := s.project.Save(project)
 	if err != nil {
-		return &supply.Project{}, nil
+		return &supply.Project{}, err
 	}
 	return project, nil
 }
 func (s *service) CloseProject(projectid string) (*supply.Project, error) {
 	project, err := s.project.Find(projectid)
 	if err != nil {
-		return &supply.Project{}, nil
+		return &supply.Project{}, err
 	}
 
 	project.Close()
 
 	err = s.project.Save(project)
 	if err != nil {
-		return &supply.Project{}, nil
+		return &supply.Project{}, err
 	}
 	return project, nil
 }
 func (s *service) FindProjectsByForeman(foremanid string) ([]supply.Project, error) {
 	projects, err := s.project.FindAllByForeman(foremanid)
 	if err != nil {
-		return []supply.Project{}, nil
+		return []supply.Project{}, err
 	}
 	return projects, nil
 }
