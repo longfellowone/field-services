@@ -4,9 +4,11 @@ package graphql
 import (
 	"context"
 	"field/supply"
+	"field/supply/auth"
 	"field/supply/graphql/models"
 	"field/supply/ordering"
 	"field/supply/search"
+	"fmt"
 	"github.com/99designs/gqlgen/handler"
 	"net/http"
 )
@@ -85,12 +87,13 @@ func (r *queryResolver) Order(ctx context.Context, orderID string) (*supply.Orde
 	return order, nil
 }
 func (r *queryResolver) ProjectOrders(ctx context.Context, projectID string) ([]ordering.ProjectOrder, error) {
-	//user := ctx.Value("user")
+	user := auth.ForContext(ctx)
 
-	//fmt.Println(user.(*jwt.Token).Claims)
-	//for k, v := range user.(*jwt.Token).Claims {
-	//	fmt.Printf("%s :\t%#v\n", k, v)
-	//}
+	fmt.Println(user)
+
+	if user := auth.ForContext(ctx); user == nil {
+		return []ordering.ProjectOrder{}, fmt.Errorf("Access denied")
+	}
 
 	return r.osvc.FindProjectOrderDates(projectID), nil
 }

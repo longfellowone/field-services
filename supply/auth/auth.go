@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"field/supply"
 	"fmt"
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
@@ -53,10 +55,15 @@ var jwtToken = jwtmiddleware.New(jwtmiddleware.Options{
 	},
 })
 
+var userCtxKey = &contextKey{"user"}
+
+type contextKey struct {
+	name string
+}
+
 func Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 			err := jwtToken.CheckJWT(w, r)
 			if err != nil {
 				return
@@ -65,31 +72,57 @@ func Middleware() func(http.Handler) http.Handler {
 			authHeaderParts := strings.Split(r.Header.Get("Authorization"), " ")
 			token := authHeaderParts[1]
 
-			hasScope := checkScope("manage:orders", token)
-			if !hasScope {
+			user := populateUserDetails(token)
+
+			if !user.IsForeman && !user.IsPurchaser {
 				responseJSON("Insufficient scope", w, http.StatusForbidden)
 				return
 			}
 
-			checkForID(token)
+			ctx := context.WithValue(r.Context(), userCtxKey, user)
 
-			//userId, err := validateAndGetUserID(c)
-			//if err != nil {
-			//	http.Error(w, "Invalid cookie", http.StatusForbidden)
-			//	return
-			//}
-			//
-			//// get the user from the database
-			//user := getUserByID(db, userId)
-			//
-			//// put it in context
-			//ctx := context.WithValue(r.Context(), userCtxKey, user)
-			//
-			//// and call the next with our new context
-			//r = r.WithContext(ctx)
+			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func ForContext(ctx context.Context) *supply.User {
+	raw, _ := ctx.Value(userCtxKey).(*supply.User)
+	return raw
+}
+
+type CustomClaims struct {
+	Scope  string `json:"scope"`
+	UserID string `json:"sub"`
+	Email  string `json:"https://localhost/email"`
+	jwt.StandardClaims
+}
+
+func populateUserDetails(tokenString string) *supply.User {
+	token, _ := jwt.ParseWithClaims(tokenString, &CustomClaims{}, nil)
+	claims, _ := token.Claims.(*CustomClaims)
+
+	user := &supply.User{
+		ID:          claims.UserID,
+		Email:       claims.Email,
+		IsForeman:   checkScope("create:orders", claims),
+		IsPurchaser: checkScope("manage:orders", claims),
+	}
+
+	fmt.Println(user)
+	return user
+}
+
+func checkScope(scope string, claims *CustomClaims) bool {
+	hasScope := false
+	result := strings.Split(claims.Scope, " ")
+	for i := range result {
+		if result[i] == scope {
+			hasScope = true
+		}
+	}
+	return hasScope
 }
 
 func getPemCert(token *jwt.Token) (string, error) {
@@ -120,36 +153,6 @@ func getPemCert(token *jwt.Token) (string, error) {
 	}
 
 	return cert, nil
-}
-
-type CustomClaims struct {
-	Scope  string `json:"scope"`
-	UserID string `json:"sub"`
-	jwt.StandardClaims
-}
-
-func checkForID(tokenString string) {
-	token, _ := jwt.ParseWithClaims(tokenString, &CustomClaims{}, nil)
-
-	claims, _ := token.Claims.(*CustomClaims)
-
-	fmt.Println(claims.UserID)
-}
-
-func checkScope(scope string, tokenString string) bool {
-	token, _ := jwt.ParseWithClaims(tokenString, &CustomClaims{}, nil)
-
-	claims, _ := token.Claims.(*CustomClaims)
-
-	hasScope := false
-	result := strings.Split(claims.Scope, " ")
-	for i := range result {
-		if result[i] == scope {
-			hasScope = true
-		}
-	}
-
-	return hasScope
 }
 
 type Response struct {
