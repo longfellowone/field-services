@@ -23,8 +23,11 @@ const saveOrder = `
 	ON CONFLICT ON CONSTRAINT orders_pk
 	DO UPDATE SET 
 		projectid=EXCLUDED.projectid,
+		project_name=EXCLUDED.project_name,
+	    foreman_email=EXCLUDED.foreman_email,
 		sentdate=EXCLUDED.sentdate,
-		status=EXCLUDED.status`
+		status=EXCLUDED.status,
+		comments=EXCLUDED.comments`
 
 const saveItems = `
 	INSERT INTO order_items
@@ -160,7 +163,8 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 const findOrderDates = `
 	SELECT orderid, sentdate, status
 	FROM orders
-	WHERE projectid=$1`
+	WHERE projectid=$1
+	ORDER BY sentdate DESC`
 
 func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, error) {
 	orders := make([]ordering.ProjectOrder, 0)

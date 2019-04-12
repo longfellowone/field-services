@@ -34,6 +34,7 @@ func Create(id, pid, name, foreman, email string) *Order {
 		Project: Project{
 			ID:           pid,
 			Name:         name,
+			Foreman:      foreman,
 			ForemanEmail: email,
 		},
 		Items:    []*Item{},
@@ -73,7 +74,7 @@ func (o *Order) UpdateQuantityRequested(id string, quantity int) error {
 }
 
 // Marks an order sent
-func (o *Order) Send() error {
+func (o *Order) Send(comments string) error {
 	switch {
 	case len(o.Items) == 0:
 		return ErrMustHaveItems
@@ -82,6 +83,7 @@ func (o *Order) Send() error {
 		return ErrQuantityZero
 	}
 
+	o.Comments = comments
 	o.Status = Sent
 	o.SentDate = time.Now().Unix()
 	return nil

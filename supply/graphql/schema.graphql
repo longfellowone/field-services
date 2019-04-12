@@ -19,6 +19,7 @@ input CreateOrder {
 
 input SendOrder {
     id: ID!
+    comments: String!
 }
 
 input AddOrderItem {
@@ -101,7 +102,6 @@ type Item {
 type Project {
     id: ID!
     name: String!
-    active: Boolean!
 }
 
 #enum ItemStatus {

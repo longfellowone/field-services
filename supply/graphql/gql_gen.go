@@ -83,9 +83,8 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
-		ID     func(childComplexity int) int
-		Name   func(childComplexity int) int
-		Active func(childComplexity int) int
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
 	}
 
 	ProjectOrder struct {
@@ -369,13 +368,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Name(childComplexity), true
 
-	case "Project.Active":
-		if e.complexity.Project.Active == nil {
-			break
-		}
-
-		return e.complexity.Project.Active(childComplexity), true
-
 	case "ProjectOrder.ID":
 		if e.complexity.ProjectOrder.ID == nil {
 			break
@@ -564,6 +556,7 @@ input CreateOrder {
 
 input SendOrder {
     id: ID!
+    comments: String!
 }
 
 input AddOrderItem {
@@ -646,7 +639,6 @@ type Item {
 type Project {
     id: ID!
     name: String!
-    active: Boolean!
 }
 
 #enum ItemStatus {
@@ -1633,32 +1625,6 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Project_active(ctx context.Context, field graphql.CollectedField, obj *supply.Project) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Project",
-		Field:  field,
-		Args:   nil,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Active, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProjectOrder_id(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrder) graphql.Marshaler {
@@ -2975,6 +2941,12 @@ func (ec *executionContext) unmarshalInputSendOrder(ctx context.Context, v inter
 			if err != nil {
 				return it, err
 			}
+		case "comments":
+			var err error
+			it.Comments, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -3224,11 +3196,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "name":
 			out.Values[i] = ec._Project_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "active":
-			out.Values[i] = ec._Project_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}

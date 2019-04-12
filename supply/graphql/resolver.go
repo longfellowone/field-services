@@ -48,7 +48,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input models.CreateO
 	return order, nil
 }
 func (r *mutationResolver) SendOrder(ctx context.Context, input models.SendOrder) (*supply.Order, error) {
-	order, err := r.osvc.SendOrder(input.ID)
+	order, err := r.osvc.SendOrder(input.ID, input.Comments)
 	if err != nil {
 		return &supply.Order{}, err
 	}

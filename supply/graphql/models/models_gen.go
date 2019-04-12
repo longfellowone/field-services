@@ -36,5 +36,6 @@ type RemoveOrderItem struct {
 }
 
 type SendOrder struct {
-	ID string `json:"id"`
+	ID       string `json:"id"`
+	Comments string `json:"comments"`
 }
