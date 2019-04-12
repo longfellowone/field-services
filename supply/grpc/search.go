@@ -15,7 +15,10 @@ func (s *Server) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest)
 	}
 	//time.Sleep(2000 * time.Millisecond)
 
-	products := s.ssvc.ProductSearch(in.Name)
+	products, err := s.ssvc.ProductSearch(in.Name)
+	if err != nil {
+		return &pb.ProductSearchResponse{}, nil // TODO: handle error
+	}
 	if len(products) == 0 {
 		return &pb.ProductSearchResponse{}, nil
 	}
@@ -32,11 +35,10 @@ func (s *Server) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest)
 		}
 
 		result := &pb.Result{
-			ProductUuid: p.ID,
-			Category:    p.Category,
-			Name:        p.Name,
-			Uom:         p.UOM,
-			Indexes:     indexes,
+			Id:      p.ID,
+			Name:    p.Name,
+			Uom:     p.UOM,
+			Indexes: indexes,
 		}
 		results = append(results, result)
 	}

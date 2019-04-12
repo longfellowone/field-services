@@ -14,12 +14,19 @@ service Supply {
     rpc FindProjectOrderDates (FindProjectOrderDatesRequest) returns (FindProjectOrderDatesResponse);
     // ProductSearch
     rpc ProductSearch (ProductSearchRequest) returns (ProductSearchResponse) {}
+    // Projects
+    rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse) {}
+    rpc CloseProject (CloseProjectRequest) returns (CloseProjectResponse) {}
+    rpc FindProjects (FindProjectsRequest) returns (FindProjectsResponse) {}
 }
 
 // CreateOrder
 message CreateOrderRequest {
     string id = 1;
     string project_id = 2;
+    string name = 3;
+    string foreman = 4;
+    string email = 5;
 }
 message CreateOrderResponse {}
 
@@ -50,6 +57,7 @@ message ModifyRequestedQuantityResponse {}
 // SendOrder
 message SendOrderRequest {
     string id = 1;
+    string comments = 2;
 }
 message SendOrderResponse {}
 
@@ -61,20 +69,26 @@ message ReceiveOrderItemRequest {
 }
 message ReceiveOrderItemResponse {}
 
-
-// FindProjectOrderDates
-message FindProjectOrderDatesRequest {
-    string project_id = 1;
-}
-message FindProjectOrderDatesResponse {
-    repeated Order orders = 1;
-}
-
-// An order
+// An Order
 message Order {
     string id = 1;
-    int64 date = 2;
-    string status = 3;
+    string project_id = 2;
+    string project_name = 3;
+    repeated Item items = 4;
+    int64 date = 5;
+    string status = 6;
+    string comments = 7;
+}
+
+// An order item
+message Item {
+    string id = 1;
+    string name = 2;
+    string uom = 3;
+    uint32 quantity_requested = 4;
+    uint32 quantity_received = 5;
+    uint32 quantity_remaining = 6;
+    string item_status = 7;
 }
 
 // FindOrder
@@ -82,19 +96,34 @@ message FindOrderRequest {
     string id = 1;
 }
 message FindOrderResponse {
-    int64 date = 1;
-    string status = 2;
-    repeated Item items = 3;
+    Order order = 1;
 }
 
-// An order item
-message Item {
-    string product_id = 1;
-    string name = 2;
-    string uom = 3;
-    uint32 quantity_requested = 4;
-    uint32 quantity_received = 5;
-    string item_status = 6;
+// Project order summary
+message OrderSummary {
+    string id = 1;
+    int64 date = 2;
+    string status = 3;
+}
+
+// FindProjectOrderDates
+message FindProjectOrderDatesRequest {
+    string project_id = 1;
+}
+message FindProjectOrderDatesResponse {
+    repeated OrderSummary orders = 1;
+}
+
+// A result
+message Result {
+    string id = 1;
+    string name = 3;
+    string uom = 4;
+    repeated Index indexes = 5;
+}
+// A results matched indexes
+message Index {
+    int32 index = 1;
 }
 
 // ProductSearch
@@ -104,22 +133,34 @@ message ProductSearchRequest {
 message ProductSearchResponse {
     repeated Result results = 5;
 }
-message Result {
-    string product_uuid = 1;
-    string category = 2;
-    string name = 3;
-    string uom = 4;
-    repeated Index indexes = 5;
+
+// Create a project
+message CreateProjectRequest {
+    string id = 1;
+    string name = 2;
 }
-message Index {
-    int32 index = 1;
+message CreateProjectResponse {}
+
+// Close a project
+message CloseProjectRequest {
+    string id = 1;
+}
+message CloseProjectResponse {}
+
+// Find a project
+message FindProjectsRequest {
+    string foreman_id = 1;
+}
+message FindProjectsResponse {
+    string id = 1;
+    string name = 2;
 }
 
 // Perchasing
-service Purchasing {
-    //rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
-    //rpc 000 (Request) returns (Response) {}
-}
+//service Purchasing {
+//    rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
+//    rpc 000 (Request) returns (Response) {}
+//}
 
 /* eslint-disable */
 
