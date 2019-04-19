@@ -19,14 +19,14 @@ func main() {
 	}
 	defer db.Close()
 
-	s := InitializeSupplyServices(db)
-
 	lis, err := net.Listen("tcp", ":9090")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	fmt.Println("Listening...")
+	fmt.Println("Listening on :9090")
+
+	s := InitializeSupplyServices(db)
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

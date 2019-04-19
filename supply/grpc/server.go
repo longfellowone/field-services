@@ -15,11 +15,17 @@ type Server struct {
 
 func New(osvc ordering.Service, ssvc search.Service) *grpc.Server {
 	s := grpc.NewServer()
-
-	pb.RegisterSupplyServer(s, &Server{
+	server := &Server{
 		osvc: osvc,
 		ssvc: ssvc,
-	})
-
+	}
+	pb.RegisterSupplyServer(s, server)
 	return s
 }
+
+//request := &pb.FindOrderRequest{Id: "7e55aa12-2e6a-4f21-b01a-09503c755180"}
+//response, err := server.FindOrder(context.Background(), request)
+//if err != nil {
+//	log.Fatal(err)
+//}
+//fmt.Println(response.Order.Id)

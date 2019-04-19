@@ -72,23 +72,32 @@ message ReceiveOrderItemResponse {}
 // An Order
 message Order {
     string id = 1;
-    string project_id = 2;
-    string project_name = 3;
-    repeated Item items = 4;
-    int64 date = 5;
-    string status = 6;
-    string comments = 7;
+    Project project = 2;
+    repeated Item items = 3;
+    int64 date = 4;
+    string status = 5;
+    string comments = 6;
+}
+
+message Project {
+    string id = 1;
+    string name = 2;
 }
 
 // An order item
 message Item {
+    Product product = 1;
+    uint32 quantity_requested = 2;
+    uint32 quantity_received = 3;
+    uint32 quantity_remaining = 4;
+    string item_status = 5;
+}
+
+// A product
+message Product {
     string id = 1;
     string name = 2;
     string uom = 3;
-    uint32 quantity_requested = 4;
-    uint32 quantity_received = 5;
-    uint32 quantity_remaining = 6;
-    string item_status = 7;
 }
 
 // FindOrder
@@ -116,14 +125,8 @@ message FindProjectOrderDatesResponse {
 
 // A result
 message Result {
-    string id = 1;
-    string name = 3;
-    string uom = 4;
-    repeated Index indexes = 5;
-}
-// A results matched indexes
-message Index {
-    int32 index = 1;
+    Product product = 1;
+    repeated int32 indexes = 2;
 }
 
 // ProductSearch
@@ -147,13 +150,12 @@ message CloseProjectRequest {
 }
 message CloseProjectResponse {}
 
-// Find a project
+// Find all projects by foreman
 message FindProjectsRequest {
     string foreman_id = 1;
 }
 message FindProjectsResponse {
-    string id = 1;
-    string name = 2;
+    repeated Project projects = 1;
 }
 
 // Perchasing

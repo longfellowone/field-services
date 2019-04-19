@@ -68,24 +68,29 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 	var items []*pb.Item
 	for _, i := range o.Items {
 		item := &pb.Item{
-			Id:                i.ID,
-			Name:              i.Name,
-			Uom:               i.UOM,
+			Product: &pb.Product{
+				Id:   i.ID,
+				Name: i.Name,
+				Uom:  i.UOM,
+			},
 			QuantityRequested: uint32(i.QuantityRequested),
 			QuantityReceived:  uint32(i.QuantityReceived),
+			QuantityRemaining: 0,
 			ItemStatus:        i.ItemStatus.String(),
 		}
 		items = append(items, item)
 	}
 
 	order := &pb.Order{
-		Id:          o.ID,
-		ProjectId:   o.Project.ID,
-		ProjectName: o.Project.Name,
-		Items:       items,
-		Date:        o.SentDate,
-		Status:      o.Status.String(),
-		Comments:    o.Comments,
+		Id: o.ID,
+		Project: &pb.Project{
+			Id:   o.Project.ID,
+			Name: o.Project.Name,
+		},
+		Items:    items,
+		Date:     o.SentDate,
+		Status:   o.Status.String(),
+		Comments: o.Comments,
 	}
 
 	return &pb.FindOrderResponse{Order: order}, nil
@@ -111,7 +116,6 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 }
 
 // Projects
-
 func (s *Server) CloseProject(ctx context.Context, in *pb.CloseProjectRequest) (*pb.CloseProjectResponse, error) {
 	return &pb.CloseProjectResponse{}, nil
 }

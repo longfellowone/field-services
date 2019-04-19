@@ -26,18 +26,17 @@ func (s *Server) ProductSearch(ctx context.Context, in *pb.ProductSearchRequest)
 	var results []*pb.Result
 	for _, p := range products {
 
-		var indexes []*pb.Index
+		var indexes []int32
 		for _, i := range p.MatchedIndexes {
-			index := &pb.Index{
-				Index: int32(i),
-			}
-			indexes = append(indexes, index)
+			indexes = append(indexes, int32(i))
 		}
 
 		result := &pb.Result{
-			Id:      p.ID,
-			Name:    p.Name,
-			Uom:     p.UOM,
+			Product: &pb.Product{
+				Id:   p.ID,
+				Name: p.Name,
+				Uom:  p.UOM,
+			},
 			Indexes: indexes,
 		}
 		results = append(results, result)
