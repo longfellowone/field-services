@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	pb "field/supply/grpc/proto"
+	"time"
 )
 
 // To return error status
@@ -63,7 +64,9 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 	if err != nil {
 		return &pb.FindOrderResponse{}, err
 	}
-	//time.Sleep(2 * time.Second)
+
+	// TEMPORARY
+	time.Sleep(500 * time.Millisecond)
 
 	var items []*pb.Item
 	for _, i := range o.Items {
@@ -75,7 +78,7 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 			},
 			QuantityRequested: uint32(i.QuantityRequested),
 			QuantityReceived:  uint32(i.QuantityReceived),
-			QuantityRemaining: 0,
+			QuantityRemaining: uint32(i.QuantityRemaining),
 			ItemStatus:        i.ItemStatus.String(),
 		}
 		items = append(items, item)
@@ -88,7 +91,7 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 			Name: o.Project.Name,
 		},
 		Items:    items,
-		Date:     o.SentDate,
+		Date:     int32(o.SentDate),
 		Status:   o.Status.String(),
 		Comments: o.Comments,
 	}
@@ -102,11 +105,14 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 		return &pb.FindProjectOrderDatesResponse{}, err
 	}
 
+	// TEMPORARY
+	time.Sleep(500 * time.Millisecond)
+
 	var orders []*pb.OrderSummary
 	for _, o := range oo {
 		order := &pb.OrderSummary{
 			Id:     o.ID,
-			Date:   o.SentDate,
+			Date:   int32(o.SentDate),
 			Status: o.Status.String(),
 		}
 		orders = append(orders, order)
@@ -125,5 +131,16 @@ func (s *Server) CreateProject(ctx context.Context, in *pb.CreateProjectRequest)
 }
 
 func (s *Server) FindProjects(ctx context.Context, in *pb.FindProjectsRequest) (*pb.FindProjectsResponse, error) {
-	return &pb.FindProjectsResponse{}, nil
+	// TEMPORARY
+	time.Sleep(500 * time.Millisecond)
+
+	return &pb.FindProjectsResponse{
+		Projects: []*pb.Project{{
+			Id:   "1",
+			Name: "Test1",
+		}, {
+			Id:   "2",
+			Name: "Test2",
+		}},
+	}, nil
 }
