@@ -13,7 +13,15 @@ import (
 )
 
 func main() {
-	db, err := postgres.Connect("localhost", 5432, "default", "password", "default")
+	dbConfig := postgres.Config{
+		DBHost:     "localhost",
+		DBPort:     5432,
+		DBUser:     "default",
+		DBPassword: "password",
+		DBName:     "default",
+	}
+
+	db, err := postgres.Connect(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

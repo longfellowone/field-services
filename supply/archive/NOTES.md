@@ -1,4 +1,22 @@
 ####
+
+WDIR := /go/src/github.com/user/repo
+DIR := ${CURDIR}:${WDIR}
+
+DOCKER_IMAGE := user/image
+
+login:
+	docker run -i -v $(DIR) -w $(WDIR) --entrypoint=/bin/bash -t $(DOCKER_IMAGE)
+
+dockerbuild:
+	docker build -f Dockerfile -t $(DOCKER_IMAGE) .
+
+dockerpush:
+	docker push $(DOCKER_IMAGE):latest
+
+PHONY: dockerbuild login dockerpush
+
+####
 Use _____ID to auto generate resolver for lazy fetch
 
 #### Hot reload

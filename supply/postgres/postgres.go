@@ -9,8 +9,16 @@ import (
 
 // https://github.com/GoogleCloudPlatform/golang-samples/blob/master/getting-started/bookshelf/db_mysql.go
 
-func Connect(dbHost string, dbPort int, dbUser, dbPasswd, dbName string) (*sql.DB, error) {
-	conn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", dbUser, dbPasswd, dbHost, dbPort, dbName)
+type Config struct {
+	DBHost     string
+	DBPort     int
+	DBUser     string
+	DBPassword string
+	DBName     string
+}
+
+func Connect(cs Config) (*sql.DB, error) {
+	conn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", cs.DBUser, cs.DBPassword, cs.DBHost, cs.DBPort, cs.DBName)
 
 	db, err := sql.Open("postgres", conn)
 	if err != nil {

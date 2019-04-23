@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	pb "field/supply/grpc/proto"
-	"time"
 )
 
 // To return error status
@@ -66,7 +65,7 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 	}
 
 	// TEMPORARY
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(250 * time.Millisecond)
 
 	var items []*pb.Item
 	for _, i := range o.Items {
@@ -106,7 +105,7 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 	}
 
 	// TEMPORARY
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(250 * time.Millisecond)
 
 	var orders []*pb.OrderSummary
 	for _, o := range oo {
@@ -132,7 +131,7 @@ func (s *Server) CreateProject(ctx context.Context, in *pb.CreateProjectRequest)
 
 func (s *Server) FindProjects(ctx context.Context, in *pb.FindProjectsRequest) (*pb.FindProjectsResponse, error) {
 	// TEMPORARY
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(250 * time.Millisecond)
 
 	return &pb.FindProjectsResponse{
 		Projects: []*pb.Project{{
