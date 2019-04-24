@@ -1,5 +1,8 @@
 ####
+go get -u
+go mod tidy
 
+####
 WDIR := /go/src/github.com/user/repo
 DIR := ${CURDIR}:${WDIR}
 
