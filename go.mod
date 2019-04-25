@@ -10,6 +10,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/google/wire v0.2.1
 	github.com/gopherjs/gopherjs v0.0.0-20190411002643-bd77b112433e // indirect
 	github.com/gorilla/context v1.1.1 // indirect
@@ -22,6 +23,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.6.0
 	github.com/sahilm/fuzzy v0.1.0
+	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/assertions v0.0.0-20190401211740-f487f9de1cd3 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65 // indirect

@@ -2,11 +2,12 @@ package ordering
 
 import (
 	"field/supply"
+	"github.com/google/uuid"
 )
 
 type Service interface {
 	// Orders
-	CreateOrder(orderid, projectid, name, foreman, email string) (*supply.Order, error)
+	CreateOrder(projectid, name, foreman, email string) (*supply.Order, error)
 	AddOrderItem(orderid, productid, name, uom string) (*supply.Order, error)
 	RemoveOrderItem(orderid, productid string) (*supply.Order, error)
 	ModifyRequestedQuantity(orderid, productid string, quantity int) (*supply.Order, error)
@@ -39,7 +40,9 @@ func NewOrderingService(order orderRepository, project projectRepository) *servi
 	return &service{order: order, project: project}
 }
 
-func (s *service) CreateOrder(orderid, projectid, name, foreman, email string) (*supply.Order, error) {
+func (s *service) CreateOrder(projectid, name, foreman, email string) (*supply.Order, error) {
+	orderid := uuid.New().String()
+
 	order := supply.Create(orderid, projectid, name, foreman, email)
 
 	err := s.order.Save(order)

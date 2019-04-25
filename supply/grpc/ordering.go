@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"field/supply"
 	pb "field/supply/grpc/proto"
 )
 
@@ -11,51 +12,51 @@ import (
 // Orders
 
 func (s *Server) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	_, err := s.osvc.CreateOrder(in.Id, in.ProjectId, in.Name, in.Foreman, in.Email)
+	o, err := s.osvc.CreateOrder(in.ProjectId, in.Name, in.Foreman, in.Email)
 	if err != nil {
 		return &pb.CreateOrderResponse{}, err
 	}
-	return &pb.CreateOrderResponse{}, nil
+	return &pb.CreateOrderResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
-	_, err := s.osvc.AddOrderItem(in.Id, in.ProductId, in.Name, in.Uom)
+	o, err := s.osvc.AddOrderItem(in.Id, in.ProductId, in.Name, in.Uom)
 	if err != nil {
 		return &pb.AddOrderItemResponse{}, err
 	}
-	return &pb.AddOrderItemResponse{}, nil
+	return &pb.AddOrderItemResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) RemoveOrderItem(ctx context.Context, in *pb.RemoveOrderItemRequest) (*pb.RemoveOrderItemResponse, error) {
-	_, err := s.osvc.RemoveOrderItem(in.Id, in.ProductId)
+	o, err := s.osvc.RemoveOrderItem(in.Id, in.ProductId)
 	if err != nil {
 		return &pb.RemoveOrderItemResponse{}, err
 	}
-	return &pb.RemoveOrderItemResponse{}, nil
+	return &pb.RemoveOrderItemResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) ModifyRequestedQuantity(ctx context.Context, in *pb.ModifyRequestedQuantityRequest) (*pb.ModifyRequestedQuantityResponse, error) {
-	_, err := s.osvc.ModifyRequestedQuantity(in.Id, in.ProductId, int(in.Quantity))
+	o, err := s.osvc.ModifyRequestedQuantity(in.Id, in.ProductId, int(in.Quantity))
 	if err != nil {
 		return &pb.ModifyRequestedQuantityResponse{}, err
 	}
-	return &pb.ModifyRequestedQuantityResponse{}, nil
+	return &pb.ModifyRequestedQuantityResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) SendOrder(ctx context.Context, in *pb.SendOrderRequest) (*pb.SendOrderResponse, error) {
-	_, err := s.osvc.SendOrder(in.Id, in.Comments)
+	o, err := s.osvc.SendOrder(in.Id, in.Comments)
 	if err != nil {
 		return &pb.SendOrderResponse{}, err
 	}
-	return &pb.SendOrderResponse{}, nil
+	return &pb.SendOrderResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRequest) (*pb.ReceiveOrderItemResponse, error) {
-	_, err := s.osvc.ReceiveOrderItem(in.Id, in.ProductId, int(in.Quantity))
+	o, err := s.osvc.ReceiveOrderItem(in.Id, in.ProductId, int(in.Quantity))
 	if err != nil {
 		return &pb.ReceiveOrderItemResponse{}, err
 	}
-	return &pb.ReceiveOrderItemResponse{}, nil
+	return &pb.ReceiveOrderItemResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
@@ -67,35 +68,7 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 	// TEMPORARY
 	//time.Sleep(250 * time.Millisecond)
 
-	var items []*pb.Item
-	for _, i := range o.Items {
-		item := &pb.Item{
-			Product: &pb.Product{
-				Id:   i.ID,
-				Name: i.Name,
-				Uom:  i.UOM,
-			},
-			QuantityRequested: uint32(i.QuantityRequested),
-			QuantityReceived:  uint32(i.QuantityReceived),
-			QuantityRemaining: uint32(i.QuantityRemaining),
-			ItemStatus:        i.ItemStatus.String(),
-		}
-		items = append(items, item)
-	}
-
-	order := &pb.Order{
-		Id: o.ID,
-		Project: &pb.Project{
-			Id:   o.Project.ID,
-			Name: o.Project.Name,
-		},
-		Items:    items,
-		Date:     int32(o.SentDate),
-		Status:   o.Status.String(),
-		Comments: o.Comments,
-	}
-
-	return &pb.FindOrderResponse{Order: order}, nil
+	return &pb.FindOrderResponse{Order: orderToProto(o)}, nil
 }
 
 func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOrderDatesRequest) (*pb.FindProjectOrderDatesResponse, error) {
@@ -120,13 +93,43 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 	return &pb.FindProjectOrderDatesResponse{Orders: orders}, nil
 }
 
-// Projects
-func (s *Server) CloseProject(ctx context.Context, in *pb.CloseProjectRequest) (*pb.CloseProjectResponse, error) {
-	return &pb.CloseProjectResponse{}, nil
+func orderToProto(o *supply.Order) *pb.Order {
+	var items []*pb.Item
+	for _, i := range o.Items {
+		item := &pb.Item{
+			Product: &pb.Product{
+				Id:   i.ID,
+				Name: i.Name,
+				Uom:  i.UOM,
+			},
+			QuantityRequested: uint32(i.QuantityRequested),
+			QuantityReceived:  uint32(i.QuantityReceived),
+			QuantityRemaining: uint32(i.QuantityRemaining),
+			ItemStatus:        i.ItemStatus.String(),
+		}
+		items = append(items, item)
+	}
+
+	return &pb.Order{
+		Id: o.ID,
+		Project: &pb.Project{
+			Id:   o.Project.ID,
+			Name: o.Project.Name,
+		},
+		Items:    items,
+		Date:     int32(o.SentDate),
+		Status:   o.Status.String(),
+		Comments: o.Comments,
+	}
 }
 
+// Projects
 func (s *Server) CreateProject(ctx context.Context, in *pb.CreateProjectRequest) (*pb.CreateProjectResponse, error) {
 	return &pb.CreateProjectResponse{}, nil
+}
+
+func (s *Server) CloseProject(ctx context.Context, in *pb.CloseProjectRequest) (*pb.CloseProjectResponse, error) {
+	return &pb.CloseProjectResponse{}, nil
 }
 
 func (s *Server) FindProjects(ctx context.Context, in *pb.FindProjectsRequest) (*pb.FindProjectsResponse, error) {

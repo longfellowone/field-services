@@ -22,13 +22,14 @@ service Supply {
 
 // CreateOrder
 message CreateOrderRequest {
-    string id = 1;
     string project_id = 2;
     string name = 3;
     string foreman = 4;
     string email = 5;
 }
-message CreateOrderResponse {}
+message CreateOrderResponse {
+    Order order = 1;
+}
 
 // AddOrderItem
 message AddOrderItemRequest {
@@ -37,14 +38,18 @@ message AddOrderItemRequest {
     string name = 3;
     string uom = 4;
 }
-message AddOrderItemResponse {}
+message AddOrderItemResponse {
+    Order order = 1;
+}
 
 // RemoveOrderItem
 message RemoveOrderItemRequest {
     string id = 1;
     string product_id = 2;
 }
-message RemoveOrderItemResponse {}
+message RemoveOrderItemResponse {
+    Order order = 1;
+}
 
 // ModifyRequestedQuantity
 message ModifyRequestedQuantityRequest {
@@ -52,14 +57,18 @@ message ModifyRequestedQuantityRequest {
     string product_id = 2;
     uint32 quantity = 3;
 }
-message ModifyRequestedQuantityResponse {}
+message ModifyRequestedQuantityResponse {
+    Order order = 1;
+}
 
 // SendOrder
 message SendOrderRequest {
     string id = 1;
     string comments = 2;
 }
-message SendOrderResponse {}
+message SendOrderResponse {
+    Order order = 1;
+}
 
 // ReceiveOrderItem
 message ReceiveOrderItemRequest {
@@ -67,7 +76,9 @@ message ReceiveOrderItemRequest {
     string product_id = 2;
     uint32 quantity = 3;
 }
-message ReceiveOrderItemResponse {}
+message ReceiveOrderItemResponse {
+    Order order = 1;
+}
 
 // An Order
 message Order {

@@ -41,7 +41,8 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input models.CreateO
 	if err != nil {
 		return &supply.Order{}, err
 	}
-	order, err := r.osvc.CreateOrder(input.ID, input.ProjectID, input.Name, user.ID, user.Email)
+	// TODO: Remove input.ID
+	order, err := r.osvc.CreateOrder(input.ProjectID, input.Name, user.ID, user.Email)
 	if err != nil {
 		return &supply.Order{}, err
 	}
