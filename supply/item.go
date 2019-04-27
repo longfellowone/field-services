@@ -15,6 +15,7 @@ type Item struct {
 	ItemStatus        ItemStatus
 	PONumber          string
 	DateAdded         int64
+	Removed           bool
 }
 
 // Returns a new *Item

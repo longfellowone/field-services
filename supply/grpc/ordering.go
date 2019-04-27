@@ -106,6 +106,7 @@ func orderToProto(o *supply.Order) *pb.Order {
 			QuantityReceived:  uint32(i.QuantityReceived),
 			QuantityRemaining: uint32(i.QuantityRemaining),
 			ItemStatus:        i.ItemStatus.String(),
+			Deleted:           i.Removed,
 		}
 		items = append(items, item)
 	}

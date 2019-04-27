@@ -59,7 +59,7 @@ func (o *Order) RemoveItem(id string) error {
 	if err != nil {
 		return err
 	}
-	o.Items = append(o.Items[:i], o.Items[i+1:]...)
+	o.Items[i].Removed = true
 	return nil
 }
 

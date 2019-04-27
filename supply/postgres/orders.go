@@ -43,6 +43,12 @@ const saveItems = `
 		status=EXCLUDED.status,
 		ponumber=EXCLUDED.ponumber`
 
+const deleteItems = `
+	DELETE FROM order_items
+	WHERE orderid = $1
+	AND productid = $2
+`
+
 func (r *OrderRepository) Save(o *supply.Order) error {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -55,6 +61,12 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 		return err
 	}
 
+	deleteStmt, err := tx.Prepare(deleteItems)
+	if err != nil {
+		return err
+	}
+	defer deleteStmt.Close()
+
 	stmt, err := tx.Prepare(saveItems)
 	if err != nil {
 		return err
@@ -62,19 +74,26 @@ func (r *OrderRepository) Save(o *supply.Order) error {
 	defer stmt.Close()
 
 	for _, item := range o.Items {
-		_, err = stmt.Exec(
-			o.ID,
-			item.ID,
-			item.Name,
-			item.UOM,
-			item.QuantityRequested,
-			item.QuantityReceived,
-			item.QuantityRemaining,
-			item.ItemStatus,
-			item.PONumber,
-			item.DateAdded)
-		if err != nil {
-			return err
+		if item.Removed == true {
+			_, err = deleteStmt.Exec(o.ID, item.ID)
+			if err != nil {
+				return err
+			}
+		} else {
+			_, err = stmt.Exec(
+				o.ID,
+				item.ID,
+				item.Name,
+				item.UOM,
+				item.QuantityRequested,
+				item.QuantityReceived,
+				item.QuantityRemaining,
+				item.ItemStatus,
+				item.PONumber,
+				item.DateAdded)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

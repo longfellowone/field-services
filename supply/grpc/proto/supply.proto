@@ -102,6 +102,7 @@ message Item {
     uint32 quantity_received = 3;
     uint32 quantity_remaining = 4;
     string item_status = 5;
+    bool deleted = 6;
 }
 
 // A product
