@@ -115,7 +115,7 @@ const findOrderItems = `
 	INNER JOIN order_items oi 
 	ON o.orderid = oi.orderid 
 	WHERE o.orderid=$1
-	ORDER BY oi.dateadded DESC`
+	ORDER BY oi.dateadded ASC`
 
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	o := supply.Order{Items: make([]*supply.Item, 0)}

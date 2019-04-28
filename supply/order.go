@@ -50,7 +50,8 @@ func (o *Order) AddItem(id, name, uom string) error {
 	if err == nil {
 		return ErrItemAlreadyOnList
 	}
-	o.Items = append(o.Items, newItem(id, name, uom))
+	item := newItem(id, name, uom)
+	o.Items = append([]*Item{item}, o.Items...)
 	return nil
 }
 
