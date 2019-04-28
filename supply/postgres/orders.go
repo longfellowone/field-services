@@ -179,6 +179,24 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	return &o, nil
 }
 
+const deleteOrder = `
+	DELETE FROM orders
+	WHERE orderid = $1
+`
+
+func (r *OrderRepository) Delete(id string) error {
+	stmt, err := r.db.Prepare(deleteOrder)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 const findOrderDates = `
 	SELECT orderid, sentdate, status
 	FROM orders

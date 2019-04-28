@@ -16,7 +16,13 @@ func (s *Server) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*p
 	if err != nil {
 		return &pb.CreateOrderResponse{}, err
 	}
-	return &pb.CreateOrderResponse{Order: orderToProto(o)}, nil
+
+	os := &pb.OrderSummary{
+		Id:     o.ID,
+		Date:   int32(o.SentDate),
+		Status: o.Status.String(),
+	}
+	return &pb.CreateOrderResponse{Order: os}, nil
 }
 
 func (s *Server) AddOrderItem(ctx context.Context, in *pb.AddOrderItemRequest) (*pb.AddOrderItemResponse, error) {
@@ -91,6 +97,14 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 	}
 
 	return &pb.FindProjectOrderDatesResponse{Orders: orders}, nil
+}
+
+func (s *Server) DeleteOrder(ctx context.Context, in *pb.DeleteOrderRequest) (*pb.DeleteOrderResponse, error) {
+	err := s.osvc.DeleteOrder(in.OrderId)
+	if err != nil {
+		return &pb.DeleteOrderResponse{}, err
+	}
+	return &pb.DeleteOrderResponse{}, nil
 }
 
 func orderToProto(o *supply.Order) *pb.Order {

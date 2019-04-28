@@ -12,6 +12,7 @@ service Supply {
     rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
     rpc FindOrder  (FindOrderRequest) returns (FindOrderResponse);
     rpc FindProjectOrderDates (FindProjectOrderDatesRequest) returns (FindProjectOrderDatesResponse);
+    rpc DeleteOrder (DeleteOrderRequest) returns (DeleteOrderResponse);
     // ProductSearch
     rpc ProductSearch (ProductSearchRequest) returns (ProductSearchResponse) {}
     // Projects
@@ -28,7 +29,7 @@ message CreateOrderRequest {
     string email = 5;
 }
 message CreateOrderResponse {
-    Order order = 1;
+    OrderSummary order = 1;
 }
 
 // AddOrderItem
@@ -134,6 +135,12 @@ message FindProjectOrderDatesRequest {
 message FindProjectOrderDatesResponse {
     repeated OrderSummary orders = 1;
 }
+
+// Delete an order
+message DeleteOrderRequest {
+    string order_id = 1;
+}
+message DeleteOrderResponse {}
 
 // A result
 message Result {

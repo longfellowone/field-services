@@ -16,6 +16,7 @@ var (
 type OrderRepository interface {
 	Save(o *Order) error
 	Find(id string) (*Order, error)
+	Delete(id string) error
 }
 
 type Order struct {

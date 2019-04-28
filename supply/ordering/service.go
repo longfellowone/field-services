@@ -15,6 +15,7 @@ type Service interface {
 	ReceiveOrderItem(orderid, productid string, quantity int) (*supply.Order, error)
 	FindOrder(orderid string) (*supply.Order, error)
 	FindProjectOrderDates(projectid string) ([]ProjectOrder, error)
+	DeleteOrder(id string) error
 	// Projects
 	CreateProject(projectid, name, foreman, email string) (*supply.Project, error)
 	CloseProject(projectid string) (*supply.Project, error)
@@ -180,7 +181,13 @@ func (s *service) FindProjectsByForeman(foremanid string) ([]supply.Project, err
 	return projects, nil
 }
 
-// Order read models
+func (s *service) DeleteOrder(id string) error {
+	err := s.order.Delete(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 type ProjectOrder struct {
 	ID       string
