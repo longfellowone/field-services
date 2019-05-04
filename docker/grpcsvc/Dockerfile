@@ -18,5 +18,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./cmd/grpcsvc
 #FROM scratch
 FROM alpine
 COPY --from=builder /builder/grpcsvc /app/
-EXPOSE 8080
+EXPOSE 9090
 ENTRYPOINT ["/app/grpcsvc"]

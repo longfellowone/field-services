@@ -32,6 +32,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	fmt.Println("Testing...")
 	fmt.Println("Listening on :9090")
 
 	s := InitializeSupplyServices(db)
