@@ -118,7 +118,7 @@ const findOrderItems = `
 	ORDER BY oi.dateadded DESC`
 
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
-	o := supply.Order{Items: make([]*supply.Item, 0)}
+	o := supply.Order{Items: make([]supply.Item, 0)}
 
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -165,7 +165,7 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 		if err != nil {
 			return &supply.Order{}, err
 		}
-		o.Items = append(o.Items, &i)
+		o.Items = append(o.Items, i)
 	}
 	err = rows.Err()
 	if err != nil {

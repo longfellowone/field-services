@@ -22,7 +22,7 @@ type OrderRepository interface {
 type Order struct {
 	ID string
 	Project
-	Items    []*Item
+	Items    []Item
 	SentDate int64
 	Status   OrderStatus
 	Comments string
@@ -38,7 +38,7 @@ func Create(id, pid, name, foreman, email string) *Order {
 			Foreman:      foreman,
 			ForemanEmail: email,
 		},
-		Items:    []*Item{},
+		Items:    []Item{},
 		SentDate: time.Now().Unix(),
 		Status:   Draft,
 	}
@@ -51,7 +51,7 @@ func (o *Order) AddItem(id, name, uom string) error {
 		return ErrItemAlreadyOnList
 	}
 	item := newItem(id, name, uom)
-	o.Items = append([]*Item{item}, o.Items...)
+	o.Items = append([]Item{item}, o.Items...)
 	return nil
 }
 
@@ -85,8 +85,8 @@ func (o *Order) Send(comments string) error {
 		return ErrQuantityZero
 	}
 
-	for _, item := range o.Items {
-		item.ItemStatus = Waiting
+	for i := range o.Items {
+		o.Items[i].ItemStatus = Waiting
 	}
 
 	o.Comments = comments

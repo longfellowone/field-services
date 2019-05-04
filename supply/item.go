@@ -19,8 +19,8 @@ type Item struct {
 }
 
 // Returns a new *Item
-func newItem(id, name, uom string) *Item {
-	return &Item{
+func newItem(id, name, uom string) Item {
+	return Item{
 		ID:         id,
 		Name:       name,
 		UOM:        uom,
