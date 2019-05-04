@@ -10,6 +10,7 @@ service Supply {
     rpc RemoveOrderItem (RemoveOrderItemRequest) returns (RemoveOrderItemResponse) {}
     rpc ReceiveOrderItem (ReceiveOrderItemRequest) returns (ReceiveOrderItemResponse) {}
     rpc ModifyRequestedQuantity (ModifyRequestedQuantityRequest) returns (ModifyRequestedQuantityResponse) {}
+    rpc ProcessOrder (ProcessOrderRequest) returns (ProcessOrderResponse) {}
     rpc FindOrder  (FindOrderRequest) returns (FindOrderResponse);
     rpc FindProjectOrderDates (FindProjectOrderDatesRequest) returns (FindProjectOrderDatesResponse);
     rpc DeleteOrder (DeleteOrderRequest) returns (DeleteOrderResponse);
@@ -78,6 +79,13 @@ message ReceiveOrderItemRequest {
     uint32 quantity = 3;
 }
 message ReceiveOrderItemResponse {
+    Order order = 1;
+}
+
+message ProcessOrderRequest {
+    string id = 1;
+}
+message ProcessOrderResponse {
     Order order = 1;
 }
 

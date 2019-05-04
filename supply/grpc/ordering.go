@@ -4,7 +4,6 @@ import (
 	"context"
 	"field/supply"
 	pb "field/supply/grpc/proto"
-	"time"
 )
 
 // To return error status
@@ -66,6 +65,14 @@ func (s *Server) ReceiveOrderItem(ctx context.Context, in *pb.ReceiveOrderItemRe
 	return &pb.ReceiveOrderItemResponse{Order: orderToProto(o)}, nil
 }
 
+func (s *Server) ProcessOrder(ctx context.Context, in *pb.ProcessOrderRequest) (*pb.ProcessOrderResponse, error) {
+	o, err := s.osvc.ProcessOrder(in.Id)
+	if err != nil {
+		return &pb.ProcessOrderResponse{}, err
+	}
+	return &pb.ProcessOrderResponse{Order: orderToProto(o)}, nil
+}
+
 func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.FindOrderResponse, error) {
 	o, err := s.osvc.FindOrder(in.Id)
 	if err != nil {
@@ -73,7 +80,7 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 	}
 
 	//TEMPORARY
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(250 * time.Millisecond)
 
 	return &pb.FindOrderResponse{Order: orderToProto(o)}, nil
 }
@@ -85,7 +92,7 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 	}
 
 	// TEMPORARY
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(500 * time.Millisecond)
 
 	var orders []*pb.OrderSummary
 	for _, o := range oo {
