@@ -1,8 +1,14 @@
--- Adminer 4.7.1 PostgreSQL dump
+CREATE TABLE "public"."orders" (
+                                   "orderid" character varying(36) NOT NULL,
+                                   "projectid" character varying(36) NOT NULL,
+                                   "sentdate" integer NOT NULL,
+                                   "status" integer NOT NULL,
+                                   "project_name" character varying(80) NOT NULL,
+                                   "foreman_email" character varying(80) NOT NULL,
+                                   "comments" character varying(3000) NOT NULL,
+                                   CONSTRAINT "orders_pk" PRIMARY KEY ("orderid")
+) WITH (oids = false);
 
-\connect "default";
-
-DROP TABLE IF EXISTS "order_items";
 CREATE TABLE "public"."order_items" (
                                         "orderid" character varying(36) NOT NULL,
                                         "productid" character varying(36) NOT NULL,
@@ -15,90 +21,20 @@ CREATE TABLE "public"."order_items" (
                                         "ponumber" character varying(20) NOT NULL,
                                         "dateadded" integer NOT NULL,
                                         CONSTRAINT "order_items_orderid_productid_unique" UNIQUE ("orderid", "productid"),
-                                        CONSTRAINT "order_items_orders_orderid_fk" FOREIGN KEY (orderid) REFERENCES orders(orderid) NOT DEFERRABLE
+                                        CONSTRAINT "order_items_orderid_fkey" FOREIGN KEY (orderid) REFERENCES orders(orderid) ON DELETE CASCADE NOT DEFERRABLE
 ) WITH (oids = false);
 
 CREATE INDEX "order_items_orderid_index" ON "public"."order_items" USING btree ("orderid");
 
-INSERT INTO "order_items" ("orderid", "productid", "name", "uom", "requested", "received", "remaining", "status", "ponumber", "dateadded") VALUES
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'10d39950-9e46-4aee-bebc-df510698c01f',	'Sunscreen',	'ea',	99,	'0',	'0',	'0',	'N/A',	1555959202),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'8bb21e96-b362-4ce4-89b1-97e5190528fa',	'#6 Aluminum',	'ft',	4,	'0',	'0',	'0',	'N/A',	1555959190),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'd02909d0-3d80-469a-a3b0-941f40d3de9a',	'#3 Aluminum',	'ft',	23,	'0',	'0',	'0',	'N/A',	1555959189),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'bd6e88f4-a733-471d-9bf0-f81bf17866ba',	'#1 Aluminum',	'ft',	99,	'0',	'0',	'0',	'N/A',	1555959189),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'f3366b94-cb0f-49a5-9438-8f590053ec65',	'Holesaw arbor',	'ea',	2700,	'0',	'0',	'0',	'N/A',	1555959188),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'056b4f57-7a4d-4f0b-86c7-6249459b20f4',	'DB2 3" Sweep',	'ea',	67,	'0',	'0',	'0',	'N/A',	1555959187),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'81c0e411-9185-4a48-b1ab-93984904689d',	'Blue strobe',	'ea',	7,	'0',	'0',	'0',	'N/A',	1555959186),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'3866034e-ee51-4698-b090-007db9e9f8bf',	'4" PVC 90',	'ea',	7,	'0',	'0',	'0',	'N/A',	1555959185),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'ff182b76-3528-40fd-94e0-59884fc0ecc6',	'2/0 Copper',	'ft',	99,	'0',	'0',	'0',	'N/A',	1555959184),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'4f36c16c-52dd-4ce0-935a-ed1716865307',	'1" PVC 90',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959183),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'7f06b820-5da6-415a-a8e4-f6ab62676223',	'1/8" Rope',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959182),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'726c9b3f-4765-4955-91a9-1b5342f98212',	'7/8" Carbide tooth cutter',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959180),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'e52b0385-19de-4774-a0e4-385f75693e20',	'6-50R + Coverplate',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959179),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'8cef6b03-6e22-4fd4-b264-2995404c9e11',	'Caddy 512HD',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959178),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'0577a64f-05da-49a2-a976-1275e38378f5',	'5/16" x 1" bolt',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959176),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'7adb9132-6a75-43ab-8267-e41ebd1b8697',	'500mcm Aluminum',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959175),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'6470917e-1d2e-4450-946d-31b5daf895df',	'Caddy 512',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959173),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'48fadd7e-4af6-4f1d-ad61-7e9ad3dca7f3',	'T&B 54895L',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959172),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'868ea69e-3d8b-4d9a-8816-bee6c5711bd2',	'5-15R GFCI',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959171),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'0ed51819-daf8-46fc-82c7-0c4cc7aa7c20',	'5/8" SDS bit',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959171),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'd65cc84b-d7e5-4529-a0b5-c97dfcc1b8c1',	'5-20R GFCI',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959170),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'ee6f6019-9cff-4bbe-861e-5cc2c99162e9',	'8/2 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959168),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'75e0d66d-5dc2-4676-ba9e-478130d4f5f2',	'1/4" Nut',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959167),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'7d56fd91-051a-4f45-a0e3-a710b4da205b',	'3" EMT 90',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959166),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'5331670c-c565-4738-8300-718cce83c8ae',	'10/3 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959165),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'722fb3fa-d9e8-458c-bd8b-51c34563062d',	'12/2 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959164),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'efdcea77-5af5-4072-a1ed-fd2168dcf921',	'12/4 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959163),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'5b575a80-9e51-4f0c-8c0d-791c89809813',	'4" PVC FA',	'ea',	8,	'0',	'0',	'0',	'N/A',	1555959214),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'4976bc7d-e0b1-49cf-aa86-24337df86476',	'1/2" Nut',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959162),
-('3aedd656-0978-4204-b377-635ec971d691',	'5175b5dc-5616-4082-a08a-7fe5f37da6df',	'Roll caution tape',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959394),
-('3aedd656-0978-4204-b377-635ec971d691',	'14159eff-9106-4df9-81be-e214c64f009d',	'Roll green electrical tape',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959393),
-('3aedd656-0978-4204-b377-635ec971d691',	'c696ebe4-3704-4888-9b15-bd121ef43298',	'Roll blue electrical tape',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959392),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'c6fbc461-8f94-479b-b6cd-7ec058a55afb',	'DB2 4" Orange',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959384),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'a5e61fac-f3d9-4f90-984e-c32218d56b1a',	'FA Strobe',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959383),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'53145035-041d-4cc3-a453-004eac368288',	'8/3 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959382),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'193c1ac1-80b9-4fc5-a809-8d0611383094',	'6/3 BX',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959381),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'be72b075-c17a-4cf4-a33b-8afc46c0cdda',	'60a bolt on breaker',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959380),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'48fadd7e-4af6-4f1d-ad61-7e9ad3dca7f3',	'T&B 54895L',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959379),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7adb9132-6a75-43ab-8267-e41ebd1b8697',	'500mcm Aluminum',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959378),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'e1012371-09c3-4b37-a5e0-e06afea1425c',	'3/4" LB',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959376),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'19eb1906-69dc-4d55-a0b7-90902f9a7db9',	'Caddy CS812D 3/4"',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959374),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'08af36fb-5fde-4731-983d-ddd3f2db71a4',	'2" 6/32 Screw',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959373),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'7b9af340-95f7-409e-98d3-b80b708f7c3c',	'Bag of rags',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959385),
-('3aedd656-0978-4204-b377-635ec971d691',	'4e985b49-fcbb-4aa5-98f1-47005d15c157',	'Roll green painters tape',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959391),
-('3aedd656-0978-4204-b377-635ec971d691',	'7e9de919-84b3-4e2b-a0a3-8faa890aa503',	'#12 RWU90 Stranded - RED',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959390),
-('3aedd656-0978-4204-b377-635ec971d691',	'6e48bbd9-be30-43bd-98be-6b9d78d75960',	'#14 RW90 Solid - GREEN',	'ft',	'0',	'0',	'0',	'0',	'N/A',	1555959389),
-('3aedd656-0978-4204-b377-635ec971d691',	'3bb03d27-f299-4c72-880f-1c2a55e2240e',	'4" EMT connector w/ Insulated throat',	'ea',	'0',	'0',	'0',	'0',	'N/A',	1555959399),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'a798b777-03c7-44a5-babe-806c921de07e',	'1/2" P Clamp',	'ea',	77,	'0',	'0',	'0',	'N/A',	1555959437),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'0180a045-f829-4f48-a949-57742c9d617b',	'FLEX 2-1/2"',	'ft',	200,	'0',	'0',	'0',	'N/A',	1555959430),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'3bb03d27-f299-4c72-880f-1c2a55e2240e',	'4" EMT connector w/ Insulated throat',	'ea',	10,	'0',	'0',	'0',	'N/A',	1555959427),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'48e450a8-aa10-4f0b-ac56-07c09d349ff2',	'1/2" SDS bit',	'ea',	7,	'0',	'0',	'0',	'N/A',	1555959422),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'b3d3f045-470f-47b4-913d-6c10b805fdec',	'Thermostat for baseboard heater',	'ea',	1000,	'0',	'0',	'0',	'N/A',	1555959448),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'17a2479b-2ab5-4caa-a392-bb5247b73c16',	'EMT 4"',	'ft',	7,	4,	'0',	'0',	'N/A',	1554094453),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'a75f2ce5-af4f-4828-ae89-482b8ec4b68e',	'Red fluorescent marking paint',	'ea',	6,	'0',	'0',	'0',	'N/A',	1554094394);
-
-DROP TABLE IF EXISTS "orders";
-CREATE TABLE "public"."orders" (
-                                   "orderid" character varying(36) NOT NULL,
-                                   "projectid" character varying(36) NOT NULL,
-                                   "sentdate" integer NOT NULL,
-                                   "status" integer NOT NULL,
-                                   "project_name" character varying(80) NOT NULL,
-                                   "foreman_email" character varying(80) NOT NULL,
-                                   "comments" character varying(3000) NOT NULL,
-                                   CONSTRAINT "orders_pk" PRIMARY KEY ("orderid")
+CREATE TABLE "public"."projects" (
+                                     "projectid" character varying(36) NOT NULL,
+                                     "name" character varying(80) NOT NULL,
+                                     "foreman" character varying(36) NOT NULL,
+                                     "foreman_email" character varying(80) NOT NULL,
+                                     "active" boolean DEFAULT true,
+                                     CONSTRAINT "projects_pk" PRIMARY KEY ("projectid")
 ) WITH (oids = false);
 
-INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status", "project_name", "foreman_email", "comments") VALUES
-('a198f009-173b-4ac3-9d41-df7001090bde',	'3a63592f-22bf-4d8e-af66-c31e77c0f624',	1552186577,	'0',	'Project Name 3',	'email@email.com',	''),
-('3f9615cf-edc3-4528-8f47-052f093bbb14',	'9f84f49a-5428-40c0-8798-7f7d2d6ab1a6',	1552186588,	'0',	'Old Project',	'mattwright3195@gmail.com',	''),
-('testid',	'testproject',	1554064562,	'0',	'testname',	'testemail',	''),
-('testsid',	'testprsoject',	1554065053,	'0',	'testnasme',	'mattwright3195@gmail.com',	''),
-('88d98a36-3257-4bad-9cfd-ba3ea23b971e',	'072da62a-1c83-4670-b5b9-e8677653c2c2',	1552256702,	'0',	'St. Thomas',	'mattwright3195@gmail.com',	''),
-('7e55aa12-2e6a-4f21-b01a-09503c755180',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1555030484,	'0',	'Argyle',	'mattwright3195@gmail.com',	'my list of comments'),
-('ab23f700-e922-4cc5-bdb9-7cf8b699d4d5',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186855,	1,	'Argyle',	'mattwright3195@gmail.com',	''),
-('3aedd656-0978-4204-b377-635ec971d691',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186573,	1,	'Argyle',	'mattwright3195@gmail.com',	'');
-
-DROP TABLE IF EXISTS "products";
 CREATE TABLE "public"."products" (
                                      "productid" character varying(36) NOT NULL,
                                      "category" character varying(30) NOT NULL,
@@ -106,6 +42,48 @@ CREATE TABLE "public"."products" (
                                      "uom" character varying(3) NOT NULL,
                                      CONSTRAINT "products_pkey" PRIMARY KEY ("productid")
 ) WITH (oids = false);
+
+INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status", "project_name", "foreman_email", "comments") VALUES
+('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945392,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	''),
+('82a7ab24-257f-42a5-b2b7-9f93bef7c7c5',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556857269,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('92e3ed8e-79f8-4e40-81e5-2a908742cd90',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556857269,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('b578ccaf-2a76-45c0-b1a8-506ea3b3fc01',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552256702,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('5b3abcee-154a-42ef-aed7-ed6604bd4450',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186855,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('38ba1bab-4ebb-49f0-8690-3a3f54f43800',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945410,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'Now'),
+('c9a1a099-4ba1-447a-8a88-0d1b22bb36f3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945212,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'Please send now'),
+('aa0001e2-7dcd-438d-a930-ae8879491626',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396473,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('eab4bcea-d640-4b9e-8b74-5895b6ae6695',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396416,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('8bf59d05-aa1a-4be2-9ffe-fcc37207e713',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1554064562,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('1f19c9cc-2b2d-4e9f-8eb1-45e390936bcf',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552256702,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186577,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('b1486083-617b-43fd-99f7-2c9e6e57f5ee',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945246,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'Give me now '),
+('17f27274-9806-44e4-b7d6-66c83f3808c8',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556857269,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('31b257f2-ceb6-449f-ad82-220095b1010d',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396416,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('e9ab8f4a-9385-4b3d-8d6b-c3add1c30b6e',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396396,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
+('4fa52946-9cb4-470f-8a9e-511968bdb9d0',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186577,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions');
+
+INSERT INTO "order_items" ("orderid", "productid", "name", "uom", "requested", "received", "remaining", "status", "ponumber", "dateadded") VALUES
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'417b5745-a9b2-4be5-9d61-3896dbce97f9',	'3/4" EMT 1 hole strap',	'ea',	300,	'0',	'0',	1,	'N/A',	1556857188),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'ef8feb10-252a-4154-bce6-1302a2467292',	'3/4" EMT coupling',	'ea',	300,	'0',	'0',	1,	'N/A',	1556857179),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'471c8974-928b-4b61-abcf-d4a3aff31491',	'3/4" EMT connector w/ Insulated throat',	'ea',	300,	'0',	'0',	1,	'N/A',	1556857173),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'7961a923-5c03-4fd0-94db-dd214430ae3d',	'1" EMT 1 hole strap',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857161),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'aed4052a-4840-4d86-b9e6-aebd9738c1f1',	'1/2" EMT 1 hole strap',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857139),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'88ce3176-12d0-4628-bfb4-cbb11b73b5d3',	'1/2" EMT coupling',	'ea',	50,	'0',	'0',	1,	'N/A',	1556857133),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'7ae67fe7-1bbe-4142-963a-c4c49af22f98',	'1/2" EMT connector w/ Insulated throat',	'ea',	50,	'0',	'0',	1,	'N/A',	1556857125),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'db4f3478-e412-4558-bd89-f60e507f1d84',	'EMT 1/2"',	'ft',	1000,	'0',	'0',	1,	'N/A',	1556857115),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'585a0df1-e37c-4094-9f55-81f61b0d5178',	'3/8" Threaded rod',	'ft',	1000,	'0',	'0',	1,	'N/A',	1556857106),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'0cd3d562-0d8d-4b5d-b570-b02564585a01',	'Self tapping wafer screw',	'ea',	5000,	'0',	'0',	1,	'N/A',	1556857095),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'5bc6e7d1-3263-48ff-a6e8-9e7fba1da2a5',	'1" EMT coupling',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857091),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'9a3d63e9-a1bc-46cc-9581-1c73a3c0981b',	'1" EMT connector w/ Insulated throat',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857085),
+('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'bd6356f0-5bc7-44ce-a141-4137c1d0b2b8',	'EMT 1"',	'ft',	100,	'0',	'0',	1,	'N/A',	1556857058),
+('38ba1bab-4ebb-49f0-8690-3a3f54f43800',	'7ed7e817-b1e2-4d00-941b-75fed8f227f3',	'3" White bushing',	'ea',	1,	'0',	'0',	1,	'N/A',	1556945403),
+('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'0cd3d562-0d8d-4b5d-b570-b02564585a01',	'Self tapping wafer screw',	'ea',	100,	'0',	'0',	1,	'N/A',	1556945380),
+('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'e2079ea5-4500-4e17-9a12-44e9598205a3',	'CRLB37EG ROD LOCK Beam Clamp',	'ea',	20,	'0',	'0',	1,	'N/A',	1556945377),
+('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'd144b1de-8c9d-43ad-a126-3af4789a133b',	'Twine',	'ft',	3000,	'0',	'0',	1,	'N/A',	1556945373),
+('b1486083-617b-43fd-99f7-2c9e6e57f5ee',	'122c53fc-ba1f-47f8-8a97-4480834215be',	'Female cord end',	'ea',	10,	'0',	'0',	1,	'N/A',	1556945234),
+('b1486083-617b-43fd-99f7-2c9e6e57f5ee',	'17a2479b-2ab5-4caa-a392-bb5247b73c16',	'EMT 4"',	'ft',	30,	'0',	'0',	1,	'N/A',	1556945227),
+('c9a1a099-4ba1-447a-8a88-0d1b22bb36f3',	'43318ae6-cdfd-4ab5-bd47-6825bef78f40',	'Box thick garbage bags',	'ea',	2,	'0',	'0',	1,	'N/A',	1556945198),
+('c9a1a099-4ba1-447a-8a88-0d1b22bb36f3',	'95ff6cdb-b3ca-4dbd-bcee-9e9a05bdbe87',	'Wet hand wipes',	'ea',	100,	'0',	'0',	1,	'N/A',	1556945194);
 
 INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('87f62ef4-133e-45dd-adfe-4eb9d508827b',	'Boxes & Mudrings',	'1 Gang deep masonry box',	'ea'),
@@ -901,24 +879,6 @@ INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('2b7902f5-af18-4ff5-853b-71ff565e03bd',	'Consumables',	'Black paint marker',	'ea'),
 ('d6026ac7-ef83-4321-8b66-a71437d5d125',	'Consumables',	'Box black nitrile gloves - XL',	'ea');
 
-DROP TABLE IF EXISTS "projects";
-CREATE TABLE "public"."projects" (
-                                     "projectid" character varying(36) NOT NULL,
-                                     "name" character varying(80) NOT NULL,
-                                     "foreman" character varying(36) NOT NULL,
-                                     "foreman_email" character varying(80) NOT NULL,
-                                     "active" boolean DEFAULT true,
-                                     CONSTRAINT "projects_pk" PRIMARY KEY ("projectid")
-) WITH (oids = false);
 
 INSERT INTO "projects" ("projectid", "name", "foreman", "foreman_email", "active") VALUES
-('3a63592f-22bf-4d8e-af66-c31e77c0f624',	'Project Name 3',	'auth0|000000000000000000000000',	'email@email.com',	'1'),
-('9f84f49a-5428-40c0-8798-7f7d2d6ab1a6',	'Old Project',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0'),
-('test',	'myname',	'testid',	'testemail',	'1'),
-('pid',	'pname',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0'),
-('pid2',	'pname2',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0'),
-('pid3',	'pname3',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'1'),
-('cf510766-faf7-415e-a067-0c5ae5cb2ae8',	'Argyle',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0'),
-('072da62a-1c83-4670-b5b9-e8677653c2c2',	'St. Thomas',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0');
-
--- 2019-04-23 03:46:55.676736+00
+('cf510766-faf7-415e-a067-0c5ae5cb2ae8',	'Argyle',	'auth0|5c9d6eacf690cd1104199b9d',	'mattwright3195@gmail.com',	'0');

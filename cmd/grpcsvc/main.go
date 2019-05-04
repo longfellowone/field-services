@@ -14,7 +14,7 @@ import (
 
 func main() {
 	dbConfig := postgres.Config{
-		DBHost:     "localhost",
+		DBHost:     "db",
 		DBPort:     5432,
 		DBUser:     "default",
 		DBPassword: "password",

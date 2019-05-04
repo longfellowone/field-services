@@ -52,8 +52,8 @@ func main() {
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 
-	r.Handle("/graphql", gqlHandler)
-	r.Handle("/", handler.Playground("", "/graphql"))
+	r.Handle("/graphqlsvc", gqlHandler)
+	r.Handle("/", handler.Playground("", "/graphqlsvc"))
 
 	srv := &http.Server{Addr: ":8080", Handler: r}
 

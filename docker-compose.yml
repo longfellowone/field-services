@@ -15,12 +15,22 @@ services:
     ports:
       - "8081:8080"
 
-#  graphql:
+  grpcsvc:
+    depends_on:
+      - db
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/grpcsvc/Dockerfile
+    ports:
+      - "9090:9090"
+
+#  graphqlsvc:
 #    depends_on:
 #      - db
 #    build:
 #      context: .
-#      dockerfile: docker/graphql/Dockerfile
+#      dockerfile: docker/graphqlsvc/Dockerfile
 #    ports:
 #      - "8080:8080"
 

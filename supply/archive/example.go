@@ -5,7 +5,7 @@ import "fmt"
 func main() {
 	s := InitializeServices() // Inject *sql.DB here
 
-	s.CreateAuthor(0, "name", "name@email.com") // Example http/grpc/graphql endpoints
+	s.CreateAuthor(0, "name", "name@email.com") // Example http/grpc/graphqlsvc endpoints
 	s.CreatePost(1, 0, "title", "body")
 	s.Publish(1)
 	s.FindPost(1)
