@@ -115,7 +115,7 @@ const findOrderItems = `
 	INNER JOIN order_items oi 
 	ON o.orderid = oi.orderid 
 	WHERE o.orderid=$1
-	ORDER BY oi.dateadded ASC`
+	ORDER BY oi.dateadded DESC`
 
 func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	o := supply.Order{Items: make([]*supply.Item, 0)}
@@ -197,32 +197,47 @@ func (r *OrderRepository) Delete(id string) error {
 	return nil
 }
 
-const findOrderDates = `
-	SELECT orderid, sentdate, status
+const findProjectOrderDates = `
+	SELECT orderid, sentdate, project_name, status
 	FROM orders
 	WHERE projectid=$1
 	ORDER BY sentdate DESC`
 
-func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, error) {
-	orders := make([]ordering.ProjectOrder, 0)
+const findOrderDates = `
+	SELECT orderid, sentdate, project_name, status
+	FROM orders
+	WHERE status != 0
+	ORDER BY sentdate DESC
+	LIMIT 30`
 
-	rows, err := r.db.Query(findOrderDates, projectid)
+func (r *OrderRepository) FindProjectOrderDates(projectid string) ([]ordering.ProjectOrderDates, error) {
+	orders := make([]ordering.ProjectOrderDates, 0)
+
+	var rows *sql.Rows
+	var err error
+
+	if projectid == "" {
+		rows, err = r.db.Query(findOrderDates)
+	} else {
+		rows, err = r.db.Query(findProjectOrderDates, projectid)
+	}
+
 	if err != nil {
-		return []ordering.ProjectOrder{}, nil
+		return []ordering.ProjectOrderDates{}, nil
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var o ordering.ProjectOrder
-		err := rows.Scan(&o.ID, &o.SentDate, &o.Status)
+		var o ordering.ProjectOrderDates
+		err := rows.Scan(&o.ID, &o.SentDate, &o.ProjectName, &o.Status)
 		if err != nil {
-			return []ordering.ProjectOrder{}, nil
+			return []ordering.ProjectOrderDates{}, nil
 		}
 		orders = append(orders, o)
 	}
 	err = rows.Err()
 	if err != nil {
-		return []ordering.ProjectOrder{}, nil
+		return []ordering.ProjectOrderDates{}, nil
 	}
 
 	return orders, nil

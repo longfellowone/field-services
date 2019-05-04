@@ -24,7 +24,7 @@ func newItem(id, name, uom string) *Item {
 		ID:         id,
 		Name:       name,
 		UOM:        uom,
-		ItemStatus: Waiting,
+		ItemStatus: New,
 		PONumber:   "N/A",
 		DateAdded:  time.Now().Unix(),
 	}
@@ -57,7 +57,8 @@ func (i *Item) receive(quantity int) {
 type ItemStatus int
 
 const (
-	Waiting ItemStatus = iota
+	New ItemStatus = iota
+	Waiting
 	Filled
 	BackOrdered
 	OrderExceeded
@@ -66,6 +67,8 @@ const (
 
 func (s ItemStatus) String() string {
 	switch s {
+	case New:
+		return "New"
 	case Waiting:
 		return "Waiting"
 	case Filled:

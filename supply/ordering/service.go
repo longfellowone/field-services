@@ -14,7 +14,7 @@ type Service interface {
 	SendOrder(orderid, comments string) (*supply.Order, error)
 	ReceiveOrderItem(orderid, productid string, quantity int) (*supply.Order, error)
 	FindOrder(orderid string) (*supply.Order, error)
-	FindProjectOrderDates(projectid string) ([]ProjectOrder, error)
+	FindProjectOrderDates(projectid string) ([]ProjectOrderDates, error)
 	DeleteOrder(id string) error
 	// Projects
 	CreateProject(projectid, name, foreman, email string) (*supply.Project, error)
@@ -24,7 +24,7 @@ type Service interface {
 
 type orderRepository interface {
 	supply.OrderRepository
-	FindDates(projectid string) ([]ProjectOrder, error)
+	FindProjectOrderDates(projectid string) ([]ProjectOrderDates, error)
 }
 
 type projectRepository interface {
@@ -148,6 +148,7 @@ func (s *service) FindOrder(orderid string) (*supply.Order, error) {
 	if err != nil {
 		return &supply.Order{}, err
 	}
+
 	return order, nil
 }
 
@@ -189,16 +190,17 @@ func (s *service) DeleteOrder(id string) error {
 	return nil
 }
 
-type ProjectOrder struct {
-	ID       string
-	SentDate int64
-	Status   supply.OrderStatus
+type ProjectOrderDates struct {
+	ID          string
+	SentDate    int64
+	ProjectName string
+	Status      supply.OrderStatus
 }
 
-func (s *service) FindProjectOrderDates(projectid string) ([]ProjectOrder, error) {
-	orders, err := s.order.FindDates(projectid)
+func (s *service) FindProjectOrderDates(projectid string) ([]ProjectOrderDates, error) {
+	orders, err := s.order.FindProjectOrderDates(projectid)
 	if err != nil {
-		return []ProjectOrder{}, err
+		return []ProjectOrderDates{}, err
 	}
 	return orders, nil
 }

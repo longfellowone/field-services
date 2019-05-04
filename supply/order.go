@@ -40,7 +40,7 @@ func Create(id, pid, name, foreman, email string) *Order {
 		},
 		Items:    []*Item{},
 		SentDate: time.Now().Unix(),
-		Status:   New,
+		Status:   Draft,
 	}
 }
 
@@ -85,9 +85,14 @@ func (o *Order) Send(comments string) error {
 		return ErrQuantityZero
 	}
 
+	for _, item := range o.Items {
+		item.ItemStatus = Waiting
+	}
+
 	o.Comments = comments
 	o.Status = Sent
 	o.SentDate = time.Now().Unix()
+
 	return nil
 }
 
@@ -160,7 +165,7 @@ func (o *Order) missingQuantities() bool {
 type OrderStatus int
 
 const (
-	New OrderStatus = iota
+	Draft OrderStatus = iota
 	Sent
 	Processed
 	Complete
@@ -168,8 +173,8 @@ const (
 
 func (s OrderStatus) String() string {
 	switch s {
-	case New:
-		return "New"
+	case Draft:
+		return "Draft"
 	case Sent:
 		return "Sent"
 	case Processed:

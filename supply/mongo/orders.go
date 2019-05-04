@@ -71,8 +71,8 @@ func (r *OrderRepository) Find(id string) (*supply.Order, error) {
 	return &order, nil
 }
 
-func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, error) {
-	var orders []ordering.ProjectOrder
+func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrderDates, error) {
+	var orders []ordering.ProjectOrderDates
 	filter := bson.D{{Key: "projectid", Value: projectid}}
 
 	cur, err := r.coll.Find(context.TODO(), filter)
@@ -82,7 +82,7 @@ func (r *OrderRepository) FindDates(projectid string) ([]ordering.ProjectOrder, 
 	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
-		var order ordering.ProjectOrder
+		var order ordering.ProjectOrderDates
 		err := cur.Decode(&order)
 		if err != nil {
 			return nil, err

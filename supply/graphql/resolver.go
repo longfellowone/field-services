@@ -13,7 +13,7 @@ import (
 )
 
 //if user := auth.ForContext(ctx); user == nil || !user.IsPurchaser {
-//	return []ordering.ProjectOrder{}, fmt.Errorf("Access denied")
+//	return []ordering.ProjectOrderDates{}, fmt.Errorf("Access denied")
 
 type Resolver struct {
 	osvc ordering.Service
@@ -111,10 +111,10 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*supply.Order, er
 	}
 	return order, nil
 }
-func (r *queryResolver) ProjectOrders(ctx context.Context, id string) ([]ordering.ProjectOrder, error) {
+func (r *queryResolver) ProjectOrders(ctx context.Context, id string) ([]ordering.ProjectOrderDates, error) {
 	orders, err := r.osvc.FindProjectOrderDates(id)
 	if err != nil {
-		return []ordering.ProjectOrder{}, err
+		return []ordering.ProjectOrderDates{}, err
 	}
 	return orders, nil
 }

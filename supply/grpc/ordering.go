@@ -4,6 +4,7 @@ import (
 	"context"
 	"field/supply"
 	pb "field/supply/grpc/proto"
+	"time"
 )
 
 // To return error status
@@ -71,8 +72,8 @@ func (s *Server) FindOrder(ctx context.Context, in *pb.FindOrderRequest) (*pb.Fi
 		return &pb.FindOrderResponse{}, err
 	}
 
-	// TEMPORARY
-	//time.Sleep(250 * time.Millisecond)
+	//TEMPORARY
+	time.Sleep(1 * time.Second)
 
 	return &pb.FindOrderResponse{Order: orderToProto(o)}, nil
 }
@@ -84,14 +85,15 @@ func (s *Server) FindProjectOrderDates(ctx context.Context, in *pb.FindProjectOr
 	}
 
 	// TEMPORARY
-	//time.Sleep(250 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 
 	var orders []*pb.OrderSummary
 	for _, o := range oo {
 		order := &pb.OrderSummary{
-			Id:     o.ID,
-			Date:   int32(o.SentDate),
-			Status: o.Status.String(),
+			Id:          o.ID,
+			Date:        int32(o.SentDate),
+			ProjectName: o.ProjectName,
+			Status:      o.Status.String(),
 		}
 		orders = append(orders, order)
 	}
@@ -149,7 +151,7 @@ func (s *Server) CloseProject(ctx context.Context, in *pb.CloseProjectRequest) (
 
 func (s *Server) FindProjects(ctx context.Context, in *pb.FindProjectsRequest) (*pb.FindProjectsResponse, error) {
 	// TEMPORARY
-	//time.Sleep(250 * time.Millisecond)
+	//time.Sleep(500 * time.Millisecond)
 
 	return &pb.FindProjectsResponse{
 		Projects: []*pb.Project{{

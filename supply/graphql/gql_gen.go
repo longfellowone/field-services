@@ -119,7 +119,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Order(ctx context.Context, id string) (*supply.Order, error)
-	ProjectOrders(ctx context.Context, id string) ([]ordering.ProjectOrder, error)
+	ProjectOrders(ctx context.Context, id string) ([]ordering.ProjectOrderDates, error)
 	Products(ctx context.Context, name string) ([]search.Result, error)
 	Projects(ctx context.Context, foremanID string) ([]supply.Project, error)
 }
@@ -368,14 +368,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Name(childComplexity), true
 
-	case "ProjectOrder.ID":
+	case "ProjectOrderDates.ID":
 		if e.complexity.ProjectOrder.ID == nil {
 			break
 		}
 
 		return e.complexity.ProjectOrder.ID(childComplexity), true
 
-	case "ProjectOrder.SentDate":
+	case "ProjectOrderDates.SentDate":
 		if e.complexity.ProjectOrder.SentDate == nil {
 			break
 		}
@@ -589,7 +589,7 @@ input CloseProject {
 type Query {
     # Orders
     order(id: ID!): Order!
-    projectOrders(id: ID!): [ProjectOrder!]!
+    projectOrders(id: ID!): [ProjectOrderDates!]!
     products(name: String!): [Result!]!
     # Projects
     projects(foremanID: ID!): [Project!]!
@@ -609,7 +609,7 @@ type Product {
     uom: String!
 }
 
-type ProjectOrder {
+type ProjectOrderDates {
     id: ID!
     sentDate: Int!
     #    status: String!
@@ -1627,11 +1627,11 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProjectOrder_id(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrder) graphql.Marshaler {
+func (ec *executionContext) _ProjectOrder_id(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrderDates) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "ProjectOrder",
+		Object: "ProjectOrderDates",
 		Field:  field,
 		Args:   nil,
 	}
@@ -1653,11 +1653,11 @@ func (ec *executionContext) _ProjectOrder_id(ctx context.Context, field graphql.
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProjectOrder_sentDate(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrder) graphql.Marshaler {
+func (ec *executionContext) _ProjectOrder_sentDate(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrderDates) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "ProjectOrder",
+		Object: "ProjectOrderDates",
 		Field:  field,
 		Args:   nil,
 	}
@@ -1739,7 +1739,7 @@ func (ec *executionContext) _Query_projectOrders(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]ordering.ProjectOrder)
+	res := resTmp.([]ordering.ProjectOrderDates)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNProjectOrder2ᚕfieldᚋsupplyᚋorderingᚐProjectOrder(ctx, field.Selections, res)
@@ -3210,9 +3210,9 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var projectOrderImplementors = []string{"ProjectOrder"}
+var projectOrderImplementors = []string{"ProjectOrderDates"}
 
-func (ec *executionContext) _ProjectOrder(ctx context.Context, sel ast.SelectionSet, obj *ordering.ProjectOrder) graphql.Marshaler {
+func (ec *executionContext) _ProjectOrder(ctx context.Context, sel ast.SelectionSet, obj *ordering.ProjectOrderDates) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, projectOrderImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3220,7 +3220,7 @@ func (ec *executionContext) _ProjectOrder(ctx context.Context, sel ast.Selection
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectOrder")
+			out.Values[i] = graphql.MarshalString("ProjectOrderDates")
 		case "id":
 			out.Values[i] = ec._ProjectOrder_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3812,11 +3812,11 @@ func (ec *executionContext) marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx cont
 	return ec._Project(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectOrder2fieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v ordering.ProjectOrder) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectOrder2fieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v ordering.ProjectOrderDates) graphql.Marshaler {
 	return ec._ProjectOrder(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectOrder2ᚕfieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v []ordering.ProjectOrder) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectOrder2ᚕfieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v []ordering.ProjectOrderDates) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
