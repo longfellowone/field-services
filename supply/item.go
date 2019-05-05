@@ -71,7 +71,7 @@ func (s ItemStatus) String() string {
 	case New:
 		return "New"
 	case ToBeOrdered:
-		return "ToOrder"
+		return "ToBeOrder"
 	case Waiting:
 		return "Waiting"
 	case Filled:
