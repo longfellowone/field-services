@@ -87,7 +87,7 @@ func (o *Order) Send(comments string) error {
 
 	for i := range o.Items {
 		item := &o.Items[i]
-		item.ItemStatus = Waiting
+		item.ItemStatus = ToBeOrdered
 		item.QuantityRemaining = item.QuantityRequested
 	}
 
@@ -100,6 +100,11 @@ func (o *Order) Send(comments string) error {
 
 // Mark the order processed
 func (o *Order) Process() {
+	for i := range o.Items {
+		item := &o.Items[i]
+		item.ItemStatus = Waiting
+	}
+
 	o.Status = Processed
 }
 

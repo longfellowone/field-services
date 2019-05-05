@@ -63,12 +63,15 @@ const (
 	BackOrdered
 	OrderExceeded
 	NotOrdered
+	ToBeOrdered
 )
 
 func (s ItemStatus) String() string {
 	switch s {
 	case New:
 		return "New"
+	case ToBeOrdered:
+		return "ToOrder"
 	case Waiting:
 		return "Waiting"
 	case Filled:
