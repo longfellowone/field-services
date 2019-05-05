@@ -16,9 +16,9 @@ func main() {
 	dbConfig := postgres.Config{
 		DBHost:     "postgresql-1-postgres-exporter-svc",
 		DBPort:     5432,
-		DBUser:     "default",
-		DBPassword: "password",
-		DBName:     "default",
+		DBUser:     "postgres",
+		DBPassword: "uR57xGK6k7Hq",
+		DBName:     "postgres",
 	}
 
 	db, err := postgres.Connect(dbConfig)
