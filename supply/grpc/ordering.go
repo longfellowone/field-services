@@ -137,8 +137,10 @@ func orderToProto(o *supply.Order) *pb.Order {
 	return &pb.Order{
 		Id: o.ID,
 		Project: &pb.Project{
-			Id:   o.Project.ID,
-			Name: o.Project.Name,
+			Id:           o.Project.ID,
+			Name:         o.Project.Name,
+			ForemanEmail: o.Project.ForemanEmail,
+			//Foreman:      o.Project.Foreman,
 		},
 		Items:    items,
 		Date:     int32(o.SentDate),

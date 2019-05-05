@@ -102,6 +102,8 @@ message Order {
 message Project {
     string id = 1;
     string name = 2;
+    string foreman = 3;
+    string foreman_email = 4;
 }
 
 // An order item
