@@ -16,14 +16,20 @@ services:
       - "8081:8080"
 
   grpcsvc:
-    depends_on:
-      - db
     restart: always
     build:
       context: .
       dockerfile: docker/grpcsvc/Dockerfile
     ports:
       - "9090:9090"
+
+  envoy:
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/envoy/Dockerfile
+    ports:
+      - "8080:8080"
 
 #  graphqlsvc:
 #    depends_on:

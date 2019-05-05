@@ -14,11 +14,11 @@ import (
 
 func main() {
 	dbConfig := postgres.Config{
-		DBHost:     "35.197.72.107",
+		DBHost:     "db",
 		DBPort:     5432,
-		DBUser:     "postgres",
-		DBPassword: "uR57xGK6k7Hq",
-		DBName:     "postgres",
+		DBUser:     "default",
+		DBPassword: "password",
+		DBName:     "default",
 	}
 
 	db, err := postgres.Connect(dbConfig)

@@ -22,7 +22,7 @@ static_resources:
                       routes:
                         - match: { prefix: '/' }
                           route:
-                            cluster: todo_service
+                            cluster: supply_service
                             max_grpc_timeout: 0s
                       cors:
                         allow_origin:
@@ -37,9 +37,9 @@ static_resources:
                   - name: envoy.cors
                   - name: envoy.router
   clusters:
-    - name: todo_service
+    - name: supply_service
       connect_timeout: 0.25s
       type: logical_dns
       http2_protocol_options: {}
       lb_policy: round_robin
-      hosts: [{ socket_address: { address: localhost, port_value: 9090 } }]
+      hosts: [{ socket_address: { address: grpcsvc, port_value: 9090 } }]
