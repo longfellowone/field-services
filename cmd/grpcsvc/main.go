@@ -14,8 +14,8 @@ import (
 
 func main() {
 	dbConfig := postgres.Config{
-		DBHost:     "postgresql-1-postgres-exporter-svc",
-		DBPort:     9187,
+		DBHost:     "postgresql-1-postgresql-deployment-g4zcs",
+		DBPort:     5432,
 		DBUser:     "postgres",
 		DBPassword: "uR57xGK6k7Hq",
 		DBName:     "postgres",
