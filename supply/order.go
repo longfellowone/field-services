@@ -86,7 +86,7 @@ func (o *Order) Send(comments string) error {
 	}
 
 	for i := range o.Items {
-		item := o.Items[i]
+		item := &o.Items[i]
 		item.ItemStatus = Waiting
 		item.QuantityRemaining = item.QuantityRequested
 	}
