@@ -38,14 +38,9 @@ func (i *Item) updateRequested(quantity int) {
 // Updates quantity received, remaining and item status
 func (i *Item) receive(quantity int) {
 
-	totalReceived := i.QuantityReceived - quantity
-	i.QuantityRemaining = i.QuantityRequested - totalReceived
+	i.QuantityRemaining = i.QuantityRemaining - i.QuantityReceived - quantity
 
 	switch {
-	case i.QuantityRemaining == i.QuantityRequested:
-		i.ItemStatus = Waiting
-		return
-
 	case i.QuantityRemaining == 0:
 		i.ItemStatus = Filled
 		return

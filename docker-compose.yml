@@ -15,21 +15,32 @@ services:
     ports:
       - "8081:8080"
 
-  grpcsvc:
-    restart: always
-    build:
-      context: .
-      dockerfile: docker/grpcsvc/Dockerfile
-    ports:
-      - "9090:9090"
-
   envoy:
+    image: envoyproxy/envoy:latest
     restart: always
-    build:
-      context: .
-      dockerfile: docker/envoy/Dockerfile
+    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
     ports:
-      - "8080:8080"
+      - '8080:8080'
+    volumes:
+      - ./docker/envoy/envoy-dev.yaml:/etc/envoy/envoy.yaml
+    network_mode: 'host'
+
+#  envoy:
+#    restart: always
+#    build:
+#      context: .
+#      dockerfile: docker/envoy/Dockerfile
+#    ports:
+#      - "8080:8080"
+
+
+#  grpcsvc:
+#    restart: always
+#    build:
+#      context: .
+#      dockerfile: docker/grpcsvc/Dockerfile
+#    ports:
+#      - "9090:9090"
 
 #  graphqlsvc:
 #    depends_on:
@@ -39,16 +50,6 @@ services:
 #      dockerfile: docker/graphqlsvc/Dockerfile
 #    ports:
 #      - "8080:8080"
-
-#  envoy:
-#    image: envoyproxy/envoy:latest
-#    restart: always
-#    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
-#    ports:
-#      - '8080:8080'
-#    volumes:
-#      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
-#    network_mode: 'host'
 
 #  mongo:
 #    image: mongo
@@ -67,17 +68,6 @@ services:
 #    environment:
 #      ME_CONFIG_MONGODB_ADMINUSERNAME: default
 #      ME_CONFIG_MONGODB_ADMINPASSWORD: password
-
-#  nats:
-#    image: nats-streaming:latest
-#    restart: always
-#    command: -cid test-cluster -m 8222 --store SQL --sql_driver postgres --sql_source postgresql://default:password@db:5432/nss_db?sslmode=disable -SD # -DV
-#    entrypoint: /nats-streaming-server
-#    ports:
-#      - "4222:4222"
-#      - "8222:8222"
-#    depends_on:
-#      - db
 
 # docker system prune
 # docker inspect CONTAINER_ID
