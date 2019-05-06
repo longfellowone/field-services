@@ -1,6 +1,6 @@
-# Field Services Server
+## Field Services Golang Server
 
-Golang gRPC Server. See instructions below to get started with docker
+Go gRPC Server. See instructions below to get started with docker
 
 Purchasing client: [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing)
 - ReactJS
@@ -14,29 +14,29 @@ Mobile client: [field-services-mobile](https://github.com/longfellowone/field-se
 
 Use the following commands in the root directory
 
-##### $ make up
+#### `make up`
 To start docker containers
 
-##### $ make down
+#### `make down`
 To stop docker containers
 
-##### $ make build
+#### `make build`
 To rebuild docker containers
 
-##### $ make clean
+#### `make clean`
 To stop docker containers and clean up
 
 ## Windows
 
 Use the following commands in the root directory
 
-##### $ docker-compose up -d
+#### `docker-compose up -d`
 To start docker containers
 
-##### $ docker-compose do
+#### `docker-compose do`
 To stop docker containers
 
-##### $ docker-compose build
+#### `docker-compose build`
 To rebuild docker containers
 
 ## Todo
