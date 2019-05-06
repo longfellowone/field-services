@@ -33,7 +33,7 @@ Use the following commands in the root directory
 #### `docker-compose up -d`
 To start docker containers
 
-#### `docker-compose do`
+#### `docker-compose down`
 To stop docker containers
 
 #### `docker-compose build`
