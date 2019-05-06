@@ -42,19 +42,19 @@ func (i *Item) receive(quantity int) {
 	i.QuantityRemaining = i.QuantityRequested - i.QuantityReceived
 
 	switch {
-	case i.QuantityReceived == i.QuantityRequested:
+	case i.QuantityRemaining == i.QuantityRequested:
 		i.ItemStatus = Waiting
 		return
 
-	case i.QuantityReceived == 0:
+	case i.QuantityRemaining == 0:
 		i.ItemStatus = Filled
 		return
 
-	case i.QuantityReceived > 0:
+	case i.QuantityRemaining > 0:
 		i.ItemStatus = BackOrdered
 		return
 
-	case i.QuantityReceived < 0:
+	case i.QuantityRemaining < 0:
 		i.ItemStatus = OrderExceeded
 		return
 	}
