@@ -1,39 +1,38 @@
-TO DO
-
-default:
-	@echo "=============building Local API============="
-	docker build -f cmd/api/Dockerfile -t api .
-
-up: default
-	@echo "=============starting api locally============="
+up:
+	@echo ""
+	@echo "Starting docker containers..."
+	@echo ""
 	docker-compose up -d
+	@echo ""
+	@echo "Postgres running on localhost:5432"
+	@echo "Adminer running on localhost:8081"
+	@echo "gRPC service running on localhost:9090"
+	@echo "Envoy incoming on localhost:8080"
+	@echo "Envoy outgoing on localhost:9090"
+
+down:
+	@echo ""
+	@echo "Stopping docker containers..."
+	@echo ""
+	docker-compose down
+
+build:
+	@echo ""
+	@echo "Rebuilding docker containers..."
+	@echo ""
+	docker-compose build
+
+info:
+	@echo ""
+	docker ps
+	@echo ""
 
 logs:
 	docker-compose logs -f
 
-down:
-	docker-compose down
-
-test:
-	go test -v -cover ./...
-
 clean: down
-	@echo "=============cleaning up============="
-	rm -f api
-	docker system prune -f
-	docker volume prune -f
-
-	#! /bin/bash
-    cd docker
-    echo "Stopping services ..."
-    docker-compose down
-
-
-    #! /bin/bash
-    echo "Starting docker containers..."
-    cd docker
-    docker-compose up -d
-    echo "Starting grpcsvc..."
-    cd ../cmd/grpcsvc/
-    GOOS=linux CGO_ENABLED=0 go build -o grpcsvc .
-    ./grpcsvc
+	@echo ""
+	@echo "Cleaning up..."
+	@echo ""
+	docker system prune
+	docker volume prune

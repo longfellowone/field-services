@@ -5,7 +5,9 @@ services:
   db:
     image: postgres
     restart: always
-    env_file: docker/.env
+    env_file: docker/postgres/.env
+    volumes:
+      - ./docker/postgres/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
     ports:
       - "5432:5432"
 
@@ -19,11 +21,19 @@ services:
     image: envoyproxy/envoy:latest
     restart: always
     command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
-    ports:
-      - '8080:8080'
     volumes:
       - ./docker/envoy/envoy-dev.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - '8080:8080'
     network_mode: 'host'
+
+  grpcsvc:
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/grpcsvc/Dockerfile
+    ports:
+      - "9090:9090"
 
 #  envoy:
 #    restart: always
@@ -32,15 +42,6 @@ services:
 #      dockerfile: docker/envoy/Dockerfile
 #    ports:
 #      - "8080:8080"
-
-
-#  grpcsvc:
-#    restart: always
-#    build:
-#      context: .
-#      dockerfile: docker/grpcsvc/Dockerfile
-#    ports:
-#      - "9090:9090"
 
 #  graphqlsvc:
 #    depends_on:
