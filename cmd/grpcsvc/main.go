@@ -14,12 +14,20 @@ import (
 
 func main() {
 	dbConfig := postgres.Config{
-		DBHost:     "35.197.72.107",
+		DBHost:     "postgresql-1-postgresql-deployment-g4zcs",
 		DBPort:     5432,
 		DBUser:     "postgres",
 		DBPassword: "uR57xGK6k7Hq",
 		DBName:     "postgres",
 	}
+
+	//dbConfig := postgres.Config{
+	//	DBHost:     "localhost",
+	//	DBPort:     5432,
+	//	DBUser:     "default",
+	//	DBPassword: "password",
+	//	DBName:     "default",
+	//}
 
 	db, err := postgres.Connect(dbConfig)
 	if err != nil {

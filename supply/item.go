@@ -37,20 +37,21 @@ func (i *Item) updateRequested(quantity int) {
 
 // Updates quantity received, remaining and item status
 func (i *Item) receive(quantity int) {
-	i.QuantityReceived = quantity
+
+	i.QuantityRemaining = i.QuantityRemaining - i.QuantityReceived - quantity
 
 	switch {
-	case i.QuantityReceived == i.QuantityRequested:
+	case i.QuantityRemaining == 0:
 		i.ItemStatus = Filled
-		i.QuantityRemaining = 0
+		return
 
-	case quantity > 0 && quantity < i.QuantityRequested:
+	case i.QuantityRemaining > 0:
 		i.ItemStatus = BackOrdered
-		i.QuantityRemaining = i.QuantityRequested - i.QuantityReceived
+		return
 
-	case i.QuantityReceived > i.QuantityRequested:
+	case i.QuantityRemaining < 0:
 		i.ItemStatus = OrderExceeded
-		i.QuantityRemaining = 0
+		return
 	}
 }
 
@@ -63,12 +64,15 @@ const (
 	BackOrdered
 	OrderExceeded
 	NotOrdered
+	ToBeOrdered
 )
 
 func (s ItemStatus) String() string {
 	switch s {
 	case New:
 		return "New"
+	case ToBeOrdered:
+		return "To Be Ordered"
 	case Waiting:
 		return "Waiting"
 	case Filled:
