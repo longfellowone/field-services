@@ -44,46 +44,24 @@ CREATE TABLE "public"."products" (
 ) WITH (oids = false);
 
 INSERT INTO "orders" ("orderid", "projectid", "sentdate", "status", "project_name", "foreman_email", "comments") VALUES
-('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945392,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	''),
-('82a7ab24-257f-42a5-b2b7-9f93bef7c7c5',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556857269,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('92e3ed8e-79f8-4e40-81e5-2a908742cd90',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556857269,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('b578ccaf-2a76-45c0-b1a8-506ea3b3fc01',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552256702,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('5b3abcee-154a-42ef-aed7-ed6604bd4450',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186855,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('38ba1bab-4ebb-49f0-8690-3a3f54f43800',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945410,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'Now'),
-('c9a1a099-4ba1-447a-8a88-0d1b22bb36f3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945212,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'Please send now'),
-('aa0001e2-7dcd-438d-a930-ae8879491626',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396473,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('eab4bcea-d640-4b9e-8b74-5895b6ae6695',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396416,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('8bf59d05-aa1a-4be2-9ffe-fcc37207e713',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1554064562,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('1f19c9cc-2b2d-4e9f-8eb1-45e390936bcf',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552256702,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186577,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('b1486083-617b-43fd-99f7-2c9e6e57f5ee',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556945246,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'Give me now '),
-('17f27274-9806-44e4-b7d6-66c83f3808c8',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556857269,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('31b257f2-ceb6-449f-ad82-220095b1010d',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396416,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('e9ab8f4a-9385-4b3d-8d6b-c3add1c30b6e',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1556396396,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions'),
-('4fa52946-9cb4-470f-8a9e-511968bdb9d0',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1552186577,	2,	'Argyle Secondary School',	'mwright@plan-group.com',	'No special instructions');
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'cf510766-faf7-415e-a067-0c5ae5cb2ae8',	1557118950,	1,	'Argyle Secondary School',	'mwright@plan-group.com',	'Nothing today, thanks!');
 
 INSERT INTO "order_items" ("orderid", "productid", "name", "uom", "requested", "received", "remaining", "status", "ponumber", "dateadded") VALUES
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'417b5745-a9b2-4be5-9d61-3896dbce97f9',	'3/4" EMT 1 hole strap',	'ea',	300,	'0',	'0',	1,	'N/A',	1556857188),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'ef8feb10-252a-4154-bce6-1302a2467292',	'3/4" EMT coupling',	'ea',	300,	'0',	'0',	1,	'N/A',	1556857179),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'471c8974-928b-4b61-abcf-d4a3aff31491',	'3/4" EMT connector w/ Insulated throat',	'ea',	300,	'0',	'0',	1,	'N/A',	1556857173),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'7961a923-5c03-4fd0-94db-dd214430ae3d',	'1" EMT 1 hole strap',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857161),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'aed4052a-4840-4d86-b9e6-aebd9738c1f1',	'1/2" EMT 1 hole strap',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857139),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'88ce3176-12d0-4628-bfb4-cbb11b73b5d3',	'1/2" EMT coupling',	'ea',	50,	'0',	'0',	1,	'N/A',	1556857133),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'7ae67fe7-1bbe-4142-963a-c4c49af22f98',	'1/2" EMT connector w/ Insulated throat',	'ea',	50,	'0',	'0',	1,	'N/A',	1556857125),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'db4f3478-e412-4558-bd89-f60e507f1d84',	'EMT 1/2"',	'ft',	1000,	'0',	'0',	1,	'N/A',	1556857115),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'585a0df1-e37c-4094-9f55-81f61b0d5178',	'3/8" Threaded rod',	'ft',	1000,	'0',	'0',	1,	'N/A',	1556857106),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'0cd3d562-0d8d-4b5d-b570-b02564585a01',	'Self tapping wafer screw',	'ea',	5000,	'0',	'0',	1,	'N/A',	1556857095),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'5bc6e7d1-3263-48ff-a6e8-9e7fba1da2a5',	'1" EMT coupling',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857091),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'9a3d63e9-a1bc-46cc-9581-1c73a3c0981b',	'1" EMT connector w/ Insulated throat',	'ea',	100,	'0',	'0',	1,	'N/A',	1556857085),
-('eba3a135-6c21-4904-b101-6bdc4e3e51b3',	'bd6356f0-5bc7-44ce-a141-4137c1d0b2b8',	'EMT 1"',	'ft',	100,	'0',	'0',	1,	'N/A',	1556857058),
-('38ba1bab-4ebb-49f0-8690-3a3f54f43800',	'7ed7e817-b1e2-4d00-941b-75fed8f227f3',	'3" White bushing',	'ea',	1,	'0',	'0',	1,	'N/A',	1556945403),
-('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'0cd3d562-0d8d-4b5d-b570-b02564585a01',	'Self tapping wafer screw',	'ea',	100,	'0',	'0',	1,	'N/A',	1556945380),
-('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'e2079ea5-4500-4e17-9a12-44e9598205a3',	'CRLB37EG ROD LOCK Beam Clamp',	'ea',	20,	'0',	'0',	1,	'N/A',	1556945377),
-('8d0d028f-e0bc-46d3-811e-40736199e0d3',	'd144b1de-8c9d-43ad-a126-3af4789a133b',	'Twine',	'ft',	3000,	'0',	'0',	1,	'N/A',	1556945373),
-('b1486083-617b-43fd-99f7-2c9e6e57f5ee',	'122c53fc-ba1f-47f8-8a97-4480834215be',	'Female cord end',	'ea',	10,	'0',	'0',	1,	'N/A',	1556945234),
-('b1486083-617b-43fd-99f7-2c9e6e57f5ee',	'17a2479b-2ab5-4caa-a392-bb5247b73c16',	'EMT 4"',	'ft',	30,	'0',	'0',	1,	'N/A',	1556945227),
-('c9a1a099-4ba1-447a-8a88-0d1b22bb36f3',	'43318ae6-cdfd-4ab5-bd47-6825bef78f40',	'Box thick garbage bags',	'ea',	2,	'0',	'0',	1,	'N/A',	1556945198),
-('c9a1a099-4ba1-447a-8a88-0d1b22bb36f3',	'95ff6cdb-b3ca-4dbd-bcee-9e9a05bdbe87',	'Wet hand wipes',	'ea',	100,	'0',	'0',	1,	'N/A',	1556945194);
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'7d64b444-3ea5-4ce1-ad75-3392124888fc',	'#10 x 1" screw',	'ea',	1500,	'0',	1500,	6,	'N/A',	1557118843),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'959c21eb-daf0-45b7-a585-9eb7b0512d79',	'#8 x 3" screw',	'ea',	100,	'0',	100,	6,	'N/A',	1557118839),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'4e3de834-41b0-4469-94dc-eb1d9e5e1172',	'3" PVC 90',	'ea',	3,	'0',	3,	6,	'N/A',	1557118832),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'a9a5681a-f7f9-4fbf-ae47-171c5142a141',	'3" PVC end cap',	'ea',	20,	'0',	20,	6,	'N/A',	1557118828),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'b5c52d9a-8cd4-48de-bedc-8ea91fdf0da0',	'Carpenter pencil',	'ea',	25,	'0',	25,	6,	'N/A',	1557118820),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'2b7902f5-af18-4ff5-853b-71ff565e03bd',	'Black paint marker',	'ea',	6,	'0',	6,	6,	'N/A',	1557118815),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'9a3d63e9-a1bc-46cc-9581-1c73a3c0981b',	'1" EMT connector w/ Insulated throat',	'ea',	200,	'0',	200,	6,	'N/A',	1557118809),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'5bc6e7d1-3263-48ff-a6e8-9e7fba1da2a5',	'1" EMT coupling',	'ea',	200,	'0',	200,	6,	'N/A',	1557118805),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'7961a923-5c03-4fd0-94db-dd214430ae3d',	'1" EMT 1 hole strap',	'ea',	500,	'0',	500,	6,	'N/A',	1557118801),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'bd6356f0-5bc7-44ce-a141-4137c1d0b2b8',	'EMT 1"',	'ft',	4000,	'0',	4000,	6,	'N/A',	1557118798),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'd658ccb8-df04-4db5-86bd-dbcfca365990',	'4x4 Deep box',	'ea',	120,	'0',	120,	6,	'N/A',	1557118789),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'e11760db-2730-4b17-a65c-c829e6fe0f79',	'3/8" Fender washer',	'ea',	100,	'0',	100,	6,	'N/A',	1557118864),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'c78e5deb-e34a-4708-81d3-2478bada3fdf',	'3/8" Flat washer',	'ea',	100,	'0',	100,	6,	'N/A',	1557118860),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'bc22dc77-c71f-45e7-b5e5-9e9eefdb9850',	'3/8" Nut',	'ea',	150,	'0',	150,	6,	'N/A',	1557118854),
+('4ec348fc-dd73-4cbd-b9fd-1e9c44e48ab3',	'fb667ac8-e69c-4814-ac6e-6023973e488a',	'Quart PVC glue',	'ea',	10,	'0',	10,	6,	'N/A',	1557118850);
 
 INSERT INTO "products" ("productid", "category", "name", "uom") VALUES
 ('87f62ef4-133e-45dd-adfe-4eb9d508827b',	'Boxes & Mudrings',	'1 Gang deep masonry box',	'ea'),
