@@ -38,8 +38,8 @@ func (i *Item) updateRequested(quantity int) {
 // Updates quantity received, remaining and item status
 func (i *Item) receive(quantity int) {
 
-	i.QuantityReceived = i.QuantityReceived - quantity
-	i.QuantityRemaining = i.QuantityRequested - i.QuantityReceived
+	totalReceived := i.QuantityReceived - quantity
+	i.QuantityRemaining = i.QuantityRequested - totalReceived
 
 	switch {
 	case i.QuantityRemaining == i.QuantityRequested:
@@ -58,42 +58,6 @@ func (i *Item) receive(quantity int) {
 		i.ItemStatus = OrderExceeded
 		return
 	}
-
-	//i.QuantityRemaining = i.QuantityRemaining - quantity
-
-	//switch {
-	//case i.QuantityRemaining == i.QuantityRequested:
-	//	return
-	//
-	//case i.QuantityRemaining == 0:
-	//	i.ItemStatus = Filled
-	//	return
-	//
-	//case i.QuantityRemaining > 0:
-	//	i.ItemStatus = BackOrdered
-	//	return
-	//
-	//case i.QuantityRemaining < 0:
-	//	i.ItemStatus = OrderExceeded
-	//	return
-	//}
-	//
-
-	//i.QuantityReceived = quantity
-	//
-	//switch {
-	//case i.QuantityReceived == i.QuantityRequested:
-	//	i.ItemStatus = Filled
-	//	i.QuantityRemaining = 0
-	//
-	//case quantity > 0 && quantity < i.QuantityRequested:
-	//	i.ItemStatus = BackOrdered
-	//	i.QuantityRemaining = i.QuantityRequested - i.QuantityReceived
-	//
-	//case i.QuantityReceived > i.QuantityRequested:
-	//	i.ItemStatus = OrderExceeded
-	//	i.QuantityRemaining = 0
-	//}
 }
 
 type ItemStatus int
