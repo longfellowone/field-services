@@ -1,6 +1,6 @@
 ## Field Services Golang Server
 
-Go gRPC Server. See instructions below to get started with docker
+Go gRPC Server. See instructions below to get started with docker.
 
 Purchasing client: [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing)
 - ReactJS
@@ -12,7 +12,7 @@ Mobile client: [field-services-mobile](https://github.com/longfellowone/field-se
 
 ## Linux/Mac
 
-Use the following commands in the root directory
+Use the following commands in the root directory. 
 
 #### `make up`
 To start docker containers
@@ -28,7 +28,9 @@ To stop docker containers and clean up
 
 ## Windows
 
-Use the following commands in the root directory
+1. Open the .env file and change the SERVICE_NAME from 'grpcsvc' to 'host.docker.internal'
+2. In the .env file change DB_HOSTNAME from 'db' to 'localhost'
+3. Use the following commands in the root directory
 
 #### `docker-compose up -d`
 To start docker containers
@@ -43,3 +45,16 @@ To rebuild docker containers
 
 - Fix tests
 - More...
+
+## Potential Errors
+
+It make take a few seconds for the containers to start up. If you are getting errors, first try shutting down and restarting the containers
+
+#### `Error: Http response at 400 or 500 level`
+Issue connecting to Envoy, check envoy has not crashed
+
+#### `Error: upstream connect error or disconnect/reset before headers. reset reason: connection failure`
+Envoy cannot find service, check SERVICE address in envoy config is correct
+
+#### `Error: no healthy upstream`
+Envoy OK, check go service has not crashed

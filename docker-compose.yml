@@ -5,7 +5,7 @@ services:
   db:
     image: postgres
     restart: always
-    env_file: docker/postgres/.env
+    env_file: .env
     volumes:
       - ./docker/postgres/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
     ports:
@@ -18,30 +18,24 @@ services:
       - "8081:8080"
 
   envoy:
-    image: envoyproxy/envoy:latest
+    build:
+      context: .
+      dockerfile: docker/envoy/Dockerfile
     restart: always
-    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
-    volumes:
-      - ./docker/envoy/envoy-dev.yaml:/etc/envoy/envoy.yaml
+    env_file: .env
     ports:
       - '8080:8080'
-    network_mode: 'host'
 
   grpcsvc:
-    restart: always
     build:
       context: .
       dockerfile: docker/grpcsvc/Dockerfile
+    depends_on:
+      - db
+    restart: always
+    env_file: .env
     ports:
       - "9090:9090"
-
-#  envoy:
-#    restart: always
-#    build:
-#      context: .
-#      dockerfile: docker/envoy/Dockerfile
-#    ports:
-#      - "8080:8080"
 
 #  graphqlsvc:
 #    depends_on:
@@ -70,7 +64,6 @@ services:
 #      ME_CONFIG_MONGODB_ADMINUSERNAME: default
 #      ME_CONFIG_MONGODB_ADMINPASSWORD: password
 
-# docker system prune
 # docker inspect CONTAINER_ID
 # docker run --rm -it CONTAINER_ID sh
 # docker exec -it CONTAINER_ID sh

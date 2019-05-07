@@ -10,22 +10,15 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
 )
 
 func main() {
-	//dbConfig := postgres.Config{
-	//	DBHost:     "postgresql-1-postgresql-deployment-g4zcs",
-	//	DBPort:     5432,
-	//	DBUser:     "postgres",
-	//	DBPassword: "uR57xGK6k7Hq",
-	//	DBName:     "postgres",
-	//}
-
 	dbConfig := postgres.Config{
-		DBHost:     "db",
+		DBHost:     os.Getenv("DB_HOSTNAME"),
 		DBPort:     5432,
-		DBUser:     "default",
-		DBPassword: "password",
+		DBUser:     os.Getenv("DB_USER"),
+		DBPassword: os.Getenv("DB_PASSWORD"),
 		DBName:     "default",
 	}
 

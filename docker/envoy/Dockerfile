@@ -1,5 +1,11 @@
 FROM envoyproxy/envoy:latest
 
-COPY docker/envoy/envoy.yaml /etc/envoy/envoy.yaml
+COPY /docker/envoy/envoy.yaml /tmpl/envoy.yaml.tmpl
+COPY /docker/envoy/entrypoint.sh /
 
-CMD /usr/local/bin/envoy -c /etc/envoy/envoy.yaml -l trace --log-path /tmp/envoy_info.log
+RUN chmod 500 /entrypoint.sh
+
+RUN apt-get update && \
+    apt-get install gettext -y
+
+ENTRYPOINT ["/entrypoint.sh"]
