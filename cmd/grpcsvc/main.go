@@ -13,13 +13,20 @@ import (
 	"os"
 )
 
+const (
+	defaultDBHost     = "localhost"
+	defaultDBUser     = "default"
+	defaultDBPassword = "password"
+	defaultDBName     = "default"
+)
+
 func main() {
 	dbConfig := postgres.Config{
-		DBHost:     os.Getenv("DB_HOSTNAME"),
+		DBHost:     envString("DB_HOSTNAME", defaultDBHost),
 		DBPort:     5432,
-		DBUser:     os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBName:     "default",
+		DBUser:     envString("DB_USER", defaultDBUser),
+		DBPassword: envString("DB_PASSWORD", defaultDBPassword),
+		DBName:     envString("DB_NAME", defaultDBName),
 	}
 
 	db, err := postgres.Connect(dbConfig)
@@ -33,7 +40,6 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	fmt.Println("Testing...")
 	fmt.Println("Listening on :9090")
 
 	s := InitializeSupplyServices(db)
@@ -52,4 +58,12 @@ func InitializeSupplyServices(db *sql.DB) *grpc.Server {
 	searchService := search.NewSearchService(productRepository)
 
 	return server.New(orderingService, searchService)
+}
+
+func envString(env, fallback string) string {
+	e := os.Getenv(env)
+	if e == "" {
+		return fallback
+	}
+	return e
 }

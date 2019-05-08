@@ -4,23 +4,28 @@ up:
 	@echo ""
 	docker-compose up -d
 	@echo ""
-	@echo "Postgres running on localhost:5432"
-	@echo "Adminer running on localhost:8081"
-	@echo "gRPC service running on localhost:9090"
-	@echo "Envoy incoming on localhost:8080"
-	@echo "Envoy outgoing on localhost:9090"
+	@echo ":PORT SERVICE"
+	@echo ""
+	@echo ":5432 Postgres"
+	@echo ":8081 Adminer"
+	@echo ":8080 Envoy incoming"
+	@echo ":9090 Envoy outgoing"
+	@echo ":9090 gRPC Go server"
+	@echo ""
 
 down:
 	@echo ""
 	@echo "Stopping docker containers..."
 	@echo ""
 	docker-compose down
+	@echo ""
 
 build:
 	@echo ""
 	@echo "Rebuilding docker containers..."
 	@echo ""
 	docker-compose build
+	@echo ""
 
 info:
 	@echo ""
@@ -36,3 +41,4 @@ clean: down
 	@echo ""
 	docker system prune
 	docker volume prune
+	@echo ""
