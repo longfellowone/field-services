@@ -29,8 +29,7 @@ To stop docker containers and clean up
 ## Windows
 
 1. Open the .env file and change the SERVICE_NAME from 'grpcsvc' to 'host.docker.internal'
-2. In the .env file change DB_HOSTNAME from 'db' to 'localhost'
-3. Use the following commands in the root directory
+2. Use the following commands in the root directory
 
 #### `docker-compose up -d`
 To start docker containers
