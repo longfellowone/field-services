@@ -41,7 +41,7 @@ To stop docker containers and clean up
 
 ### Windows
 
-1. Open the .env file and change the SERVICE_NAME variable from 'grpcsvc' to 'host.docker.internal'
+1. Open the .env file and change the `SERVICE` variable from `grpcsvc` to `host.docker.internal`
 
 2. Use the following commands in the root directory
 
@@ -63,8 +63,8 @@ To rebuild docker containers
 ## Running Go server without docker
 
 1. Stop all running containers
-2. Open the .env file and change the SERVICE_NAME variable from 'grpcsvc' to  your local IP address e.g. '192.168.0.176'
-3. Comment out the entire 'grpcsvc' in docker-compose.yml
+2. Open the .env file and change the `SERVICE` variable from `grpcsvc` to  your local IP address e.g. `192.168.0.176`
+3. Comment out the entire `grpcsvc` in docker-compose.yml
 4. Restart docker containers
 5. In the root directory run `go run cmd/grpcsvc/main.go`
 
