@@ -70,7 +70,7 @@ To rebuild docker containers
 
 ## Potential Errors
 
-It make take a few seconds for the containers to start up. If you are getting errors, first try shutting down and restarting the containers
+It may take a few seconds for the containers to start up. If you are getting errors, first try shutting down and restarting the containers
 
 ```Error: Http response at 400 or 500 level```  
 Issue connecting to Envoy, check envoy has not crashed
