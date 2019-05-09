@@ -2,70 +2,32 @@
 
 Go gRPC Server for Purchasing and Mobile clients.
 
-Purchasing client (ReactJS): [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing)  
+Purchasing client (ReactJS): [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing) 
+ 
 Mobile client (Flutter): [field-services-mobile](https://github.com/longfellowone/field-services-mobile)
+
+![](http://g.recordit.co/21luo1Y6Hs.gif | width=400) ![](http://g.recordit.co/bK2FPTJWjM.gif | width=400)
 
 ## Table of Contents
 * [Getting Started](#getting-started)
-  * [Linux](#linux)
-  * [Windows](#windows)
 * [Running Go server without docker](#running-go-server-without-docker)
 * [Potential Errors](#potential-errors)
 * [TODO](#todo)
 
 ## Getting Started
 
-### Linux
-
-Use the following commands in the root directory. 
-
-```sh
-make up
-```
-To start docker containers
-
-```sh
-make down
-```
-To stop docker containers
-
-```sh
-make build
-```
-To rebuild docker containers
-
-```sh
-make clean
-```
-To stop docker containers and clean up
-
-### Windows
-
-1. Open the .env file and change the `SERVICE` variable from `grpcsvc` to `host.docker.internal`
-
-2. Use the following commands in the root directory
+Use the following command in the root directory to start the docker containers.
 
 ```sh
 docker-compose up -d
 ```
-To start docker containers
-
-```sh
-docker-compose down
-```
-To stop docker containers
-
-```sh
-docker-compose build
-```
-To rebuild docker containers
 
 ## Running Go server without docker
 
-1. Stop all running containers
-2. Open the .env file and change the `SERVICE` variable from `grpcsvc` to  your local IP address e.g. `192.168.0.176`
+1. Stop all running containers with `docker-compose down`
+2. Open the .env file and change the `SERVICE` variable from `grpcsvc` to `localhost` on linux or `host.docker.internal` if using windows
 3. Comment out the entire `grpcsvc` in docker-compose.yml
-4. Restart docker containers
+4. Restart docker containers with `docker-compose up -d`
 5. In the root directory run `go run cmd/grpcsvc/main.go`
 
 ## Potential Errors
