@@ -2,18 +2,21 @@
 
 Go gRPC Server for Purchasing and Mobile clients.
 
-Purchasing client (ReactJS): [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing) 
-![](http://g.recordit.co/bK2FPTJWjM.gif | width=400)
-
-Mobile client (Flutter): [field-services-mobile](https://github.com/longfellowone/field-services-mobile)
-![](http://g.recordit.co/21luo1Y6Hs.gif | width=400) 
-
-
 ## Table of Contents
+* [Client Apps](#client-apps)
 * [Getting Started](#getting-started)
 * [Running Go server without docker](#running-go-server-without-docker)
 * [Potential Errors](#potential-errors)
 * [TODO](#todo)
+
+## Client Apps
+
+Mobile client (Flutter): [field-services-mobile](https://github.com/longfellowone/field-services-mobile)
+
+![](http://g.recordit.co/21luo1Y6Hs.gif) 
+
+Purchasing client (ReactJS): [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing) 
+![](http://g.recordit.co/bK2FPTJWjM.gif)
 
 ## Getting Started
 
