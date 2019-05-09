@@ -3,10 +3,11 @@
 Go gRPC Server for Purchasing and Mobile clients.
 
 Purchasing client (ReactJS): [field-services-purchasing](https://github.com/longfellowone/field-services-purchasing) 
- 
-Mobile client (Flutter): [field-services-mobile](https://github.com/longfellowone/field-services-mobile)
+![](http://g.recordit.co/bK2FPTJWjM.gif | width=400)
 
-![](http://g.recordit.co/21luo1Y6Hs.gif | width=400) ![](http://g.recordit.co/bK2FPTJWjM.gif | width=400)
+Mobile client (Flutter): [field-services-mobile](https://github.com/longfellowone/field-services-mobile)
+![](http://g.recordit.co/21luo1Y6Hs.gif | width=400) 
+
 
 ## Table of Contents
 * [Getting Started](#getting-started)
