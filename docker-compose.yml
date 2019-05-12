@@ -1,7 +1,6 @@
-version: '3.7'
+version: "3.7"
 
 services:
-
   db:
     image: postgres
     restart: always
@@ -24,15 +23,14 @@ services:
     restart: always
     env_file: .env
     ports:
-      - '8080:8080'
-
-  grpcsvc:
-    build:
-      context: .
-      dockerfile: docker/grpcsvc/Dockerfile
-    depends_on:
-      - db
-    restart: always
-    env_file: .env
-    ports:
-      - "9090:9090"
+      - "8080:8080"
+  # grpcsvc:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/grpcsvc/Dockerfile
+  #   depends_on:
+  #     - db
+  #   restart: always
+  #   env_file: .env
+  #   ports:
+  #     - "9090:9090"
