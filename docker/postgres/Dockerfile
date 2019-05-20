@@ -1,2 +1,1 @@
-
-COPY ./mysqldb-init.sql /docker-entrypoint-initdb.d
+COPY ./docker/postgres/postgres-init.sql /docker-entrypoint-initdb.d/postgres-init.sql

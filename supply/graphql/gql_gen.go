@@ -535,7 +535,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema.graphqlsvc", Input: `type Mutation {
+	&ast.Source{Name: "schema.supplysvc", Input: `type Mutation {
     # Orders
     createOrder(input: CreateOrder!): Order!
     sendOrder(input: SendOrder!): Order!

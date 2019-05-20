@@ -17,6 +17,13 @@ import (
 	"time"
 )
 
+//const (
+//	defaultDBHost     = "localhost"
+//	defaultDBUser     = "default"
+//	defaultDBPassword = "password"
+//	defaultDBName     = "default"
+//)
+
 func main() {
 	dbConfig := postgres.Config{
 		DBHost:     "localhost",
@@ -52,8 +59,8 @@ func main() {
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 
-	r.Handle("/graphqlsvc", gqlHandler)
-	r.Handle("/", handler.Playground("", "/graphqlsvc"))
+	r.Handle("/supplysvc", gqlHandler)
+	r.Handle("/", handler.Playground("", "/supplysvc"))
 
 	srv := &http.Server{Addr: ":8080", Handler: r}
 
@@ -74,4 +81,12 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func envString(env, fallback string) string {
+	e := os.Getenv(env)
+	if e == "" {
+		return fallback
+	}
+	return e
 }

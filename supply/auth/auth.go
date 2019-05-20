@@ -29,7 +29,7 @@ type JSONWebKeys struct {
 
 var jwtToken = jwtmiddleware.New(jwtmiddleware.Options{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		aud := "http://192.168.0.104:8080/graphqlsvc"
+		aud := "http://192.168.0.104:8080/supplysvc"
 		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
 		if !checkAud {
 			return token, errors.New("Invalid audience")
