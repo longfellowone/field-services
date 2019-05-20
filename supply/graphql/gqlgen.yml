@@ -1,10 +1,5 @@
-# .gqlgen.yml example
-#
-# Refer to https://gqlgen.com/config/
-# for detailed .gqlgen.yml documentation.
-
 schema:
-  - schema.supplysvc
+  - schema.graphql
 
 exec:
   filename: gql_gen.go
@@ -14,24 +9,27 @@ model:
   package: models
 
 resolver:
-  filename: resolver.go
+  filename: resolverDELETE.go
   type: Resolver
 
 models:
   Order:
-    model: field/supply.Order
-    fields:
+    model: github.com/longfellowone/field-services/supply.Order
   Item:
-    model: field/supply.Item
-  #  ItemStatus:
-  #    model: field/supply/search.ItemStatus
+    model: github.com/longfellowone/field-services/supply.Item
+  ItemStatus:
+    model: github.com/longfellowone/field-services/supply/search.ItemStatus
   Product:
-    model: field/supply.Product
+    model: github.com/longfellowone/field-services/supply.Product
   Project:
-    model: field/supply.Project
+    model: github.com/longfellowone/field-services/supply.Project
   Result:
-    model: field/supply/search.Result
+    model: github.com/longfellowone/field-services/supply/search.Result
   ProjectOrder:
-    model: field/supply/ordering.ProjectOrder
+    model: github.com/longfellowone/field-services/supply/ordering.ProjectOrder
+
+#  ID:
+#    model:
+#      - github.com/99designs/gqlgen/graphql.ID
 
 

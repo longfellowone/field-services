@@ -2,7 +2,7 @@ package purchasing
 
 //
 //import (
-//	"field/supply"
+//	"github.com/longfellowone/field-services/supply"
 //)
 //
 //type Service interface {

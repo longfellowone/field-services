@@ -6,15 +6,15 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"field/supply"
-	"field/supply/graphql/models"
-	"field/supply/ordering"
-	"field/supply/search"
+	"fmt"
 	"strconv"
 	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	"github.com/longfellowone/field-services/supply"
+	"github.com/longfellowone/field-services/supply/graphql/models"
+	"github.com/longfellowone/field-services/supply/search"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 )
@@ -46,38 +46,56 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Item struct {
+		DateAdded         func(childComplexity int) int
 		ID                func(childComplexity int) int
 		Name              func(childComplexity int) int
-		UOM               func(childComplexity int) int
-		QuantityRequested func(childComplexity int) int
+		PONumber          func(childComplexity int) int
 		QuantityReceived  func(childComplexity int) int
 		QuantityRemaining func(childComplexity int) int
-		PONumber          func(childComplexity int) int
-		DateAdded         func(childComplexity int) int
+		QuantityRequested func(childComplexity int) int
+		UOM               func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateOrder             func(childComplexity int, input models.CreateOrder) int
-		SendOrder               func(childComplexity int, input models.SendOrder) int
 		AddOrderItem            func(childComplexity int, input models.AddOrderItem) int
-		RemoveOrderItem         func(childComplexity int, input models.RemoveOrderItem) int
-		ReceiveOrderItem        func(childComplexity int, input models.ModifyQuantity) int
-		ModifyRequestedQuantity func(childComplexity int, input models.ModifyQuantity) int
-		CreateProject           func(childComplexity int, input models.CreateProject) int
 		CloseProject            func(childComplexity int, input models.CloseProject) int
+		CreateOrder             func(childComplexity int, input models.CreateOrder) int
+		CreateProject           func(childComplexity int, input models.CreateProject) int
+		ModifyRequestedQuantity func(childComplexity int, input models.ModifyQuantity) int
+		ReceiveOrderItem        func(childComplexity int, input models.ModifyQuantity) int
+		RemoveOrderItem         func(childComplexity int, input models.RemoveOrderItem) int
+		SendOrder               func(childComplexity int, input models.SendOrder) int
 	}
 
 	Order struct {
-		ID       func(childComplexity int) int
-		Project  func(childComplexity int) int
-		Items    func(childComplexity int) int
-		SentDate func(childComplexity int) int
 		Comments func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Items    func(childComplexity int) int
+		Project  func(childComplexity int) int
+		SentDate func(childComplexity int) int
+	}
+
+	OrderConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	OrderEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	PageInfo struct {
+		EndCursor       func(childComplexity int) int
+		HasNextPage     func(childComplexity int) int
+		HasPreviousPage func(childComplexity int) int
+		StartCursor     func(childComplexity int) int
 	}
 
 	Product struct {
-		ID       func(childComplexity int) int
 		Category func(childComplexity int) int
+		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 		UOM      func(childComplexity int) int
 	}
@@ -87,23 +105,15 @@ type ComplexityRoot struct {
 		Name func(childComplexity int) int
 	}
 
-	ProjectOrder struct {
-		ID       func(childComplexity int) int
-		SentDate func(childComplexity int) int
-	}
-
 	Query struct {
-		Order         func(childComplexity int, id string) int
-		ProjectOrders func(childComplexity int, id string) int
-		Products      func(childComplexity int, name string) int
-		Projects      func(childComplexity int, foremanID string) int
+		Orders func(childComplexity int, after *string, first *int, before *string, last *int) int
 	}
 
 	Result struct {
 		ID             func(childComplexity int) int
+		MatchedIndexes func(childComplexity int) int
 		Name           func(childComplexity int) int
 		UOM            func(childComplexity int) int
-		MatchedIndexes func(childComplexity int) int
 	}
 }
 
@@ -118,10 +128,7 @@ type MutationResolver interface {
 	CloseProject(ctx context.Context, input models.CloseProject) (*supply.Project, error)
 }
 type QueryResolver interface {
-	Order(ctx context.Context, id string) (*supply.Order, error)
-	ProjectOrders(ctx context.Context, id string) ([]ordering.ProjectOrderDates, error)
-	Products(ctx context.Context, name string) ([]search.Result, error)
-	Projects(ctx context.Context, foremanID string) ([]supply.Project, error)
+	Orders(ctx context.Context, after *string, first *int, before *string, last *int) (*models.OrderConnection, error)
 }
 
 type executableSchema struct {
@@ -139,87 +146,63 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Item.ID":
-		if e.complexity.Item.ID == nil {
-			break
-		}
-
-		return e.complexity.Item.ID(childComplexity), true
-
-	case "Item.Name":
-		if e.complexity.Item.Name == nil {
-			break
-		}
-
-		return e.complexity.Item.Name(childComplexity), true
-
-	case "Item.UOM":
-		if e.complexity.Item.UOM == nil {
-			break
-		}
-
-		return e.complexity.Item.UOM(childComplexity), true
-
-	case "Item.QuantityRequested":
-		if e.complexity.Item.QuantityRequested == nil {
-			break
-		}
-
-		return e.complexity.Item.QuantityRequested(childComplexity), true
-
-	case "Item.QuantityReceived":
-		if e.complexity.Item.QuantityReceived == nil {
-			break
-		}
-
-		return e.complexity.Item.QuantityReceived(childComplexity), true
-
-	case "Item.QuantityRemaining":
-		if e.complexity.Item.QuantityRemaining == nil {
-			break
-		}
-
-		return e.complexity.Item.QuantityRemaining(childComplexity), true
-
-	case "Item.PONumber":
-		if e.complexity.Item.PONumber == nil {
-			break
-		}
-
-		return e.complexity.Item.PONumber(childComplexity), true
-
-	case "Item.DateAdded":
+	case "Item.dateAdded":
 		if e.complexity.Item.DateAdded == nil {
 			break
 		}
 
 		return e.complexity.Item.DateAdded(childComplexity), true
 
-	case "Mutation.CreateOrder":
-		if e.complexity.Mutation.CreateOrder == nil {
+	case "Item.id":
+		if e.complexity.Item.ID == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createOrder_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
+		return e.complexity.Item.ID(childComplexity), true
 
-		return e.complexity.Mutation.CreateOrder(childComplexity, args["input"].(models.CreateOrder)), true
-
-	case "Mutation.SendOrder":
-		if e.complexity.Mutation.SendOrder == nil {
+	case "Item.name":
+		if e.complexity.Item.Name == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_sendOrder_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
+		return e.complexity.Item.Name(childComplexity), true
+
+	case "Item.poNumber":
+		if e.complexity.Item.PONumber == nil {
+			break
 		}
 
-		return e.complexity.Mutation.SendOrder(childComplexity, args["input"].(models.SendOrder)), true
+		return e.complexity.Item.PONumber(childComplexity), true
 
-	case "Mutation.AddOrderItem":
+	case "Item.quantityReceived":
+		if e.complexity.Item.QuantityReceived == nil {
+			break
+		}
+
+		return e.complexity.Item.QuantityReceived(childComplexity), true
+
+	case "Item.quantityRemaining":
+		if e.complexity.Item.QuantityRemaining == nil {
+			break
+		}
+
+		return e.complexity.Item.QuantityRemaining(childComplexity), true
+
+	case "Item.quantityRequested":
+		if e.complexity.Item.QuantityRequested == nil {
+			break
+		}
+
+		return e.complexity.Item.QuantityRequested(childComplexity), true
+
+	case "Item.uom":
+		if e.complexity.Item.UOM == nil {
+			break
+		}
+
+		return e.complexity.Item.UOM(childComplexity), true
+
+	case "Mutation.addOrderItem":
 		if e.complexity.Mutation.AddOrderItem == nil {
 			break
 		}
@@ -231,55 +214,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddOrderItem(childComplexity, args["input"].(models.AddOrderItem)), true
 
-	case "Mutation.RemoveOrderItem":
-		if e.complexity.Mutation.RemoveOrderItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_removeOrderItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.RemoveOrderItem(childComplexity, args["input"].(models.RemoveOrderItem)), true
-
-	case "Mutation.ReceiveOrderItem":
-		if e.complexity.Mutation.ReceiveOrderItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_receiveOrderItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ReceiveOrderItem(childComplexity, args["input"].(models.ModifyQuantity)), true
-
-	case "Mutation.ModifyRequestedQuantity":
-		if e.complexity.Mutation.ModifyRequestedQuantity == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_modifyRequestedQuantity_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ModifyRequestedQuantity(childComplexity, args["input"].(models.ModifyQuantity)), true
-
-	case "Mutation.CreateProject":
-		if e.complexity.Mutation.CreateProject == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createProject_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateProject(childComplexity, args["input"].(models.CreateProject)), true
-
-	case "Mutation.CloseProject":
+	case "Mutation.closeProject":
 		if e.complexity.Mutation.CloseProject == nil {
 			break
 		}
@@ -291,172 +226,257 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CloseProject(childComplexity, args["input"].(models.CloseProject)), true
 
-	case "Order.ID":
-		if e.complexity.Order.ID == nil {
+	case "Mutation.createOrder":
+		if e.complexity.Mutation.CreateOrder == nil {
 			break
 		}
 
-		return e.complexity.Order.ID(childComplexity), true
+		args, err := ec.field_Mutation_createOrder_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "Order.Project":
-		if e.complexity.Order.Project == nil {
+		return e.complexity.Mutation.CreateOrder(childComplexity, args["input"].(models.CreateOrder)), true
+
+	case "Mutation.createProject":
+		if e.complexity.Mutation.CreateProject == nil {
 			break
 		}
 
-		return e.complexity.Order.Project(childComplexity), true
+		args, err := ec.field_Mutation_createProject_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "Order.Items":
-		if e.complexity.Order.Items == nil {
+		return e.complexity.Mutation.CreateProject(childComplexity, args["input"].(models.CreateProject)), true
+
+	case "Mutation.modifyRequestedQuantity":
+		if e.complexity.Mutation.ModifyRequestedQuantity == nil {
 			break
 		}
 
-		return e.complexity.Order.Items(childComplexity), true
+		args, err := ec.field_Mutation_modifyRequestedQuantity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "Order.SentDate":
-		if e.complexity.Order.SentDate == nil {
+		return e.complexity.Mutation.ModifyRequestedQuantity(childComplexity, args["input"].(models.ModifyQuantity)), true
+
+	case "Mutation.receiveOrderItem":
+		if e.complexity.Mutation.ReceiveOrderItem == nil {
 			break
 		}
 
-		return e.complexity.Order.SentDate(childComplexity), true
+		args, err := ec.field_Mutation_receiveOrderItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "Order.Comments":
+		return e.complexity.Mutation.ReceiveOrderItem(childComplexity, args["input"].(models.ModifyQuantity)), true
+
+	case "Mutation.removeOrderItem":
+		if e.complexity.Mutation.RemoveOrderItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeOrderItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveOrderItem(childComplexity, args["input"].(models.RemoveOrderItem)), true
+
+	case "Mutation.sendOrder":
+		if e.complexity.Mutation.SendOrder == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_sendOrder_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SendOrder(childComplexity, args["input"].(models.SendOrder)), true
+
+	case "Order.comments":
 		if e.complexity.Order.Comments == nil {
 			break
 		}
 
 		return e.complexity.Order.Comments(childComplexity), true
 
-	case "Product.ID":
-		if e.complexity.Product.ID == nil {
+	case "Order.id":
+		if e.complexity.Order.ID == nil {
 			break
 		}
 
-		return e.complexity.Product.ID(childComplexity), true
+		return e.complexity.Order.ID(childComplexity), true
 
-	case "Product.Category":
+	case "Order.items":
+		if e.complexity.Order.Items == nil {
+			break
+		}
+
+		return e.complexity.Order.Items(childComplexity), true
+
+	case "Order.project":
+		if e.complexity.Order.Project == nil {
+			break
+		}
+
+		return e.complexity.Order.Project(childComplexity), true
+
+	case "Order.sentDate":
+		if e.complexity.Order.SentDate == nil {
+			break
+		}
+
+		return e.complexity.Order.SentDate(childComplexity), true
+
+	case "OrderConnection.edges":
+		if e.complexity.OrderConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.OrderConnection.Edges(childComplexity), true
+
+	case "OrderConnection.pageInfo":
+		if e.complexity.OrderConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.OrderConnection.PageInfo(childComplexity), true
+
+	case "OrderConnection.totalCount":
+		if e.complexity.OrderConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.OrderConnection.TotalCount(childComplexity), true
+
+	case "OrderEdge.cursor":
+		if e.complexity.OrderEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.OrderEdge.Cursor(childComplexity), true
+
+	case "OrderEdge.node":
+		if e.complexity.OrderEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.OrderEdge.Node(childComplexity), true
+
+	case "PageInfo.endCursor":
+		if e.complexity.PageInfo.EndCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.EndCursor(childComplexity), true
+
+	case "PageInfo.hasNextPage":
+		if e.complexity.PageInfo.HasNextPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasNextPage(childComplexity), true
+
+	case "PageInfo.hasPreviousPage":
+		if e.complexity.PageInfo.HasPreviousPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasPreviousPage(childComplexity), true
+
+	case "PageInfo.startCursor":
+		if e.complexity.PageInfo.StartCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Product.category":
 		if e.complexity.Product.Category == nil {
 			break
 		}
 
 		return e.complexity.Product.Category(childComplexity), true
 
-	case "Product.Name":
+	case "Product.id":
+		if e.complexity.Product.ID == nil {
+			break
+		}
+
+		return e.complexity.Product.ID(childComplexity), true
+
+	case "Product.name":
 		if e.complexity.Product.Name == nil {
 			break
 		}
 
 		return e.complexity.Product.Name(childComplexity), true
 
-	case "Product.UOM":
+	case "Product.uom":
 		if e.complexity.Product.UOM == nil {
 			break
 		}
 
 		return e.complexity.Product.UOM(childComplexity), true
 
-	case "Project.ID":
+	case "Project.id":
 		if e.complexity.Project.ID == nil {
 			break
 		}
 
 		return e.complexity.Project.ID(childComplexity), true
 
-	case "Project.Name":
+	case "Project.name":
 		if e.complexity.Project.Name == nil {
 			break
 		}
 
 		return e.complexity.Project.Name(childComplexity), true
 
-	case "ProjectOrderDates.ID":
-		if e.complexity.ProjectOrder.ID == nil {
+	case "Query.orders":
+		if e.complexity.Query.Orders == nil {
 			break
 		}
 
-		return e.complexity.ProjectOrder.ID(childComplexity), true
-
-	case "ProjectOrderDates.SentDate":
-		if e.complexity.ProjectOrder.SentDate == nil {
-			break
-		}
-
-		return e.complexity.ProjectOrder.SentDate(childComplexity), true
-
-	case "Query.Order":
-		if e.complexity.Query.Order == nil {
-			break
-		}
-
-		args, err := ec.field_Query_order_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_orders_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.Order(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Orders(childComplexity, args["after"].(*string), args["first"].(*int), args["before"].(*string), args["last"].(*int)), true
 
-	case "Query.ProjectOrders":
-		if e.complexity.Query.ProjectOrders == nil {
-			break
-		}
-
-		args, err := ec.field_Query_projectOrders_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.ProjectOrders(childComplexity, args["id"].(string)), true
-
-	case "Query.Products":
-		if e.complexity.Query.Products == nil {
-			break
-		}
-
-		args, err := ec.field_Query_products_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Products(childComplexity, args["name"].(string)), true
-
-	case "Query.Projects":
-		if e.complexity.Query.Projects == nil {
-			break
-		}
-
-		args, err := ec.field_Query_projects_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Projects(childComplexity, args["foremanID"].(string)), true
-
-	case "Result.ID":
+	case "Result.id":
 		if e.complexity.Result.ID == nil {
 			break
 		}
 
 		return e.complexity.Result.ID(childComplexity), true
 
-	case "Result.Name":
+	case "Result.matchedIndexes":
+		if e.complexity.Result.MatchedIndexes == nil {
+			break
+		}
+
+		return e.complexity.Result.MatchedIndexes(childComplexity), true
+
+	case "Result.name":
 		if e.complexity.Result.Name == nil {
 			break
 		}
 
 		return e.complexity.Result.Name(childComplexity), true
 
-	case "Result.UOM":
+	case "Result.uom":
 		if e.complexity.Result.UOM == nil {
 			break
 		}
 
 		return e.complexity.Result.UOM(childComplexity), true
-
-	case "Result.MatchedIndexes":
-		if e.complexity.Result.MatchedIndexes == nil {
-			break
-		}
-
-		return e.complexity.Result.MatchedIndexes(childComplexity), true
 
 	}
 	return 0, false
@@ -535,7 +555,84 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema.supplysvc", Input: `type Mutation {
+	&ast.Source{Name: "schema.graphql", Input: `interface Node {
+    id: ID!
+}
+
+type Query {
+    orders(after: String, first: Int, before: String, last: Int): OrderConnection
+#    order(id: ID!): Order!
+#    projectOrders(id: ID!): [ProjectOrder!]!
+#    products(name: String!): [Result!]!
+#    projects(foremanID: ID!): [Project!]!
+}
+
+type OrderConnection {
+    totalCount: Int!
+    pageInfo: PageInfo!
+    edges: [OrderEdge]
+}
+
+type OrderEdge {
+    node: Order
+    cursor: String!
+}
+
+type Order {
+    id: ID!
+    project: Project!
+    items: [Item!]!
+    sentDate: Int!
+    comments: String!
+    #    status: String!
+}
+
+type Item {
+    id: ID!
+    name: String!
+    uom: String!
+    quantityRequested: Int!
+    quantityReceived: Int!
+    quantityRemaining: Int!
+    #    ItemStatus: ItemStatus!
+    poNumber: String!
+    dateAdded: Int!
+}
+
+type Product {
+    id: ID!
+    category: String!
+    name: String!
+    uom: String!
+}
+
+type Project {
+    id: ID!
+    name: String!
+}
+
+type Result {
+    id: ID!
+    name: String!
+    uom: String!
+    matchedIndexes: [Int!]!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+#enum ItemStatus {
+#    Waiting
+#    Filled
+#    BackOrdered
+#    OrderExceeded
+#    NotOrdered
+#}
+
+type Mutation {
     # Orders
     createOrder(input: CreateOrder!): Order!
     sendOrder(input: SendOrder!): Order!
@@ -584,71 +681,7 @@ input CreateProject {
 
 input CloseProject {
     id: ID!
-}
-
-type Query {
-    # Orders
-    order(id: ID!): Order!
-    projectOrders(id: ID!): [ProjectOrderDates!]!
-    products(name: String!): [Result!]!
-    # Projects
-    projects(foremanID: ID!): [Project!]!
-}
-
-type Result {
-    id: ID!
-    name: String!
-    uom: String!
-    matchedIndexes: [Int!]!
-}
-
-type Product {
-    id: ID!
-    category: String!
-    name: String!
-    uom: String!
-}
-
-type ProjectOrderDates {
-    id: ID!
-    sentDate: Int!
-    #    status: String!
-}
-
-type Order {
-    id: ID!
-    project: Project!
-    items: [Item!]!
-    sentDate: Int!
-    comments: String!
-    #    status: String!
-}
-
-type Item {
-    id: ID!
-    name: String!
-    uom: String!
-    quantityRequested: Int!
-    quantityReceived: Int!
-    quantityRemaining: Int!
-    #    ItemStatus: ItemStatus!
-    poNumber: String!
-    dateAdded: Int!
-}
-
-type Project {
-    id: ID!
-    name: String!
-}
-
-#enum ItemStatus {
-#    Waiting
-#    Filled
-#    BackOrdered
-#    OrderExceeded
-#    NotOrdered
-#}
-`},
+}`},
 )
 
 // endregion ************************** generated!.gotpl **************************
@@ -660,7 +693,7 @@ func (ec *executionContext) field_Mutation_addOrderItem_args(ctx context.Context
 	args := map[string]interface{}{}
 	var arg0 models.AddOrderItem
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddOrderItem2fieldᚋsupplyᚋgraphqlᚋmodelsᚐAddOrderItem(ctx, tmp)
+		arg0, err = ec.unmarshalNAddOrderItem2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐAddOrderItem(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -674,7 +707,7 @@ func (ec *executionContext) field_Mutation_closeProject_args(ctx context.Context
 	args := map[string]interface{}{}
 	var arg0 models.CloseProject
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNCloseProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCloseProject(ctx, tmp)
+		arg0, err = ec.unmarshalNCloseProject2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐCloseProject(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -688,7 +721,7 @@ func (ec *executionContext) field_Mutation_createOrder_args(ctx context.Context,
 	args := map[string]interface{}{}
 	var arg0 models.CreateOrder
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNCreateOrder2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateOrder(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateOrder2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐCreateOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -702,7 +735,7 @@ func (ec *executionContext) field_Mutation_createProject_args(ctx context.Contex
 	args := map[string]interface{}{}
 	var arg0 models.CreateProject
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNCreateProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateProject(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateProject2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐCreateProject(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -716,7 +749,7 @@ func (ec *executionContext) field_Mutation_modifyRequestedQuantity_args(ctx cont
 	args := map[string]interface{}{}
 	var arg0 models.ModifyQuantity
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNModifyQuantity2fieldᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx, tmp)
+		arg0, err = ec.unmarshalNModifyQuantity2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -730,7 +763,7 @@ func (ec *executionContext) field_Mutation_receiveOrderItem_args(ctx context.Con
 	args := map[string]interface{}{}
 	var arg0 models.ModifyQuantity
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNModifyQuantity2fieldᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx, tmp)
+		arg0, err = ec.unmarshalNModifyQuantity2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -744,7 +777,7 @@ func (ec *executionContext) field_Mutation_removeOrderItem_args(ctx context.Cont
 	args := map[string]interface{}{}
 	var arg0 models.RemoveOrderItem
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNRemoveOrderItem2fieldᚋsupplyᚋgraphqlᚋmodelsᚐRemoveOrderItem(ctx, tmp)
+		arg0, err = ec.unmarshalNRemoveOrderItem2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐRemoveOrderItem(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -758,7 +791,7 @@ func (ec *executionContext) field_Mutation_sendOrder_args(ctx context.Context, r
 	args := map[string]interface{}{}
 	var arg0 models.SendOrder
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNSendOrder2fieldᚋsupplyᚋgraphqlᚋmodelsᚐSendOrder(ctx, tmp)
+		arg0, err = ec.unmarshalNSendOrder2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐSendOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -781,59 +814,41 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_order_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_orders_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["after"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_products_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_projectOrders_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+	args["first"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["before"]; ok {
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_projects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["foremanID"]; ok {
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["foremanID"] = arg0
+	args["last"] = arg3
 	return args, nil
 }
 
@@ -873,9 +888,10 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -899,9 +915,10 @@ func (ec *executionContext) _Item_name(ctx context.Context, field graphql.Collec
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -925,9 +942,10 @@ func (ec *executionContext) _Item_uom(ctx context.Context, field graphql.Collect
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -951,9 +969,10 @@ func (ec *executionContext) _Item_quantityRequested(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -977,9 +996,10 @@ func (ec *executionContext) _Item_quantityReceived(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1003,9 +1023,10 @@ func (ec *executionContext) _Item_quantityRemaining(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1029,9 +1050,10 @@ func (ec *executionContext) _Item_poNumber(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1055,9 +1077,10 @@ func (ec *executionContext) _Item_dateAdded(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Item",
-		Field:  field,
-		Args:   nil,
+		Object:   "Item",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1081,9 +1104,10 @@ func (ec *executionContext) _Mutation_createOrder(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1107,16 +1131,17 @@ func (ec *executionContext) _Mutation_createOrder(ctx context.Context, field gra
 	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_sendOrder(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1140,16 +1165,17 @@ func (ec *executionContext) _Mutation_sendOrder(ctx context.Context, field graph
 	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addOrderItem(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1173,16 +1199,17 @@ func (ec *executionContext) _Mutation_addOrderItem(ctx context.Context, field gr
 	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeOrderItem(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1206,16 +1233,17 @@ func (ec *executionContext) _Mutation_removeOrderItem(ctx context.Context, field
 	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_receiveOrderItem(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1239,16 +1267,17 @@ func (ec *executionContext) _Mutation_receiveOrderItem(ctx context.Context, fiel
 	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_modifyRequestedQuantity(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1272,16 +1301,17 @@ func (ec *executionContext) _Mutation_modifyRequestedQuantity(ctx context.Contex
 	res := resTmp.(*supply.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1305,16 +1335,17 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 	res := resTmp.(*supply.Project)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_closeProject(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Mutation",
-		Field:  field,
-		Args:   nil,
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1338,16 +1369,17 @@ func (ec *executionContext) _Mutation_closeProject(ctx context.Context, field gr
 	res := resTmp.(*supply.Project)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *supply.Order) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Order",
-		Field:  field,
-		Args:   nil,
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1371,9 +1403,10 @@ func (ec *executionContext) _Order_project(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Order",
-		Field:  field,
-		Args:   nil,
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1390,16 +1423,17 @@ func (ec *executionContext) _Order_project(ctx context.Context, field graphql.Co
 	res := resTmp.(supply.Project)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNProject2fieldᚋsupplyᚐProject(ctx, field.Selections, res)
+	return ec.marshalNProject2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_items(ctx context.Context, field graphql.CollectedField, obj *supply.Order) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Order",
-		Field:  field,
-		Args:   nil,
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1413,19 +1447,20 @@ func (ec *executionContext) _Order_items(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*supply.Item)
+	res := resTmp.([]supply.Item)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNItem2ᚕᚖfieldᚋsupplyᚐItem(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚕgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_sentDate(ctx context.Context, field graphql.CollectedField, obj *supply.Order) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Order",
-		Field:  field,
-		Args:   nil,
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1449,9 +1484,10 @@ func (ec *executionContext) _Order_comments(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Order",
-		Field:  field,
-		Args:   nil,
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1471,13 +1507,245 @@ func (ec *executionContext) _Order_comments(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _OrderConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *models.OrderConnection) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "OrderConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *models.OrderConnection) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "OrderConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.PageInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderConnection_edges(ctx context.Context, field graphql.CollectedField, obj *models.OrderConnection) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "OrderConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.OrderEdge)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOOrderEdge2ᚕᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderEdge_node(ctx context.Context, field graphql.CollectedField, obj *models.OrderEdge) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "OrderEdge",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*supply.Order)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *models.OrderEdge) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "OrderEdge",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "PageInfo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasNextPage, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "PageInfo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasPreviousPage, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "PageInfo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartCursor, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "PageInfo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndCursor, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Product_id(ctx context.Context, field graphql.CollectedField, obj *supply.Product) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Product",
-		Field:  field,
-		Args:   nil,
+		Object:   "Product",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1501,9 +1769,10 @@ func (ec *executionContext) _Product_category(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Product",
-		Field:  field,
-		Args:   nil,
+		Object:   "Product",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1527,9 +1796,10 @@ func (ec *executionContext) _Product_name(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Product",
-		Field:  field,
-		Args:   nil,
+		Object:   "Product",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1553,9 +1823,10 @@ func (ec *executionContext) _Product_uom(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Product",
-		Field:  field,
-		Args:   nil,
+		Object:   "Product",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1579,9 +1850,10 @@ func (ec *executionContext) _Project_id(ctx context.Context, field graphql.Colle
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Project",
-		Field:  field,
-		Args:   nil,
+		Object:   "Project",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1605,9 +1877,10 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Project",
-		Field:  field,
-		Args:   nil,
+		Object:   "Project",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1627,69 +1900,18 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProjectOrder_id(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrderDates) graphql.Marshaler {
+func (ec *executionContext) _Query_orders(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "ProjectOrderDates",
-		Field:  field,
-		Args:   nil,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ProjectOrder_sentDate(ctx context.Context, field graphql.CollectedField, obj *ordering.ProjectOrderDates) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "ProjectOrderDates",
-		Field:  field,
-		Args:   nil,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SentDate, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int64)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNInt2int64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_order(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Field:  field,
-		Args:   nil,
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_order_args(ctx, rawArgs)
+	args, err := ec.field_Query_orders_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1698,126 +1920,25 @@ func (ec *executionContext) _Query_order(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Order(rctx, args["id"].(string))
+		return ec.resolvers.Query().Orders(rctx, args["after"].(*string), args["first"].(*int), args["before"].(*string), args["last"].(*int))
 	})
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(*supply.Order)
+	res := resTmp.(*models.OrderConnection)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_projectOrders(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Field:  field,
-		Args:   nil,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_projectOrders_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	rctx.Args = args
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ProjectOrders(rctx, args["id"].(string))
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]ordering.ProjectOrderDates)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNProjectOrder2ᚕfieldᚋsupplyᚋorderingᚐProjectOrder(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_products(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Field:  field,
-		Args:   nil,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_products_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	rctx.Args = args
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Products(rctx, args["name"].(string))
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]search.Result)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNResult2ᚕfieldᚋsupplyᚋsearchᚐResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Field:  field,
-		Args:   nil,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_projects_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	rctx.Args = args
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Projects(rctx, args["foremanID"].(string))
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]supply.Project)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNProject2ᚕfieldᚋsupplyᚐProject(ctx, field.Selections, res)
+	return ec.marshalOOrderConnection2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Field:  field,
-		Args:   nil,
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -1845,9 +1966,10 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Field:  field,
-		Args:   nil,
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1868,9 +1990,10 @@ func (ec *executionContext) _Result_id(ctx context.Context, field graphql.Collec
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Result",
-		Field:  field,
-		Args:   nil,
+		Object:   "Result",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1894,9 +2017,10 @@ func (ec *executionContext) _Result_name(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Result",
-		Field:  field,
-		Args:   nil,
+		Object:   "Result",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1920,9 +2044,10 @@ func (ec *executionContext) _Result_uom(ctx context.Context, field graphql.Colle
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Result",
-		Field:  field,
-		Args:   nil,
+		Object:   "Result",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1946,9 +2071,10 @@ func (ec *executionContext) _Result_matchedIndexes(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "Result",
-		Field:  field,
-		Args:   nil,
+		Object:   "Result",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1972,9 +2098,10 @@ func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Directive",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Directive",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -1998,9 +2125,10 @@ func (ec *executionContext) ___Directive_description(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Directive",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Directive",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2021,9 +2149,10 @@ func (ec *executionContext) ___Directive_locations(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Directive",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Directive",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2047,9 +2176,10 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Directive",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Directive",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2073,9 +2203,10 @@ func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__EnumValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__EnumValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2099,9 +2230,10 @@ func (ec *executionContext) ___EnumValue_description(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__EnumValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__EnumValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2122,9 +2254,10 @@ func (ec *executionContext) ___EnumValue_isDeprecated(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__EnumValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__EnumValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2148,9 +2281,10 @@ func (ec *executionContext) ___EnumValue_deprecationReason(ctx context.Context, 
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__EnumValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__EnumValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2171,9 +2305,10 @@ func (ec *executionContext) ___Field_name(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Field",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Field",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2197,9 +2332,10 @@ func (ec *executionContext) ___Field_description(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Field",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Field",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2220,9 +2356,10 @@ func (ec *executionContext) ___Field_args(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Field",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Field",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2246,9 +2383,10 @@ func (ec *executionContext) ___Field_type(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Field",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Field",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2272,9 +2410,10 @@ func (ec *executionContext) ___Field_isDeprecated(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Field",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Field",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2298,9 +2437,10 @@ func (ec *executionContext) ___Field_deprecationReason(ctx context.Context, fiel
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Field",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Field",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2321,9 +2461,10 @@ func (ec *executionContext) ___InputValue_name(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__InputValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__InputValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2347,9 +2488,10 @@ func (ec *executionContext) ___InputValue_description(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__InputValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__InputValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2370,9 +2512,10 @@ func (ec *executionContext) ___InputValue_type(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__InputValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__InputValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2396,9 +2539,10 @@ func (ec *executionContext) ___InputValue_defaultValue(ctx context.Context, fiel
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__InputValue",
-		Field:  field,
-		Args:   nil,
+		Object:   "__InputValue",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2419,9 +2563,10 @@ func (ec *executionContext) ___Schema_types(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Schema",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Schema",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2445,9 +2590,10 @@ func (ec *executionContext) ___Schema_queryType(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Schema",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Schema",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2471,9 +2617,10 @@ func (ec *executionContext) ___Schema_mutationType(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Schema",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Schema",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2494,9 +2641,10 @@ func (ec *executionContext) ___Schema_subscriptionType(ctx context.Context, fiel
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Schema",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Schema",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2517,9 +2665,10 @@ func (ec *executionContext) ___Schema_directives(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Schema",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Schema",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2543,9 +2692,10 @@ func (ec *executionContext) ___Type_kind(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2569,9 +2719,10 @@ func (ec *executionContext) ___Type_name(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2592,9 +2743,10 @@ func (ec *executionContext) ___Type_description(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2615,9 +2767,10 @@ func (ec *executionContext) ___Type_fields(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -2645,9 +2798,10 @@ func (ec *executionContext) ___Type_interfaces(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2668,9 +2822,10 @@ func (ec *executionContext) ___Type_possibleTypes(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2691,9 +2846,10 @@ func (ec *executionContext) ___Type_enumValues(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
@@ -2721,9 +2877,10 @@ func (ec *executionContext) ___Type_inputFields(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2744,9 +2901,10 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "__Type",
-		Field:  field,
-		Args:   nil,
+		Object:   "__Type",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
@@ -2957,6 +3115,15 @@ func (ec *executionContext) unmarshalInputSendOrder(ctx context.Context, v inter
 
 // region    ************************** interface.gotpl ***************************
 
+func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj *models.Node) graphql.Marshaler {
+	switch obj := (*obj).(type) {
+	case nil:
+		return graphql.Null
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -2964,10 +3131,10 @@ func (ec *executionContext) unmarshalInputSendOrder(ctx context.Context, v inter
 var itemImplementors = []string{"Item"}
 
 func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *supply.Item) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, itemImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, itemImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -2975,49 +3142,49 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Item_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "name":
 			out.Values[i] = ec._Item_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "uom":
 			out.Values[i] = ec._Item_uom(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "quantityRequested":
 			out.Values[i] = ec._Item_quantityRequested(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "quantityReceived":
 			out.Values[i] = ec._Item_quantityReceived(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "quantityRemaining":
 			out.Values[i] = ec._Item_quantityRemaining(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "poNumber":
 			out.Values[i] = ec._Item_poNumber(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "dateAdded":
 			out.Values[i] = ec._Item_dateAdded(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3026,14 +3193,14 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, mutationImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, mutationImplementors)
 
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Object: "Mutation",
 	})
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3041,49 +3208,49 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createOrder":
 			out.Values[i] = ec._Mutation_createOrder(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "sendOrder":
 			out.Values[i] = ec._Mutation_sendOrder(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "addOrderItem":
 			out.Values[i] = ec._Mutation_addOrderItem(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "removeOrderItem":
 			out.Values[i] = ec._Mutation_removeOrderItem(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "receiveOrderItem":
 			out.Values[i] = ec._Mutation_receiveOrderItem(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "modifyRequestedQuantity":
 			out.Values[i] = ec._Mutation_modifyRequestedQuantity(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "createProject":
 			out.Values[i] = ec._Mutation_createProject(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "closeProject":
 			out.Values[i] = ec._Mutation_closeProject(ctx, field)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3092,10 +3259,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 var orderImplementors = []string{"Order"}
 
 func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, obj *supply.Order) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, orderImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, orderImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3103,34 +3270,133 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 		case "id":
 			out.Values[i] = ec._Order_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "project":
 			out.Values[i] = ec._Order_project(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "items":
 			out.Values[i] = ec._Order_items(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "sentDate":
 			out.Values[i] = ec._Order_sentDate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "comments":
 			out.Values[i] = ec._Order_comments(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var orderConnectionImplementors = []string{"OrderConnection"}
+
+func (ec *executionContext) _OrderConnection(ctx context.Context, sel ast.SelectionSet, obj *models.OrderConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, orderConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OrderConnection")
+		case "totalCount":
+			out.Values[i] = ec._OrderConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._OrderConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._OrderConnection_edges(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var orderEdgeImplementors = []string{"OrderEdge"}
+
+func (ec *executionContext) _OrderEdge(ctx context.Context, sel ast.SelectionSet, obj *models.OrderEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, orderEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OrderEdge")
+		case "node":
+			out.Values[i] = ec._OrderEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._OrderEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var pageInfoImplementors = []string{"PageInfo"}
+
+func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *models.PageInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, pageInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PageInfo")
+		case "hasNextPage":
+			out.Values[i] = ec._PageInfo_hasNextPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "hasPreviousPage":
+			out.Values[i] = ec._PageInfo_hasPreviousPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "startCursor":
+			out.Values[i] = ec._PageInfo_startCursor(ctx, field, obj)
+		case "endCursor":
+			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3139,10 +3405,10 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 var productImplementors = []string{"Product"}
 
 func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, obj *supply.Product) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, productImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, productImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3150,29 +3416,29 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Product_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "category":
 			out.Values[i] = ec._Product_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "name":
 			out.Values[i] = ec._Product_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "uom":
 			out.Values[i] = ec._Product_uom(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3181,10 +3447,10 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 var projectImplementors = []string{"Project"}
 
 func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *supply.Project) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, projectImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, projectImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3192,51 +3458,19 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Project_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "name":
 			out.Values[i] = ec._Project_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-var projectOrderImplementors = []string{"ProjectOrderDates"}
-
-func (ec *executionContext) _ProjectOrder(ctx context.Context, sel ast.SelectionSet, obj *ordering.ProjectOrderDates) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, projectOrderImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	invalid := false
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectOrderDates")
-		case "id":
-			out.Values[i] = ec._ProjectOrder_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "sentDate":
-			out.Values[i] = ec._ProjectOrder_sentDate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3245,19 +3479,19 @@ func (ec *executionContext) _ProjectOrder(ctx context.Context, sel ast.Selection
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, queryImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, queryImplementors)
 
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Object: "Query",
 	})
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "order":
+		case "orders":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3265,52 +3499,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_order(ctx, field)
-				if res == graphql.Null {
-					invalid = true
-				}
-				return res
-			})
-		case "projectOrders":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_projectOrders(ctx, field)
-				if res == graphql.Null {
-					invalid = true
-				}
-				return res
-			})
-		case "products":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_products(ctx, field)
-				if res == graphql.Null {
-					invalid = true
-				}
-				return res
-			})
-		case "projects":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_projects(ctx, field)
-				if res == graphql.Null {
-					invalid = true
-				}
+				res = ec._Query_orders(ctx, field)
 				return res
 			})
 		case "__type":
@@ -3322,7 +3511,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3331,10 +3520,10 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 var resultImplementors = []string{"Result"}
 
 func (ec *executionContext) _Result(ctx context.Context, sel ast.SelectionSet, obj *search.Result) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, resultImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, resultImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3342,29 +3531,29 @@ func (ec *executionContext) _Result(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Result_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "name":
 			out.Values[i] = ec._Result_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "uom":
 			out.Values[i] = ec._Result_uom(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "matchedIndexes":
 			out.Values[i] = ec._Result_matchedIndexes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3373,10 +3562,10 @@ func (ec *executionContext) _Result(ctx context.Context, sel ast.SelectionSet, o
 var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, __DirectiveImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, __DirectiveImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3384,26 +3573,26 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 		case "name":
 			out.Values[i] = ec.___Directive_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "description":
 			out.Values[i] = ec.___Directive_description(ctx, field, obj)
 		case "locations":
 			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "args":
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3412,10 +3601,10 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 var __EnumValueImplementors = []string{"__EnumValue"}
 
 func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.EnumValue) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, __EnumValueImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, __EnumValueImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3423,14 +3612,14 @@ func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionS
 		case "name":
 			out.Values[i] = ec.___EnumValue_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "description":
 			out.Values[i] = ec.___EnumValue_description(ctx, field, obj)
 		case "isDeprecated":
 			out.Values[i] = ec.___EnumValue_isDeprecated(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "deprecationReason":
 			out.Values[i] = ec.___EnumValue_deprecationReason(ctx, field, obj)
@@ -3439,7 +3628,7 @@ func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionS
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3448,10 +3637,10 @@ func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionS
 var __FieldImplementors = []string{"__Field"}
 
 func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, obj *introspection.Field) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, __FieldImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, __FieldImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3459,24 +3648,24 @@ func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, 
 		case "name":
 			out.Values[i] = ec.___Field_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "description":
 			out.Values[i] = ec.___Field_description(ctx, field, obj)
 		case "args":
 			out.Values[i] = ec.___Field_args(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "type":
 			out.Values[i] = ec.___Field_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "isDeprecated":
 			out.Values[i] = ec.___Field_isDeprecated(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "deprecationReason":
 			out.Values[i] = ec.___Field_deprecationReason(ctx, field, obj)
@@ -3485,7 +3674,7 @@ func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, 
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3494,10 +3683,10 @@ func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, 
 var __InputValueImplementors = []string{"__InputValue"}
 
 func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.InputValue) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, __InputValueImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, __InputValueImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3505,14 +3694,14 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 		case "name":
 			out.Values[i] = ec.___InputValue_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "description":
 			out.Values[i] = ec.___InputValue_description(ctx, field, obj)
 		case "type":
 			out.Values[i] = ec.___InputValue_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "defaultValue":
 			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
@@ -3521,7 +3710,7 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3530,10 +3719,10 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 var __SchemaImplementors = []string{"__Schema"}
 
 func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet, obj *introspection.Schema) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, __SchemaImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, __SchemaImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3541,12 +3730,12 @@ func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet,
 		case "types":
 			out.Values[i] = ec.___Schema_types(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "queryType":
 			out.Values[i] = ec.___Schema_queryType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "mutationType":
 			out.Values[i] = ec.___Schema_mutationType(ctx, field, obj)
@@ -3555,14 +3744,14 @@ func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet,
 		case "directives":
 			out.Values[i] = ec.___Schema_directives(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3571,10 +3760,10 @@ func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet,
 var __TypeImplementors = []string{"__Type"}
 
 func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, obj *introspection.Type) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, __TypeImplementors)
+	fields := graphql.CollectFields(ec.RequestContext, sel, __TypeImplementors)
 
 	out := graphql.NewFieldSet(fields)
-	invalid := false
+	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -3582,7 +3771,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 		case "kind":
 			out.Values[i] = ec.___Type_kind(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalid = true
+				invalids++
 			}
 		case "name":
 			out.Values[i] = ec.___Type_name(ctx, field, obj)
@@ -3605,7 +3794,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 		}
 	}
 	out.Dispatch()
-	if invalid {
+	if invalids > 0 {
 		return graphql.Null
 	}
 	return out
@@ -3615,7 +3804,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNAddOrderItem2fieldᚋsupplyᚋgraphqlᚋmodelsᚐAddOrderItem(ctx context.Context, v interface{}) (models.AddOrderItem, error) {
+func (ec *executionContext) unmarshalNAddOrderItem2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐAddOrderItem(ctx context.Context, v interface{}) (models.AddOrderItem, error) {
 	return ec.unmarshalInputAddOrderItem(ctx, v)
 }
 
@@ -3624,18 +3813,24 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 }
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
-	return graphql.MarshalBoolean(v)
+	res := graphql.MarshalBoolean(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
-func (ec *executionContext) unmarshalNCloseProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCloseProject(ctx context.Context, v interface{}) (models.CloseProject, error) {
+func (ec *executionContext) unmarshalNCloseProject2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐCloseProject(ctx context.Context, v interface{}) (models.CloseProject, error) {
 	return ec.unmarshalInputCloseProject(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNCreateOrder2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateOrder(ctx context.Context, v interface{}) (models.CreateOrder, error) {
+func (ec *executionContext) unmarshalNCreateOrder2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐCreateOrder(ctx context.Context, v interface{}) (models.CreateOrder, error) {
 	return ec.unmarshalInputCreateOrder(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNCreateProject2fieldᚋsupplyᚋgraphqlᚋmodelsᚐCreateProject(ctx context.Context, v interface{}) (models.CreateProject, error) {
+func (ec *executionContext) unmarshalNCreateProject2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐCreateProject(ctx context.Context, v interface{}) (models.CreateProject, error) {
 	return ec.unmarshalInputCreateProject(ctx, v)
 }
 
@@ -3644,7 +3839,13 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 }
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalID(v)
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -3652,7 +3853,13 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 }
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	return graphql.MarshalInt(v)
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
@@ -3660,7 +3867,13 @@ func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface
 }
 
 func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
-	return graphql.MarshalInt64(v)
+	res := graphql.MarshalInt64(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNInt2ᚕint(ctx context.Context, v interface{}) ([]int, error) {
@@ -3692,11 +3905,11 @@ func (ec *executionContext) marshalNInt2ᚕint(ctx context.Context, sel ast.Sele
 	return ret
 }
 
-func (ec *executionContext) marshalNItem2fieldᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v supply.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v supply.Item) graphql.Marshaler {
 	return ec._Item(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNItem2ᚕᚖfieldᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v []*supply.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚕgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v []supply.Item) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3720,7 +3933,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖfieldᚋsupplyᚐItem(ctx context
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItem2ᚖfieldᚋsupplyᚐItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNItem2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3733,25 +3946,15 @@ func (ec *executionContext) marshalNItem2ᚕᚖfieldᚋsupplyᚐItem(ctx context
 	return ret
 }
 
-func (ec *executionContext) marshalNItem2ᚖfieldᚋsupplyᚐItem(ctx context.Context, sel ast.SelectionSet, v *supply.Item) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Item(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNModifyQuantity2fieldᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx context.Context, v interface{}) (models.ModifyQuantity, error) {
+func (ec *executionContext) unmarshalNModifyQuantity2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐModifyQuantity(ctx context.Context, v interface{}) (models.ModifyQuantity, error) {
 	return ec.unmarshalInputModifyQuantity(ctx, v)
 }
 
-func (ec *executionContext) marshalNOrder2fieldᚋsupplyᚐOrder(ctx context.Context, sel ast.SelectionSet, v supply.Order) graphql.Marshaler {
+func (ec *executionContext) marshalNOrder2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx context.Context, sel ast.SelectionSet, v supply.Order) graphql.Marshaler {
 	return ec._Order(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx context.Context, sel ast.SelectionSet, v *supply.Order) graphql.Marshaler {
+func (ec *executionContext) marshalNOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx context.Context, sel ast.SelectionSet, v *supply.Order) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3761,48 +3964,25 @@ func (ec *executionContext) marshalNOrder2ᚖfieldᚋsupplyᚐOrder(ctx context.
 	return ec._Order(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProject2fieldᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v supply.Project) graphql.Marshaler {
+func (ec *executionContext) marshalNPageInfo2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v models.PageInfo) graphql.Marshaler {
+	return ec._PageInfo(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *models.PageInfo) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PageInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProject2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v supply.Project) graphql.Marshaler {
 	return ec._Project(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProject2ᚕfieldᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v []supply.Project) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		rctx := &graphql.ResolverContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNProject2fieldᚋsupplyᚐProject(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v *supply.Project) graphql.Marshaler {
+func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐProject(ctx context.Context, sel ast.SelectionSet, v *supply.Project) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3812,93 +3992,11 @@ func (ec *executionContext) marshalNProject2ᚖfieldᚋsupplyᚐProject(ctx cont
 	return ec._Project(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectOrder2fieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v ordering.ProjectOrderDates) graphql.Marshaler {
-	return ec._ProjectOrder(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNProjectOrder2ᚕfieldᚋsupplyᚋorderingᚐProjectOrder(ctx context.Context, sel ast.SelectionSet, v []ordering.ProjectOrderDates) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		rctx := &graphql.ResolverContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNProjectOrder2fieldᚋsupplyᚋorderingᚐProjectOrder(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalNRemoveOrderItem2fieldᚋsupplyᚋgraphqlᚋmodelsᚐRemoveOrderItem(ctx context.Context, v interface{}) (models.RemoveOrderItem, error) {
+func (ec *executionContext) unmarshalNRemoveOrderItem2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐRemoveOrderItem(ctx context.Context, v interface{}) (models.RemoveOrderItem, error) {
 	return ec.unmarshalInputRemoveOrderItem(ctx, v)
 }
 
-func (ec *executionContext) marshalNResult2fieldᚋsupplyᚋsearchᚐResult(ctx context.Context, sel ast.SelectionSet, v search.Result) graphql.Marshaler {
-	return ec._Result(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNResult2ᚕfieldᚋsupplyᚋsearchᚐResult(ctx context.Context, sel ast.SelectionSet, v []search.Result) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		rctx := &graphql.ResolverContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNResult2fieldᚋsupplyᚋsearchᚐResult(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalNSendOrder2fieldᚋsupplyᚋgraphqlᚋmodelsᚐSendOrder(ctx context.Context, v interface{}) (models.SendOrder, error) {
+func (ec *executionContext) unmarshalNSendOrder2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐSendOrder(ctx context.Context, v interface{}) (models.SendOrder, error) {
 	return ec.unmarshalInputSendOrder(ctx, v)
 }
 
@@ -3907,7 +4005,13 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 }
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalString(v)
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -3956,7 +4060,13 @@ func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Con
 }
 
 func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalString(v)
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
@@ -4121,7 +4231,13 @@ func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v i
 }
 
 func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalString(v)
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -4145,6 +4261,102 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	return graphql.MarshalInt(v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOInt2int(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOInt2int(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOOrder2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx context.Context, sel ast.SelectionSet, v supply.Order) graphql.Marshaler {
+	return ec._Order(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOOrder2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚐOrder(ctx context.Context, sel ast.SelectionSet, v *supply.Order) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Order(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOOrderConnection2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderConnection(ctx context.Context, sel ast.SelectionSet, v models.OrderConnection) graphql.Marshaler {
+	return ec._OrderConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOOrderConnection2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderConnection(ctx context.Context, sel ast.SelectionSet, v *models.OrderConnection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._OrderConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOOrderEdge2githubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderEdge(ctx context.Context, sel ast.SelectionSet, v models.OrderEdge) graphql.Marshaler {
+	return ec._OrderEdge(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOOrderEdge2ᚕᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderEdge(ctx context.Context, sel ast.SelectionSet, v []*models.OrderEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOOrderEdge2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOOrderEdge2ᚖgithubᚗcomᚋlongfellowoneᚋfieldᚑservicesᚋsupplyᚋgraphqlᚋmodelsᚐOrderEdge(ctx context.Context, sel ast.SelectionSet, v *models.OrderEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._OrderEdge(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4171,6 +4383,9 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValue(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4208,6 +4423,9 @@ func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgq
 }
 
 func (ec *executionContext) marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐField(ctx context.Context, sel ast.SelectionSet, v []introspection.Field) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4245,6 +4463,9 @@ func (ec *executionContext) marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgen
 }
 
 func (ec *executionContext) marshalO__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValue(ctx context.Context, sel ast.SelectionSet, v []introspection.InputValue) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4297,6 +4518,9 @@ func (ec *executionContext) marshalO__Type2githubᚗcomᚋ99designsᚋgqlgenᚋg
 }
 
 func (ec *executionContext) marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx context.Context, sel ast.SelectionSet, v []introspection.Type) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1

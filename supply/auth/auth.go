@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"field/supply"
 	"fmt"
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/longfellowone/field-services/supply"
 	"log"
 	"strings"
 

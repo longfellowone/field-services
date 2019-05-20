@@ -1,7 +1,7 @@
 package search
 
 import (
-	"field/supply"
+	"github.com/longfellowone/field-services/supply"
 	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
 	"strings"

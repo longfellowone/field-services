@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	"field/supply"
-	"field/supply/ordering"
+	"github.com/longfellowone/field-services/supply"
+	"github.com/longfellowone/field-services/supply/ordering"
 	"github.com/pkg/errors"
 	"log"
 )

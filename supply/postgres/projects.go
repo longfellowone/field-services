@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"errors"
-	"field/supply"
+	"github.com/longfellowone/field-services/supply"
 	"log"
 )
 

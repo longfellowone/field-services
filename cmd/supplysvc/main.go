@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"field/supply/graphql"
-	"field/supply/ordering"
-	"field/supply/postgres"
-	"field/supply/search"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/go-chi/chi"
+	"github.com/longfellowone/field-services/supply/graphql"
+	"github.com/longfellowone/field-services/supply/ordering"
+	"github.com/longfellowone/field-services/supply/postgres"
+	"github.com/longfellowone/field-services/supply/search"
 	"github.com/rs/cors"
 	"log"
 	"net/http"
@@ -59,8 +59,8 @@ func main() {
 
 	gqlHandler := graphql.Initialize(searchService, orderingService)
 
-	r.Handle("/supplysvc", gqlHandler)
-	r.Handle("/", handler.Playground("", "/supplysvc"))
+	r.Handle("/graphql", gqlHandler)
+	r.Handle("/", handler.Playground("", "/graphql"))
 
 	srv := &http.Server{Addr: ":8080", Handler: r}
 

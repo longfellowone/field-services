@@ -2,6 +2,14 @@
 
 package models
 
+import (
+	"github.com/longfellowone/field-services/supply"
+)
+
+type Node interface {
+	IsNode()
+}
+
 type AddOrderItem struct {
 	ID        string `json:"id"`
 	ProductID string `json:"productID"`
@@ -28,6 +36,24 @@ type ModifyQuantity struct {
 	ID        string `json:"id"`
 	ProductID string `json:"productID"`
 	Quantity  int    `json:"quantity"`
+}
+
+type OrderConnection struct {
+	TotalCount int          `json:"totalCount"`
+	PageInfo   *PageInfo    `json:"pageInfo"`
+	Edges      []*OrderEdge `json:"edges"`
+}
+
+type OrderEdge struct {
+	Node   *supply.Order `json:"node"`
+	Cursor string        `json:"cursor"`
+}
+
+type PageInfo struct {
+	HasNextPage     bool    `json:"hasNextPage"`
+	HasPreviousPage bool    `json:"hasPreviousPage"`
+	StartCursor     *string `json:"startCursor"`
+	EndCursor       *string `json:"endCursor"`
 }
 
 type RemoveOrderItem struct {

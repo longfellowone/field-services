@@ -1,3 +1,80 @@
+interface Node {
+    id: ID!
+}
+
+type Query {
+    orders(after: String, first: Int, before: String, last: Int): OrderConnection
+#    order(id: ID!): Order!
+#    projectOrders(id: ID!): [ProjectOrder!]!
+#    products(name: String!): [Result!]!
+#    projects(foremanID: ID!): [Project!]!
+}
+
+type OrderConnection {
+    totalCount: Int!
+    pageInfo: PageInfo!
+    edges: [OrderEdge]
+}
+
+type OrderEdge {
+    node: Order
+    cursor: String!
+}
+
+type Order {
+    id: ID!
+    project: Project!
+    items: [Item!]!
+    sentDate: Int!
+    comments: String!
+    #    status: String!
+}
+
+type Item {
+    id: ID!
+    name: String!
+    uom: String!
+    quantityRequested: Int!
+    quantityReceived: Int!
+    quantityRemaining: Int!
+    #    ItemStatus: ItemStatus!
+    poNumber: String!
+    dateAdded: Int!
+}
+
+type Product {
+    id: ID!
+    category: String!
+    name: String!
+    uom: String!
+}
+
+type Project {
+    id: ID!
+    name: String!
+}
+
+type Result {
+    id: ID!
+    name: String!
+    uom: String!
+    matchedIndexes: [Int!]!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+#enum ItemStatus {
+#    Waiting
+#    Filled
+#    BackOrdered
+#    OrderExceeded
+#    NotOrdered
+#}
+
 type Mutation {
     # Orders
     createOrder(input: CreateOrder!): Order!
@@ -48,66 +125,3 @@ input CreateProject {
 input CloseProject {
     id: ID!
 }
-
-type Query {
-    # Orders
-    order(id: ID!): Order!
-    projectOrders(id: ID!): [ProjectOrder!]!
-    products(name: String!): [Result!]!
-    # Projects
-    projects(foremanID: ID!): [Project!]!
-}
-
-type Result {
-    id: ID!
-    name: String!
-    uom: String!
-    matchedIndexes: [Int!]!
-}
-
-type Product {
-    id: ID!
-    category: String!
-    name: String!
-    uom: String!
-}
-
-type ProjectOrder {
-    id: ID!
-    sentDate: Int!
-    #    status: String!
-}
-
-type Order {
-    id: ID!
-    project: Project!
-    items: [Item!]!
-    sentDate: Int!
-    comments: String!
-    #    status: String!
-}
-
-type Item {
-    id: ID!
-    name: String!
-    uom: String!
-    quantityRequested: Int!
-    quantityReceived: Int!
-    quantityRemaining: Int!
-    #    ItemStatus: ItemStatus!
-    poNumber: String!
-    dateAdded: Int!
-}
-
-type Project {
-    id: ID!
-    name: String!
-}
-
-#enum ItemStatus {
-#    Waiting
-#    Filled
-#    BackOrdered
-#    OrderExceeded
-#    NotOrdered
-#}
